@@ -1,0 +1,25 @@
+; rom start:
+0:
+602e0104 - stack pointer
+00fc0030 - program counter
+00fc0000
+0000611c
+00fc0030
+00fe81fe
+
+; start of execution:
+
+00fc0030: 46fc 2700       movew #9984,%sr
+
+
+
+
+
+m68k-elf-objdump -b binary -m 68000 -D tos104uk.img --adjust-vma 0xfc0000 | grep -v "\.\.\." >tos-dasm2.txt
+
+Problem: disassembler gets instruction alignment wrong and gets confused.
+e.g. jump/subroutine target 0xfcb5aa isn't disassembled.
+
+a patch made manually:
+fcb5aa:	33c0 0000 2b86 	movew %d0,0x2b86
+fcb5b0:	2079 0000 2b82 	moveal 0x2b82,%a0
