@@ -190,6 +190,30 @@ etv_term:
 .set ram_unknown29,0x2b7e
 .global ram_unknown29
 
+.set ram_unknown48,0x3426
+.global ram_unknown48
+
+.set ram_unknown45,0x3436
+.global ram_unknown45
+
+.set ram_unknown44,0x343a
+.global ram_unknown44
+
+.set ram_unknown46,0x34ca
+.global ram_unknown46
+
+.set ram_unknown47,0x354e
+.global ram_unknown47
+
+.set ram_unknown38,0x3552
+.global ram_unknown38
+
+.set ram_unknown39,0x3556
+.global ram_unknown39
+
+.set ram_unknown37,0x35a8
+.global ram_unknown37
+
 .set stack_top,0x378a
 .global stack_top
 
@@ -251,10 +275,98 @@ typedef struct _bcb
 .set ram_unknown10,0x6110
 .global ram_unknown10
 
-.set ram_unknown30,0x6662
-.global ram_unknown30
+.set retsave,0x611e
+.global retsave
 
+.set _autoexec,0x6122
+.global _autoexec
 
+/* 2 bytes */
+.set _gl_rschange,0x6124
+.global _gl_rschange
+
+/* User stack - 132 bytes */
+.set ustak,0x6126
+.global ustak
+
+.set _diskin,0x61aa
+.global _diskin
+
+/* Used by interrupts_off and interrupts_on subroutines */
+.set saved_sr,0x63ca
+.global saved_sr
+
+.set aes_trap2_next_vec,0x6662
+.global aes_trap2_next_vec
+
+.set _drawaddr,0x666a
+.global _drawaddr
+
+.set _drwaddr,0x6b02
+.global _drwaddr
+
+.set _tikaddr,0x6b06
+.global _tikaddr
+
+.set ram_unknown35,0x6dc0
+.global ram_unknown35
+
+.set ram_unknown34,0x6dd4
+.global ram_unknown34
+
+.set _sh_iscart,0x6de0
+.global _sh_iscart
+
+.set ram_unknown33,0x6e1a
+.global ram_unknown33
+
+.set _DOS_AX,0x6e20
+.global _DOS_AX
+
+.set _ad_envrn,0x6e28
+.global _ad_envrn
+
+.set _pglobal,0x6e6c
+.global _pglobal
+
+.set _sh_gem,0x6f0c
+.global _sh_gem
+
+.set _g_wsend,0x6fee
+.global _g_wsend
+
+.set _sh_doexec,0x7006
+.global _sh_doexec
+
+.set _sh_isgem,0x708a
+.global _sh_isgem
+
+.set _DOS_ERR,0x742a
+.global _DOS_ERR
+
+.set ram_unknown40,0x776c
+.global ram_unknown40
+
+/* rlr is a pointer to pd structure. */
+.set _rlr,0xa792
+.global _rlr
+
+.set ram_unknown43,0xa788
+.global ram_unknown43
+
+.set ram_unknown41,0xa7b6
+.global ram_unknown41
+
+.set ram_unknown42,0xa7ba
+.global ram_unknown42
+
+.set ram_unknown32,0xa7c4
+.global ram_unknown32
+
+.set ram_unknown36,0xa792
+.global ram_unknown36
+
+/* The end of RAM used by GEM is a84e */
 
 .global vectors
 .global vector_bus_error
@@ -305,3 +417,15 @@ cart_boot:
 .global psg
 .global mfp_pp
 
+.set STACK_SIZE,448
+.set uda_size,74+(4*STACK_SIZE)
+/* This should be 1866 */
+.set init_size,uda_size
+.set fsize,100
+.global init_size
+.global fsize
+
+/* I still don't know what this is - it's just a constant 0x369e in the 3.06 source */
+/* but it's 0x745e in 1.4 */
+.set _D,0x745e                              /* sizeof(THEGLO) */
+.global _D

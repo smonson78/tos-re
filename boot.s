@@ -7,10 +7,10 @@ os_version:
 reseth:    
 	.long boot          /* Initial PC */
 os_beg:	
-	.long 0x00fc0000    /* Start of OS */
+	.long os_entry      /* Start of OS */
 os_end:
 	.long 0x0000611c    /* Start of free RAM */
-	.long 0x00fc0030    /* Default shell (reset) */
+	.long boot          /* Default shell (reset) */
 os_magic:
 	.long gem_magic     /* Address for GEM magic */
 os_date:
