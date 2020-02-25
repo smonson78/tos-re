@@ -82762,7 +82762,7 @@ lineftab:
 	.long linef_lwcopy                      /* 107 */
 	.long addr_1f0da
 	.long 0x00fdf862
-	.long 0x00fe17ac
+	.long 0x00fe17ac                        /* 110 */
 	.long 0x00fe173c
 	.long 0x00fd4b8e
 	.long 0x00fd4b64
@@ -82772,7 +82772,7 @@ lineftab:
 	.long 0x00fe37f4
 	.long 0x00fe369a
 	.long 0x00fdfcee
-	.long 0x00fd4b64
+	.long 0x00fd4b64                        /* 120 */
 	.long 0x00fd4b64
 	.long 0x00fe1d8c
 	.long 0x00fe5cd0
@@ -82782,7 +82782,7 @@ lineftab:
 	.long 0x00fe5a60
 	.long 0x00fe1a16
 	.long 0x00fe18b0
-	.long 0x00fe5a60
+	.long 0x00fe5a60                        /* 130 */
 	.long 0x00fe5a60
 	.long 0x00fe18ea
 	.long 0x00fe1a16
@@ -82792,7 +82792,7 @@ lineftab:
 	.long 0x00fe5a60
 	.long 0x00fe1d6e
 	.long 0x00fe3844
-	.long 0x00fe197a
+	.long 0x00fe197a                        /* 140 */
 	.long 0x00fe5b9c
 	.long 0x00fd4752
 	.long 0x00fdd0ea
@@ -82802,7 +82802,7 @@ lineftab:
 	.long 0x00fe5e50
 	.long 0x00fe5c8e
 	.long 0x00fd4606
-	.long 0x00fd79ce
+	.long 0x00fd79ce                        /* 150 */
 	.long 0x00fe6166
 	.long 0x00fd432e
 	.long 0x00fd4624
@@ -82812,7 +82812,7 @@ lineftab:
 	.long 0x00fd4342
 	.long 0x00fe2cb0
 	.long 0x00fd43ec
-	.long 0x00fd4484
+	.long 0x00fd4484                        /* 160 */
 	.long 0x00fe2d52
 	.long 0x00fd4692
 	.long 0x00fe632e
@@ -82822,7 +82822,7 @@ lineftab:
 	.long 0x00fe5c9a
 	.long 0x00fe38e8
 	.long 0x00fe352a
-	.long 0x00fe2d94
+	.long 0x00fe2d94                        /* 170 */
 	.long 0x00fe5f4c
 	.long 0x00fe5fd8
 	.long 0x00fd7c0c
@@ -82832,7 +82832,7 @@ lineftab:
 	.long 0x00fd7ac0
 	.long 0x00fd4668
 	.long 0x00fd5de0
-	.long 0x00fd79dc
+	.long 0x00fd79dc                        /* 180 */
 	.long 0x00fd5d22
 	.long 0x00fd46a6
 	.long 0x00fd7b56
@@ -82842,7 +82842,7 @@ lineftab:
 	.long 0x00fdc3c2
 	.long 0x00fd5ba4
 	.long 0x00fd6324
-	.long addr_1b01a
+	.long addr_1b01a                        /* 190 */
 	.long 0x00fe5ce6
 	.long 0x00fd7c32
 	.long 0x00fe5d50
@@ -82852,7 +82852,7 @@ lineftab:
 	.long 0x00fd5bf6
 	.long 0x00fd7a34
 	.long 0x00fd4ce0
-	.long 0x00fd4d1c
+	.long 0x00fd4d1c                        /* 200 */
 	.long 0x00fd4dba
 	.long 0x00fd4d52
 	.long 0x00fd4de6
@@ -82862,7 +82862,7 @@ lineftab:
 	.long 0x00fdcfb8
 	.long 0x00fdcfde
 	.long 0x00fdd13a
-	.long 0x00fe76ac
+	.long 0x00fe76ac                        /* 210 */
 	.long 0x00fe64f8
 	.long 0x00fd4c56
 	.long 0x00fd4e28
@@ -82872,7 +82872,7 @@ lineftab:
 	.long 0x00fd5564
 	.long 0x00fd7c88
 	.long 0x00fe5e7c
-	.long 0x00fdd152
+	.long 0x00fdd152                        /* 220 */
 	.long 0x00fd6a76
 	.long 0x00fdcfe2
 	.long 0x00fdd14a
@@ -82882,7 +82882,7 @@ lineftab:
 	.long 0x00fd9f24
 	.long 0x00fe5df2
 	.long 0x00fd7972
-	.long 0x00fe60f6
+	.long 0x00fe60f6                        /* 230 */
 	.long 0x00fe5e60
 	.long 0x00fd7aa8
 	.long 0x00fd7a76
@@ -82892,7 +82892,7 @@ lineftab:
 	.long 0x00fe5ee8
 	.long 0x00fdd118
 	.long 0x00fe7474
-	.long 0x00fdd0ea
+	.long 0x00fdd0ea                        /* 240 */
 	.long 0x00fd81b6
 	.long 0x00fe5f7a
 	.long 0x00fd6900
@@ -82902,7 +82902,7 @@ lineftab:
 	.long 0x00fd7598
 	.long 0x00fd6de6
 	.long 0x00fd7902
-	.long 0x00fd72bc
+	.long 0x00fd72bc                        /* 250 */
 	.long 0x00fd68c2
 	.long 0x00fdd156
 	.long 0x00fdd136
@@ -82912,7 +82912,7 @@ lineftab:
 	.long 0x00fe5e9e
 	.long 0x00fd76d6
 	.long 0x00fd77ba
-	.long 0x00fdd02a
+	.long 0x00fdd02a                        /* 260 */
 	.long 0x00fdcfac
 	.long 0x00fdd14e
 	.long 0x00fdd0d0
@@ -82922,7 +82922,7 @@ lineftab:
 	.long 0x00fe5f9e
 	.long 0x00fe5f1c
 	.long 0x00fd78c4
-	.long 0x00fd69b0
+	.long 0x00fd69b0                        /* 270 */
 	.long 0x00fd695c
 	.long 0x00fe74f8
 	.long 0x00fda0ae
@@ -82932,7 +82932,7 @@ lineftab:
 	.long 0x00fe7488
 	.long 0x00fe739e
 	.long 0x00fe5e12
-	.long 0x00fe73d6
+	.long 0x00fe73d6                        /* 280 */
 	.long 0x00fd874e
 	.long 0x00fd8d44
 	.long 0x00fdd132
@@ -82942,7 +82942,7 @@ lineftab:
 	.long 0x00fe5ec6
 	.long 0x00fe5eb2
 	.long 0x00fd9024
-	.long 0x00fe6590
+	.long 0x00fe6590                        /* 290 */
 	.long 0x00fd8f18
 	.long 0x00fe65a2
 	.long 0x00fd90e6
@@ -82952,17 +82952,17 @@ lineftab:
 	.long 0x00fdc4b4
 	.long 0x00fd958e
 	.long 0x00fd92e8
-	.long 0x00fda10a
-	.long 0x00fdcd62
-	.long 0x00fd7cee
-	.long 0x00fdcdea
+    .long 0x00fda10a                        /* 300 */
+    .long 0x00fdcd62
+    .long 0x00fd7cee
+    .long 0x00fdcdea
 	.long 0x00fd9496
 	.long 0x00fd8078
 	.long 0x00fd9540
 	.long 0x00fd6c74
 	.long 0x00fd771a
 	.long 0x00fda258
-	.long 0x00fd9736
+	.long 0x00fd9736                        /* 310 */
 	.long 0x00fd5adc
 	.long 0x00fd9816
 	.long 0x00fdad84
@@ -83228,7 +83228,7 @@ lineftab:
 	.long 0x00fe4154
 	.long 0x00fe4062
 	.long 0x00fe6628
-	.long addr_1bc56                        /* note: calls rsrc_gaddr(0, ...) */
+	.long addr_1bc56                        /*  note: calls rsrc_gaddr(0, ...) */
 	.long 0x00fdd29a
 	.long 0x00fe45b8
 	.long 0x00fe4502
