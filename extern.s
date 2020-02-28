@@ -184,6 +184,9 @@ etv_term:
 .set ram_unknown19,0x2ae0
 .global ram_unknown19
 
+.set ram_unknown51,0x2ae4
+.global ram_unknown51
+
 .set ram_unknown21,0x2b00
 .global ram_unknown21
 
@@ -400,11 +403,11 @@ cart_boot:
 /* These are negative for use with 16-bit offsets */
 .section .mmu
 .set memctrl,0xffff8000
-.set video_baseh,0xffff8200
-.set video_basem,0xffff8202
-.set shifter_sync_mode,0xffff820a
+.set video_baseh,0xffff8200                 /* -32254 */
+.set video_basem,0xffff8202                 /* -32256 */
+.set shifter_sync_mode,0xffff820a           /* -32246 */
 .set palette,0xffff8240
-.set video_res,0xffff8260
+.set video_res,0xffff8260                   /* -32160 */
 .set psg,0xffff8800
 .set mfp_pp,0xfffffa01
 
