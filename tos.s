@@ -41569,7 +41569,7 @@ addr_1424c:
 addr_14270:	
     andiw #0xf,%fp@(-2)
     addqw #1,%fp@(-2)
-    clrw _gl_rschange                       /* This code is part of pred_dinf() in aes/geminit.c */
+    clrw _gl_rschange                       /* This code is part of pred_dinf() in aes/geminit.c which is called in gem_main(). */
 
 /* 0x014280: */
 	.short 0x3eae
