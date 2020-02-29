@@ -54,6 +54,7 @@ etv_term:
 .set seekrate,0x440                         /* Floppy disk seek rate */
 .set _fverify,0x444                         /* Flag indicating floppy writes will be verified */
 .set _bootdev,0x446                         /* Device booted from 0=A, 1=B, and so on */
+.set defshiftmod,0x44a                      /* Default shifter mode */
 .set sshiftmod,0x44c                        /* Copy of current shifter mode */
 .set _v_bas_ad,0x44e                        /* Logical screen address */
 .set vblsem,0x452
@@ -99,6 +100,7 @@ etv_term:
 .global seekrate
 .global _fverify
 .global _bootdev
+.global defshiftmod
 .global sshiftmod
 .global _v_bas_ad
 .global vblsem

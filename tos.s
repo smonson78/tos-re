@@ -248,7 +248,7 @@ autovec_lvl_4:
     addql #1,_vbclock
     subal %a5,%a5
     moveb %a5@(-1535),%d1
-    moveb %a5@(-32160),%d0
+    moveb %a5@(video_res),%d0
     .short 0xc03c,0x0003            /* andb #3,%d0 */
     .short 0xb03c,0x0002            /* cmpb #2,%d0 */
     bges addr_0702
@@ -270,7 +270,7 @@ addr_0702:
     clrb %d0
 addr_0714:    
     moveb %d0,%a5@(sshiftmod)
-    moveb %d0,%a5@(-32160)
+    moveb %d0,%a5@(video_res)
     moveal %a5@(1134),%a0
     jsr %a0@
 addr_0722:
@@ -601,6 +601,7 @@ addr_978:
 	.short 0x044e
 	rts
 
+/* Trap 14, opcode 4 */
 /* 
     int16_t Getrez() 
     0 - low res
@@ -614,6 +615,7 @@ getrez:
     .short 0xc03c,0003                      /* andb #3,%d0 */
 	rts
 
+/* Trap 14, opcode 5 */
 /* void Setscreen(void *laddr, void *paddr, int16_t rez) */
 addr_a7e:
 setscreen:
@@ -22785,12 +22787,13 @@ addr_b222:
 	rts
 
 addr_b2b6:
+_FindDevice:
     movew #4,%sp@-
     trap #14                                /* Getrez() - get current video mode */
     addql #2,%sp
     moveb %d0,%d2                           /* Save the original resolution value */
-    .short 0xb43c,0x0002                    /* cmpb #2,%d2 */
-    beqs addr_b332                          /* Video mode - 2 - skip to the end (becasue you can't change res in mono?) */
+    .short 0xb43c,0x0002                    /* cmpb #2,%d2 - current rez = mono? */
+    beqs addr_b332                          /* Yes - can't be changed */
 
     moveal ram_unknown51,%a0
     movew %a0@,%d0                          /* get something from a global variable and put it in d0, this must be the requested res */
@@ -22802,57 +22805,55 @@ addr_b2b6:
 
 /* Video mode 1 was not requested */
 addr_b2da:
-    .short 0xb07c,0x0003                    /* cmpw #3,%d0 */
-    beqs addr_b308                          /* mode "3" requested? go here */
+    .short 0xb07c,0x0003                    /* cmpw #3,%d0 - switch to medium res? */
+    beqs addr_b308                          /* yes */
     tstb %d2
-    beqs addr_b2f6                          /* Originally low res? -> jump */
-    clrw %sp@-
+    beqs addr_b2f6                          /* Originally low res? -> no need to change */
+    clrw %sp@-                              /* Switch to low res */
     moveq #-1,%d0
     movel %d0,%sp@-
     movel %d0,%sp@-
     movew #5,%sp@-
-    trap #14                                /* Setscreen */
+    trap #14                                /* Setscreen(-1, -1, 0) - change to low res */
     lea %sp@(12),%sp
 
-/* Originally low res, now "1" selected */
+/* Set up 16-colour palette */
 addr_b2f6:
-    .short 0x4879                           /* pea addr_b34c */
-    .long addr_b34c
+    .short 0x4879                           /* pea paltab16 */
+    .long paltab16
     movew #6,%sp@-
-    trap #14                                /* Setpalette(void *pallptr) (16 colours) */
+    trap #14                                /* Setpalette(void *pallptr) */
     addql #6,%sp
     moveq #1,%d0                            /* return 1 */
 	rts
 
 /* Mode "3" requested */
 addr_b308:    
-	.short 0x7001
-	.short 0xb400
-	.short 0x6712
-	.short 0x3f00
-	.short 0x70ff
-	.short 0x2f00
-	.short 0x2f00
-addr_b316:
+    moveq #1,%d0
+    cmpb %d0,%d2                            
+    beqs addr_b320                          /* mode "1" originally -> */
+    movew %d0,%sp@-
+    moveq #-1,%d0
+    movel %d0,%sp@-
+    movel %d0,%sp@-
     movew #5,%sp@-
-    trap #14                                /* Trap14 opcode 5 */
+    trap #14                                /* Setscreen(-1, -1, 1) - change to medium res */
+    lea %sp@(12),%sp
 
-	.short 0x4fef
-	.short 0x000c
-
-/* Originally medium, now "1" selected */
+/* Set up 4-colour palette */
 addr_b320:
-    .short 0x4879                           /* pea addr_b344 */
-    .long addr_b344
+    .short 0x4879                           /* pea paltab4 */
+    .long paltab4
     movew #6,%sp@-
     trap #14                                /* Setpalette(void *pallptr) */
     addql #6,%sp
     moveq #2,%d0                            /* return 2 */
 	rts
 
+/* Originally high res and it makes no difference what was selected */
 addr_b332:
-    .short 0x4879                           /* pea addr_b344 */
-    .long addr_b344
+    .short 0x4879                           /* pea paltab4 */
+    .long paltab4
     movew #6,%sp@-
     trap #14                                /* Setpalette(void *pallptr) */
     addql #6,%sp
@@ -22861,13 +22862,15 @@ addr_b332:
 
 /* Default palette for medium */
 addr_b344:
+paltab4:
 	.short 0x0777
 	.short 0x0700
 	.short 0x0070
 	.short 0x0000
 
 /* Default palette for low */
-addr_b34c:    
+addr_b34c:
+paltab16:
 	.short 0x0777
 	.short 0x0700
 	.short 0x0070
@@ -41547,32 +41550,27 @@ gem_main:
 	.short 0x2ebc
 	.short 0x0040
 	.short 0x0000
+
+addr_1424c:
 	.short 0xf0ec
-	.short 0x4a79
-	.short 0x0000
-	.short 0x6124
-	.short 0x671a
-	.short 0x3eae
-	.short 0xfffe
-	.short 0x0257
-	.short 0x00f0
-	.short 0x3039
-	.short 0x0000
-	.short 0x6122
-	.short 0x5340
-	.short 0x8157
-	.short 0x2f0d
-	.short 0xf360
-	.short 0x588f
-	.short 0x601c
-	.short 0x026e
-	.short 0x000f
-	.short 0xfffe
-	.short 0x526e
-	.short 0xfffe
-	.short 0x4279
-	.short 0x0000
-	.short 0x6124
+    tstw _gl_rschange
+    beqs addr_14270                         /* If res hasn't changed, skip over */
+
+    movew %fp@(-2),%sp@
+    andiw #0xf0,%sp@
+    movew _autoexec,%d0
+    subqw #1,%d0
+    orw %d0,%sp@
+    movel %a5,%sp@-
+    .short 0xf360
+    addql #4,%sp
+    bras addr_1428c
+
+addr_14270:	
+    andiw #0xf,%fp@(-2)
+    addqw #1,%fp@(-2)
+    clrw _gl_rschange                       /* This code is part of pred_dinf() in aes/geminit.c */
+
 /* 0x014280: */
 	.short 0x3eae
 	.short 0xfffe
@@ -41580,6 +41578,8 @@ gem_main:
 	.short 0x4a40
 	.short 0x6602
 	.short 0x4245
+
+addr_1428c:
 	.short 0x4a15
 	.short 0x6706
 	.short 0x4a44
@@ -44061,10 +44061,9 @@ gem_main:
 	.short 0x0008
 	.short 0x0000
 	.short 0x6122
-	.short 0x33fc
-	.short 0x0001
-	.short 0x0000
-	.short 0x6124
+
+    movew #1,_gl_rschange
+
 	.short 0x7001
 	.short 0xf001
 	.short 0x4e56
@@ -58101,9 +58100,9 @@ addr_1bd40:
 	.short 0x6dc6
 	.short 0xf678
 	.short 0x7e01
-	.short 0x4a79
-	.short 0x0000
-	.short 0x6124
+
+    tstw _gl_rschange
+
 	.short 0x671a
 	.short 0xf690
 	.short 0xf338
@@ -70224,9 +70223,9 @@ addr_1f926:
 	.short 0x6604
 	.short 0x34bc
 	.short 0x0004
-	.short 0x4279
-	.short 0x0000
-	.short 0x6124
+
+    clrw _gl_rschange
+
 	.short 0x33fc
 	.short 0x0001
 	.short 0x0000
@@ -75415,9 +75414,9 @@ addr_23da2:
 	.short 0x4279
 	.short 0x0000
 	.short 0x6dd6
-	.short 0x4a79
-	.short 0x0000
-	.short 0x6124
+
+    tstw _gl_rschange
+
 	.short 0x6600
 	.short 0x0180
 	.short 0x3039
