@@ -283,8 +283,13 @@ typedef struct _bcb
 .set retsave,0x611e
 .global retsave
 
-.set _autoexec,0x6122
-.global _autoexec
+/* AES+DESKTOP vars start here according to TOS306, with retsava at 0x611e */
+
+.set retsava,0x611e
+.global retsava
+
+.set _gl_restype,0x6122
+.global _gl_restype
 
 /* 2 bytes */
 .set _gl_rschange,0x6124

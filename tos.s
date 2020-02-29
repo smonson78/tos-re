@@ -40726,11 +40726,11 @@ addr_13b34:
 addr_13ba4:
     clrw _gl_rschange                       /* Clear out resolution globals */
     movew #1,%d0
+    movew %d0,_gl_restype
 
-    movew %d0,_autoexec                     /* turn on auto exec */
     movew %d0,_sh_isgem                     /* desktop is the next to run  */
     movew %d0,_sh_gem
-    movew %d0,0xa7c4                        /* ???? */
+    movew %d0,0xa7c4                        /* ???? probably _autoexec */
     clrw _sh_doexec
     clrw _sh_iscart
 
@@ -41558,7 +41558,7 @@ addr_1424c:
 
     movew %fp@(-2),%sp@
     andiw #0xf0,%sp@
-    movew _autoexec,%d0
+    movew _gl_restype,%d0
     subqw #1,%d0
     orw %d0,%sp@
     movel %a5,%sp@-
@@ -41574,7 +41574,7 @@ addr_14270:
 /* 0x014280: */
 	.short 0x3eae
 	.short 0xfffe
-	.short 0xf544
+	.short 0xf544                           /* app_reschange() */
 	.short 0x4a40
 	.short 0x6602
 	.short 0x4245
@@ -44046,26 +44046,24 @@ addr_1428c:
 	.short 0x35e6
 	.short 0x7001
 	.short 0xfe31
-	.short 0x4e56
-	.short 0xfffc
-/* 0x015540: */
-	.short 0x302e
-	.short 0x0008
-	.short 0xb079
-	.short 0x0000
-	.short 0x6122
-	.short 0x6604
-	.short 0x4240
-	.short 0x6012
-	.short 0x33ee
-	.short 0x0008
-	.short 0x0000
-	.short 0x6122
 
-    movew #1,_gl_rschange
-
-	.short 0x7001
+/* BOOLEAN app_reschange(P(int16_t) res) */
+addr_1553c:
+app_reschange:
+    linkw %fp,#-4
+    movew %fp@(8),%d0
+    cmpw _gl_restype,%d0                    /* if res == _gl_restype */
+    bnes addr_15550
+    clrw %d0                                /* Then just return 0 */
+    bras addr_15562
+addr_15550:    
+    movew %fp@(8),_gl_restype               /* Otherwise, _gl_restype = res */
+    movew #1,_gl_rschange                   /* Set the flag to change res */
+    moveq #1,%d0                            /* Return 1 */
+addr_15562:    
 	.short 0xf001
+
+
 	.short 0x4e56
 	.short 0x0000
 	.short 0x48e7
@@ -50493,134 +50491,130 @@ rsrc_gaddr:
 	.short 0x00b2
 	.short 0x3086
 	.short 0x4a46
-	.short 0x6704
-	.short 0x4240
-	.short 0x6002
-	.short 0x7001
-	.short 0x2247
-	.short 0xd3fc
-	.short 0x0000
-	.short 0x00ca
-	.short 0x3280
-	.short 0x4245
-	.short 0x6018
-	.short 0x2047
-	.short 0x3205
-	.short 0xd27c
-	.short 0x000e
-	.short 0xc3fc
-	.short 0x0018
-	.short 0xd1c1
-	.short 0xd1fc
-	.short 0x0000
-	.short 0x000a
-/* 0x018680: */
-	.short 0x4250
-	.short 0x5245
-	.short 0xba7c
-	.short 0x0003
-	.short 0x6de2
-	.short 0x3ebc
-	.short 0x0004
-	.short 0xf0ec
-	.short 0x3800
-	.short 0xb87c
-	.short 0x0002
-	.short 0x670e
-	.short 0x2047
-	.short 0xd1fc
-	.short 0x0000
-	.short 0x018a
-	.short 0x30bc
-	.short 0x0008
-	.short 0x6018
-	.short 0x2047
-	.short 0xd1fc
-	.short 0x0000
-	.short 0x015a
-	.short 0x30bc
-	.short 0x0008
-	.short 0x2047
-	.short 0xd1fc
-	.short 0x0000
-	.short 0x0172
-	.short 0x30bc
-	.short 0x0008
-	.short 0x3839
-/* 0x0186c0: */
-	.short 0x0000
-	.short 0x6122
-	.short 0x5544
-	.short 0x2047
-	.short 0x3204
-	.short 0xd27c
-	.short 0x000e
-	.short 0xc3fc
-	.short 0x0018
-	.short 0xd1c1
-	.short 0xd1fc
-	.short 0x0000
-	.short 0x000a
-	.short 0x30bc
-	.short 0x0001
-	.short 0x4257
-	.short 0x2f07
-	.short 0xf4c4
-	.short 0x588f
-	.short 0xb07c
-	.short 0x0011
-	.short 0x665e
-	.short 0x3ebc
-	.short 0x0005
-	.short 0x3f3c
-	.short 0x0004
-	.short 0x2f07
-	.short 0xf3d4
-	.short 0x5c8f
-	.short 0x3b40
-	.short 0x35a2
-	.short 0x3ebc
-/* 0x018700: */
-	.short 0x0008
-	.short 0x3f3c
-	.short 0x0007
-	.short 0x2f07
-	.short 0xf3d4
-	.short 0x5c8f
-	.short 0x3b40
-	.short 0x35a0
-	.short 0x3ebc
-	.short 0x000b
-	.short 0x3f3c
-	.short 0x000a
-	.short 0x2f07
-	.short 0xf3d4
-	.short 0x5c8f
-	.short 0x4a40
-	.short 0x6704
-	.short 0x4240
-	.short 0x6002
-	.short 0x7001
-	.short 0x3b40
-	.short 0x35a6
-	.short 0x3ebc
-	.short 0x0003
-	.short 0x3f3c
-	.short 0x000e
-	.short 0x2f07
-	.short 0xf540
-	.short 0x5c8f
-	.short 0x3800
-	.short 0x5444
-	.short 0x3e84
-/* 0x018740: */
-	.short 0xf544
-	.short 0x4a40
-	.short 0x6704
-	.short 0x7001
-	.short 0x6002
-	.short 0x4240
-	.short 0xf83d
+
+	
+
+
+    beqs addr_1865c
+    clrw %d0
+    bras addr_1865e
+addr_1865c:
+    moveq #1,%d0
+addr_1865e:
+    moveal %d7,%a1
+    addal #202,%a1
+    movew %d0,%a1@
+    clrw %d5                                /* d5 = loop counter 0 to 2 */
+    bras addr_18684
+addr_1866c:
+    moveal %d7,%a0
+    movew %d5,%d1
+    .short 0xd27c,0x000e                    /* addw #14,%d1 */
+    mulsw #24,%d1
+    addal %d1,%a0
+    addal #10,%a0                           /* a0 = d7 + ((count + 14) * 24) + 10 */
+
+/* d7 is obviously the object array */
+/* #define OB_STATE(x) (tree + (x) * sizeof(OBJECT) + 10) */
+/* OBJECT is 24 bytes. */
+/* ob_state is 10 bytes into OBJECT */
+/* 14 is the LOW button */
+
+    clrw %a0@                               /* .ob_state = 0 (NORMAL) */
+
+    addqw #1,%d5
+addr_18684:
+    .short 0xba7c,0003                      /* cmpw #3,%d5 - a FOR loop from 0 to 2 */
+    blts addr_1866c
+
+    movew #4,%sp@
+    .short 0xf0ec
+    movew %d0,%d4
+    .short 0xb87c,0x0002                    /* cmpw #2,%d4 */
+    beqs addr_186a6
+    moveal %d7,%a0
+    addal #394,%a0
+    
+    movew #8,%a0@                           /*  */
+
+    bras addr_186be
+addr_186a6:
+    moveal %d7,%a0
+    addal #346,%a0
+    movew #8,%a0@
+    moveal %d7,%a0
+    addal #370,%a0
+    movew #8,%a0@                           /*  */
+addr_186be:
+    movew _gl_restype,%d4
+    subqw #2,%d4
+    moveal %d7,%a0
+    movew %d4,%d1
+    .short 0xd27c,0x000e                    /* addw #14,%d1 */
+    mulsw #24,%d1
+    addal %d1,%a0
+    addal #10,%a0
+    movew #1,%a0@                           /* (button for the res).ob_state = SELECTED */
+    clrw %sp@
+    movel %d7,%sp@-
+    .short 0xf4c4
+
+    addql #4,%sp
+    .short 0xb07c,0x0011                    /* cmpw #17,%d0 */
+    bnes addr_1874a                         /* if d0 != 17, return 0 */
+
+    movew #5,%sp@
+    movew #4,%sp@-
+    movel %d7,%sp@-
+    .short 0xf3d4                           /* something(x, 4, 5) */
+    addql #6,%sp
+
+    movew %d0,%a5@(13730)
+    movew #8,%sp@
+    movew #7,%sp@-
+    movel %d7,%sp@-
+    .short 0xf3d4                           /* something(x, 7, 8) */
+    addql #6,%sp
+
+    movew %d0,%a5@(13728)
+    movew #11,%sp@
+    movew #10,%sp@-
+    movel %d7,%sp@-
+    .short 0xf3d4                           /* something(x, 10, 11) */
+    addql #6,%sp
+
+    tstw %d0
+    beqs addr_18726
+    clrw %d0
+    bras addr_18728
+
+addr_18726:
+    moveq #1,%d0
+addr_18728:
+    movew %d0,%a5@(13734)
+
+    movew #3,%sp@
+    movew #14,%sp@-                         /* This is the ID of the low-res button in the set preferences dialog */
+    movel %d7,%sp@-
+    .short 0xf540                           /* inf_gindex(x, SPLOW, 3) */
+    addql #6,%sp
+    movew %d0,%d4
+    addqw #2,%d4                            /* Add 2 to the result */
+    movew %d4,%sp@
+	.short 0xf544                           /* app_reschange() */
+
+    tstw %d0
+    beqs addr_1874a                         /* If the above returned 0 (no change), then return 0, else 1 */
+    moveq #1,%d0
+    bras addr_1874c
+addr_1874a:
+    clrw %d0
+addr_1874c:
+    .short 0xf83d
+
+
+
+
 	.short 0x4e56
 	.short 0xffe8
 	.short 0x3eae
@@ -79222,35 +79216,34 @@ addr_25c40:
 	.short 0x51c9
 	.short 0xffee
 	.short 0x3001
+
 /* 0x026000: */
 	rts
-	.short 0x3f3c
-	.short 0x0002
-	.short 0x3f2f
-	.short 0x000a
-	.short 0x2f2f
-	.short 0x0008
-	.short 0xf2b0
-	.short 0x508f
-	.short 0xb07c
-	.short 0xffff
-	.short 0x671e
-	.short 0x3200
-	.short 0xd16f
-	.short 0x0008
-	.short 0x207c
-	.short 0x0000
-	.short 0x000a
-	.short 0x6100
-	.short 0x0130
-	.short 0x4250
-	.short 0x4a41
-	.short 0x6704
-	.short 0x4240
-	.short 0x6004
-	.short 0x303c
-	.short 0x0001
-	rts
+
+/* linef handler 245 */
+/* takes params x, y, z */
+addr_26002:
+    movew #2,%sp@-
+    movew %sp@(10),%sp@-
+    movel %sp@(8),%sp@-
+    .short 0xf2b0                           /* Call something(y, z, 2) */
+    addql #8,%sp
+    .short 0xb07c,0xffff                    /* cmpw #-1,%d0 - check return val */
+    beqs addr_26036                         /* if it was -1, return 1 */
+    movew %d0,%d1
+    addw %d0,%sp@(8)                        /* y = y + return val */
+    moveal #10,%a0
+    bsrw addr_26156                         /* something() */
+    clrw %a0@
+    tstw %d1
+    beqs addr_26032
+    clrw %d0
+    bras addr_26036
+addr_26032:
+    movew #1,%d0
+addr_26036:
+    rts
+
 	.short 0x48e7
 	.short 0x1e1c
 	.short 0x4cef
@@ -79399,6 +79392,7 @@ addr_25c40:
 	.short 0x6002
 	.short 0x4240
 	rts
+addr_26156:
 	.short 0x302f
 	.short 0x000c
 	.short 0xc1fc
@@ -82758,8 +82752,8 @@ lineftab:
 	.long 0x00fe5f7a
 	.long 0x00fd6900
 	.long 0x00fd7a62
-	.long 0x00fe6002
-	.long addr_16abc                        /* 246 (0xf3d8) - desk_pref()? */
+	.long addr_26002                        /* 245 (0xf3d4) - called repeatedly by desk_pref, takes 3 params */
+	.long addr_16abc                        /* 246 (0xf3d8) */
 	.long 0x00fd7598
 	.long 0x00fd6de6
 	.long 0x00fd7902
@@ -82850,7 +82844,7 @@ lineftab:
 	.long 0x00fdd068
 	.long 0x00fd810c
 	.long 0x00fe5fd8
-	.long 0x00fd553c
+	.long app_reschange                     /* 337 (0xf544) - BOOLEAN app_reschange(P(int16_t) res) */
 	.long 0x00fe5e38
 	.long 0x00fd4ca2
 	.long 0x00fe5e88                        /* 340 */
