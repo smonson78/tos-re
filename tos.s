@@ -50504,6 +50504,8 @@ addr_1865e:
     moveal %d7,%a1
     addal #202,%a1
     movew %d0,%a1@
+
+
     clrw %d5                                /* d5 = loop counter 0 to 2 */
     bras addr_18684
 addr_1866c:
@@ -50535,16 +50537,20 @@ addr_18684:
     moveal %d7,%a0
     addal #394,%a0
     
-    movew #8,%a0@                           /*  */
+/* object array plus 394 */
+/* object 16 is the high res button */
+/* obj[16].ob_state = 8 (DISABLED) */
+
+    movew #8,%a0@       /* movew #8,%a0@ */ /* RESMOD */
 
     bras addr_186be
 addr_186a6:
     moveal %d7,%a0
     addal #346,%a0
-    movew #8,%a0@
+    movew #8,%a0@                           /* LOW res button .ob_state */ /* RESMOD */
     moveal %d7,%a0
     addal #370,%a0
-    movew #8,%a0@                           /*  */
+    movew #8,%a0@                           /* MED res button .ob_state */ /* RESMOD */
 addr_186be:
     movew _gl_restype,%d4
     subqw #2,%d4
@@ -50566,28 +50572,26 @@ addr_186be:
     movew #5,%sp@
     movew #4,%sp@-
     movel %d7,%sp@-
-    .short 0xf3d4                           /* something(x, 4, 5) */
+    .short 0xf3d4                           /* inf_what(obj, 4, 5) */
     addql #6,%sp
-
     movew %d0,%a5@(13730)
+
     movew #8,%sp@
     movew #7,%sp@-
     movel %d7,%sp@-
-    .short 0xf3d4                           /* something(x, 7, 8) */
+    .short 0xf3d4                           /* inf_what(obj, 7, 8) */
     addql #6,%sp
-
     movew %d0,%a5@(13728)
+
     movew #11,%sp@
     movew #10,%sp@-
     movel %d7,%sp@-
-    .short 0xf3d4                           /* something(x, 10, 11) */
+    .short 0xf3d4                           /* inf_what(obj, 10, 11) */
     addql #6,%sp
-
     tstw %d0
     beqs addr_18726
     clrw %d0
     bras addr_18728
-
 addr_18726:
     moveq #1,%d0
 addr_18728:
@@ -50596,7 +50600,7 @@ addr_18728:
     movew #3,%sp@
     movew #14,%sp@-                         /* This is the ID of the low-res button in the set preferences dialog */
     movel %d7,%sp@-
-    .short 0xf540                           /* inf_gindex(x, SPLOW, 3) */
+    .short 0xf540                           /* inf_gindex(obj, SPLOW, 3) */
     addql #6,%sp
     movew %d0,%d4
     addqw #2,%d4                            /* Add 2 to the result */
@@ -58096,36 +58100,29 @@ addr_1bd40:
 	.short 0x7e01
 
     tstw _gl_rschange
+    beqs addr_1c04e                         /* No need to change res, skip */
+    .short 0xf690
+    .short 0xf338
+    tstw %d0
+    beqs addr_1c04c
+    .short 0xf46c
+    movew %d0,%sp@
+    addiw #65,%sp@
+    .short 0xf4e4
+    movew %d0,_diskin
+addr_1c04c:
+    clrw %d7
+addr_1c04e:
+    movel 0xa7b6,%sp@
+    .short 0xf3f0
+    movel 0xa788,%sp@
+    .short 0xf3f0
+    movel 0xa7ba,%sp@
+    .short 0xf3f0
+    movew %d7,%d0
+    .short 0xf83f
 
-	.short 0x671a
-	.short 0xf690
-	.short 0xf338
-	.short 0x4a40
-	.short 0x6710
-	.short 0xf46c
-	.short 0x3e80
-/* 0x01c040: */
-	.short 0x0657
-	.short 0x0041
-	.short 0xf4e4
-	.short 0x33c0
-	.short 0x0000
-	.short 0x61aa
-	.short 0x4247
-	.short 0x2eb9
-	.short 0x0000
-	.short 0xa7b6
-	.short 0xf3f0
-	.short 0x2eb9
-	.short 0x0000
-	.short 0xa788
-	.short 0xf3f0
-	.short 0x2eb9
-	.short 0x0000
-	.short 0xa7ba
-	.short 0xf3f0
-	.short 0x3007
-	.short 0xf83f
+
 	.short 0x4e56
 	.short 0x0000
 	.short 0x48e7
@@ -79196,6 +79193,17 @@ addr_25c40:
 	.short 0x30af
 	.short 0x0010
 	rts
+
+/*
+ *
+ * inf_gindex   for each object from baseobj for N objects return the object
+ *              that is selected or -1 if no objects are selected.
+ *              C binding:      inf_gindex(tree,baseobj,n);
+ *                                      word    baseobj,n;
+ *                                      long    tree;
+ */
+addr_25fd8:
+inf_gindex:
 	.short 0x207c
 	.short 0x0000
 	.short 0x000b
@@ -79216,13 +79224,11 @@ addr_25c40:
 	.short 0x51c9
 	.short 0xffee
 	.short 0x3001
-
-/* 0x026000: */
 	rts
 
-/* linef handler 245 */
-/* takes params x, y, z */
+/* linef handler 245 (0xf3d4) - int16_t inf_what(OBJECT *tree, int16_t ok, int16_t cncl) */
 addr_26002:
+inf_what:
     movew #2,%sp@-
     movew %sp@(10),%sp@-
     movel %sp@(8),%sp@-
@@ -82752,7 +82758,7 @@ lineftab:
 	.long 0x00fe5f7a
 	.long 0x00fd6900
 	.long 0x00fd7a62
-	.long addr_26002                        /* 245 (0xf3d4) - called repeatedly by desk_pref, takes 3 params */
+	.long inf_what                          /* 245 (0xf3d4) - int16_t inf_what(OBJECT *tree, int16_t ok, int16_t cncl) */
 	.long addr_16abc                        /* 246 (0xf3d8) */
 	.long 0x00fd7598
 	.long 0x00fd6de6
@@ -82843,7 +82849,7 @@ lineftab:
 	.long 0x00fdd146
 	.long 0x00fdd068
 	.long 0x00fd810c
-	.long 0x00fe5fd8
+	.long inf_gindex                        /* 336 (0xf540) - int16_t inf_gindex(P(OBJECT *) tree, P(int16_t) baseobj, P(int16_t) numobj) */
 	.long app_reschange                     /* 337 (0xf544) - BOOLEAN app_reschange(P(int16_t) res) */
 	.long 0x00fe5e38
 	.long 0x00fd4ca2
