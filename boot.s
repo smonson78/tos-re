@@ -318,7 +318,7 @@ addr_3b8:
     moveq #2,%d0                                /* Bit 2 */
     bsrw addr_628                               /* cartscan */
     subal %a5,%a5
-    moveb %a5@(video_res),%d0                   /* Get current video resolution */
+    moveb %a5@(video_res),%d0                   /* Get current video resolution from shifter */
     .short 0xc03c,0x0003                        /* andb #3,%d0 - strip all but bottom 2 bits */
     .short 0xb03c,0x0003                        /* cmpb #3,%d0 - check for invalid value 3 */
     bnes addr_3d8                               /* No - do nothing */
@@ -332,6 +332,12 @@ addr_3d8:
 addr_3ea:
     moveb #2,%a5@(video_res)                    /* Go to high res (2) */
     moveb #2,%a5@(sshiftmod)                    /* Also place high res in sshiftmod variable */
+/*    nop
+    nop
+    nop
+    nop
+    nop
+    nop*/ /* RESMOD */
 addr_3f6:    
     bsrw addr_ec6                               
     jsr addr_b552                               /* Initialise screen output */

@@ -247,33 +247,40 @@ autovec_lvl_4:
     moveml %d0-%fp,%sp@-
     addql #1,_vbclock
     subal %a5,%a5
-    moveb %a5@(-1535),%d1
+    moveb %a5@(mfp_pp),%d1
     moveb %a5@(video_res),%d0
     .short 0xc03c,0x0003            /* andb #3,%d0 */
     .short 0xb03c,0x0002            /* cmpb #2,%d0 */
-    bges addr_0702
-    btst #7,%d1
+    bges addr_0702                  /* Go here if mode=mono */
+    btst #7,%d1                     /* Check MFP bit 7 - mono detect (when pin low) */
     bnes addr_0722
 
-    movew #2000,%d0                 /* Delay loop? */
+    movew #2000,%d2                 /* Wait a while */
 addr_06f8:                          
-    dbf %d0,addr_06f8
+    dbf %d2,addr_06f8
 
-    moveb #2,%d0
+    /*moveb #2,%d0*/                    /* Switch to mono */
+    nop
+    nop
     bras addr_0714
-addr_0702:    
-    btst #7,%d1
-    beqs addr_0722
-    moveb %a5@(1098),%d0
-    .short 0xb03c,0x0002            /* cmpb #2,%d0 */
+
+addr_0702:
+    /* In high res */
+    btst #7,%d1                     /* Check for mono monitor */
+    beqs addr_0722                  /* It's plugged in */
+    moveb %a5@(defshiftmod),%d0     /* Get default video mode */
+    .short 0xb03c,0x0002            /* cmpb #2,%d0 is it HIGH RES? */
     blts addr_0714
-    clrb %d0
+    /*clrb %d0*/                        /* If so, switch to LOW */
+    nop
 addr_0714:    
-    moveb %d0,%a5@(sshiftmod)
+    moveb %d0,%a5@(sshiftmod)       /* Set up video registers */
     moveb %d0,%a5@(video_res)
-    moveal %a5@(1134),%a0
+    moveal %a5@(swv_vec),%a0        /* Call the resolution change vector (default: reboot) */
     jsr %a0@
+
 addr_0722:
+    /* Monitor type unchanged */
     jsr addr_a694
     subal %a5,%a5
     tstl %a5@(1114)
@@ -22788,12 +22795,17 @@ addr_b222:
 
 addr_b2b6:
 _FindDevice:
-    movew #4,%sp@-
-    trap #14                                /* Getrez() - get current video mode */
+
+    jmp _FindDevice2
+fd_ret:
+
+    /*movew #4,%sp@-*/
+    /*trap #14*/                                /* Getrez() - get current video mode */
     addql #2,%sp
     moveb %d0,%d2                           /* Save the original resolution value */
     .short 0xb43c,0x0002                    /* cmpb #2,%d2 - current rez = mono? */
-    beqs addr_b332                          /* Yes - can't be changed */
+    beqs addr_b332                          /* Yes - can't be changed */ /* RESMOD */
+
 
     moveal ram_unknown51,%a0
     movew %a0@,%d0                          /* get something from a global variable and put it in d0, this must be the requested res */
@@ -40726,7 +40738,7 @@ addr_13b34:
 addr_13ba4:
     clrw _gl_rschange                       /* Clear out resolution globals */
     movew #1,%d0
-    movew %d0,_gl_restype
+    movew %d0,_gl_restype                   /* Set resolution to 1 (low) */
 
     movew %d0,_sh_isgem                     /* desktop is the next to run  */
     movew %d0,_sh_gem
@@ -41560,7 +41572,7 @@ addr_1424c:
     andiw #0xf0,%sp@
     movew _gl_restype,%d0
     subqw #1,%d0
-    orw %d0,%sp@
+    orw %d0,%sp@                            /* @sp = (param & 0xf0) | (_gl_restype - 1) */
     movel %a5,%sp@-
     .short 0xf360
     addql #4,%sp
@@ -50541,16 +50553,16 @@ addr_18684:
 /* object 16 is the high res button */
 /* obj[16].ob_state = 8 (DISABLED) */
 
-    movew #8,%a0@       /* movew #8,%a0@ */ /* RESMOD */
+    movew #0,%a0@       /* movew #8,%a0@ */ /* RESMOD 8/0*/
 
     bras addr_186be
 addr_186a6:
     moveal %d7,%a0
     addal #346,%a0
-    movew #8,%a0@                           /* LOW res button .ob_state */ /* RESMOD */
+    movew #0,%a0@                           /* LOW res button .ob_state */ /* RESMOD */
     moveal %d7,%a0
     addal #370,%a0
-    movew #8,%a0@                           /* MED res button .ob_state */ /* RESMOD */
+    movew #0,%a0@                           /* MED res button .ob_state */ /* RESMOD */
 addr_186be:
     movew _gl_restype,%d4
     subqw #2,%d4
@@ -99338,6 +99350,135 @@ addr_2f9b6:
 	.short 0xffff
 	.short 0xffff
 /* 0x02fd00: */
+
+
+_FindDevice2:
+    movew #4,%sp@-
+    trap #14                                /* Getrez() - get current video mode */
+    addql #2,%sp
+    moveb %d0,%d2                           /* Save the original resolution value */
+    .short 0xb43c,0x0002                    /* cmpb #2,%d2 - current rez = mono? */
+    beqs fd_addr_b332                       /* Yes - can't be changed */ /* RESMOD */
+
+
+    moveal ram_unknown51,%a0
+    movew %a0@,%d0                          /* get something from a global variable and put it in d0, this must be the requested res */
+    .short 0xb07c,0x0001                    /* cmpw #1,%d0 */
+    bnes fd_addr_b2da                          /* 1 not requested, go here */
+    tstb %d2                                
+    beqs fd_addr_b2f6                          /* Originally low, mode "1" now selected - go here */
+    bras fd_addr_b320                          /* Originally medium, mode "1" now selected - go here */
+
+/* Video mode 1 was not requested */
+fd_addr_b2da:
+    .short 0xb07c,0x0003                    /* cmpw #3,%d0 - switch to medium res? */
+    beqs fd_addr_b308                          /* yes */
+    tstb %d2
+    beqs fd_addr_b2f6                          /* Originally low res? -> no need to change */
+    clrw %sp@-                              /* Switch to low res */
+    moveq #-1,%d0
+    movel %d0,%sp@-
+    movel %d0,%sp@-
+    movew #5,%sp@-
+    trap #14                                /* Setscreen(-1, -1, 0) - change to low res */
+    lea %sp@(12),%sp
+
+/* Set up 16-colour palette */
+fd_addr_b2f6:
+    .short 0x4879                           /* pea paltab16 */
+    .long fd_paltab16
+    movew #6,%sp@-
+    trap #14                                /* Setpalette(void *pallptr) */
+    addql #6,%sp
+    moveq #1,%d0                            /* return 1 - low */
+	rts
+
+/* Mode "3" requested (medium) */
+fd_addr_b308:    
+    moveq #1,%d0
+    cmpb %d0,%d2                            
+    beqs fd_addr_b320                          /* mode "1" originally -> */
+    movew %d0,%sp@-
+    moveq #-1,%d0
+    movel %d0,%sp@-
+    movel %d0,%sp@-
+    movew #5,%sp@-
+    trap #14                                /* Setscreen(-1, -1, 1) - change to medium res */
+    lea %sp@(12),%sp
+
+/* Set up 4-colour palette */
+fd_addr_b320:
+    .short 0x4879                           /* pea paltab4 */
+    .long fd_paltab4
+    movew #6,%sp@-
+    trap #14                                /* Setpalette(void *pallptr) */
+    addql #6,%sp
+    moveq #2,%d0                            /* return 2 - medium */
+	rts
+
+/* Originally high res and it makes no difference what was selected */
+fd_addr_b332:
+    moveal ram_unknown51,%a0
+    movew %a0@,%d0                          /* get something from a global variable and put it in d0, this must be the requested res */
+
+    cmpb #3,%d0
+    beq fd_med
+    cmpb #2,%d0
+    beq fd_lo
+    bra fd_hi
+fd_lo:
+    bra fd_addr_b2f6
+
+fd_med:
+    bra fd_addr_b308
+
+fd_hi:
+    movew #2,%sp@-                              /* Switch to high res */
+    moveq #-1,%d0
+    movel %d0,%sp@-
+    movel %d0,%sp@-
+    movew #5,%sp@-
+    trap #14                                /* Setscreen(-1, -1, 2) - change to high res */
+    lea %sp@(12),%sp
+    /* set "palette" */
+    .short 0x4879                           /* pea paltab4 */
+    .long fd_paltab4
+    movew #6,%sp@-
+    trap #14                                /* Setpalette(void *pallptr) */
+    addql #6,%sp
+    moveq #3,%d0                            /* return 3 = high */
+	rts
+
+/* Default palette for medium */
+fd_addr_b344:
+fd_paltab4:
+	.short 0x0777
+	.short 0x0700
+	.short 0x0070
+	.short 0x0000
+
+/* Default palette for low */
+fd_addr_b34c:
+fd_paltab16:
+	.short 0x0777
+	.short 0x0700
+	.short 0x0070
+	.short 0x0770
+	.short 0x0007
+	.short 0x0707
+	.short 0x0077
+	.short 0x0555
+	.short 0x0333
+	.short 0x0733
+	.short 0x0373
+	.short 0x0773
+	.short 0x0337
+	.short 0x0737
+	.short 0x0377
+	.short 0x0000
+
+
+
 	.short 0xffff
 	.short 0xffff
 	.short 0xffff
