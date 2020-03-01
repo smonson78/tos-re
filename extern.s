@@ -416,7 +416,7 @@ cart_boot:
 .set palette,0xffff8240
 .set video_res,0xffff8260                   /* -32160 */
 .set psg,0xffff8800
-.set mfp_pp,0xfffffa01
+.set mfp_pp,0xfffffa01                      /* -1535 */
 
 .global memctrl
 .global video_baseh
