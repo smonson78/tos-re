@@ -238,6 +238,7 @@ autovec_lvl_2:
 	.short 0x301f
 	.short 0x4e73
 
+/* This is the VBL interrupt handler. */
 addr_6c0:
 autovec_lvl_4:
 .global autovec_lvl_4
@@ -247,52 +248,59 @@ autovec_lvl_4:
     moveml %d0-%fp,%sp@-
     addql #1,_vbclock
     subal %a5,%a5
-    moveb %a5@(-1535),%d1
+    moveb %a5@(mfp_pp),%d1
     moveb %a5@(video_res),%d0
-    .short 0xc03c,0x0003            /* andb #3,%d0 */
-    .short 0xb03c,0x0002            /* cmpb #2,%d0 */
-    bges addr_0702
-    btst #7,%d1
-    bnes addr_0722
+    .short 0xc03c,0x0003                    /* andb #3,%d0 */
+    .short 0xb03c,0x0002                    /* cmpb #2,%d0 */
+    bges addr_0702                          /* Are we in mono mode? */
+    
+    /* In colour modes: */
+    btst #7,%d1                             /* Check mono detect */
+    bnes lvl4_vec_nochange                  /* No mono monitor --> skip */
 
-    movew #2000,%d0                 /* Delay loop? */
-addr_06f8:                          
-    dbf %d0,addr_06f8
+    movew #2000,%d0                         /* Delay loop */
+lvl4_vec_delay:                          
+    dbf %d0,lvl4_vec_delay
 
-    moveb #2,%d0
-    bras addr_0714
-addr_0702:    
-    btst #7,%d1
-    beqs addr_0722
-    moveb %a5@(1098),%d0
-    .short 0xb03c,0x0002            /* cmpb #2,%d0 */
-    blts addr_0714
-    clrb %d0
-addr_0714:    
-    moveb %d0,%a5@(sshiftmod)
-    moveb %d0,%a5@(video_res)
-    moveal %a5@(1134),%a0
-    jsr %a0@
-addr_0722:
+    moveb #2,%d0                            /* Set resolution to mono */
+    bras lvl4_vec_chmode
+
+addr_0702:
+    /* In mono: */
+    btst #7,%d1                             /* Check mono detect */
+    beqs lvl4_vec_nochange                  /* Monitor is present */
+    moveb %a5@(defshiftmod),%d0             /* Get default shifter mode */
+    .short 0xb03c,0x0002                    /* cmpb #2,%d0 */
+    blts lvl4_vec_chmode                    /* Default shifter mode compatible with colour monitor --> jump over */
+    clrb %d0                                /* Set to fallback mode 0 (low) */
+
+lvl4_vec_chmode:    
+    moveb %d0,%a5@(sshiftmod)               /* Set TOS copy of shifter resolution */
+    moveb %d0,%a5@(video_res)               /* Set shifter resolution register */
+    moveal %a5@(swv_vec),%a0
+    jsr %a0@                                /* Call resolution-change handler */
+
+lvl4_vec_nochange:
     jsr addr_a694
     subal %a5,%a5
-    tstl %a5@(1114)
-    beqs addr_0746
-    moveal %a5@(1114),%a0
-    lea %a5@(-32192),%a1
+    tstl %a5@(colorptr)                     /* Check it new palette is waiting */
+    beqs addr_0746                          /* No? --> skip */
+    moveal %a5@(colorptr),%a0
+    lea %a5@(palette),%a1
 
-    movew #15,%d0                   /* Copy 16 palette entries */
+    movew #15,%d0                           /* Copy 16 palette entries into the shifter */
 addr_073c:
     movew %a0@+,%a1@+
     dbf %d0,addr_073c
 
-    clrl %a5@(1114)
+    clrl %a5@(colorptr)                     /* Clear the new-palette pointer */
+
 addr_0746:    
-    tstl %a5@(1118)
-    beqs addr_075e
-    movel %a5@(1118),%a5@(1102)
-    moveb %a5@(1104),%a5@(-32253)
-    moveb %a5@(1103),%a5@(-32255)
+    tstl %a5@(screenpt)                     /* Check for a new video address waiting to be loaded into the shifter */
+    beqs addr_075e                          /* No --> skip */
+    movel %a5@(screenpt),%a5@(_v_bas_ad)    /* Copy it to TOS variable */
+    moveb %a5@(_v_bas_ad + 2),%a5@(video_basem + 1)  /* Copy bits 15-8 to hardware register */
+    moveb %a5@(_v_bas_ad + 1),%a5@(video_baseh + 1)  /* Copy bits 23-16 to hardware register */
 addr_075e:    
     bsrw addr_1360
     movew nvbls,%d7
@@ -310,11 +318,11 @@ addr_0786:
     dbf %d7,addr_0772
 addr_078a:    
     subal %a5,%a5
-    tstw %a5@(1262)
+    tstw %a5@(_dumpflg)                     /* Check for screen dump flag */
     bnes addr_0796
     bsrw addr_0cfa
 addr_0796:    
-    moveml %sp@+,%d0-%fp            /* Restore registers */
+    moveml %sp@+,%d0-%fp                    /* Restore registers */
 addr_079a:
     addqw #1,vblsem
 

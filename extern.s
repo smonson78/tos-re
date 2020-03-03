@@ -61,6 +61,7 @@ etv_term:
 .set nvbls,0x454                            /* Number of slots in deferred VBL handler list, _vblqueue */
 .set _vblqueue,0x456                        /* Pointer to list of pointers to deferred VBL handlers */
 .set colorptr,0x45a                         /* Pointer to new palette to be loaded on next VBL */
+.set screenpt,0x45e                         /* Pointer to new video address to be loaded on next VBL */
 .set _vbclock,0x462                         /* Number of VBLs since reset */
 .set _frlock,0x466                          /* Number of VBLs processed by VBL interrupt */
 .set hdv_init,0x46a                         /* Pointer to hard drive init handler */
@@ -107,6 +108,7 @@ etv_term:
 .global nvbls
 .global _vblqueue
 .global colorptr
+.global screenpt
 .global _vbclock
 .global _frlock
 .global _cmdload
@@ -413,7 +415,7 @@ cart_boot:
 .set video_baseh,0xffff8200                 /* -32254 */
 .set video_basem,0xffff8202                 /* -32256 */
 .set shifter_sync_mode,0xffff820a           /* -32246 */
-.set palette,0xffff8240
+.set palette,0xffff8240                     /* -32192 */
 .set video_res,0xffff8260                   /* -32160 */
 .set psg,0xffff8800
 .set mfp_pp,0xfffffa01                      /* -1535 */
