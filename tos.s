@@ -24813,109 +24813,50 @@ addr_b790:
 	.short 0x52ca
 	.short 0x0000
 	.short 0x2918
+
+    /* This is inside v_openwk() */
+
 	.short 0x4eb9
-	.long addr_b2b6
-	.short 0x3d40
-	.short 0xffd8
-	.short 0x0c6e
-	.short 0x0002
-	.short 0xffd8
-	.short 0x6622
-	.short 0x33fc
-	.short 0x027f
-	.short 0x0000
-	.short 0x2828
-	.short 0x33fc
-	.short 0x00a9
-	.short 0x0000
-	.short 0x282e
-	.short 0x33fc
-	.short 0x0004
-	.short 0x0000
-	.short 0x2842
-	.short 0x33fc
-	.short 0x0002
-	.short 0x0000
-	.short 0x27d6
-/* 0x00c340: */
-	.short 0x606c
-	.short 0x0c6e
-	.short 0x0003
-	.short 0xffd8
-	.short 0x6664
-	.short 0x33fc
-	.short 0x027f
-	.short 0x0000
-	.short 0x2828
-	.short 0x33fc
-	.short 0x018f
-	.short 0x0000
-	.short 0x282a
-	.short 0x33fc
-	.short 0x0174
-	.short 0x0000
-	.short 0x282e
-	.short 0x33fc
-	.short 0x0002
-	.short 0x0000
-	.short 0x2842
-	.short 0x4279
-	.short 0x0000
-	.short 0x286e
-	.short 0x33fc
-	.short 0x0002
-	.short 0x0000
-	.short 0x2876
-	.short 0x33fc
-	.short 0x0001
-	.short 0x0000
-	.short 0x27d0
-/* 0x00c380: */
-	.short 0x33fc
-	.short 0x0001
-	.short 0x0000
-	.short 0x27d6
-	.short 0x4279
-	.short 0x0000
-	.short 0x27d8
-	.short 0x33fc
-	.short 0x0009
-	.short 0x0000
-	.short 0x52cc
-	.short 0x33fc
-	.short 0x000a
-	.short 0x0000
-	.short 0x5628
-	.short 0x0a79
-	.short 0x0001
-	.short 0x0000
-	.short 0x530c
-	.short 0x0079
-	.short 0x0001
-	.short 0x0000
-	.short 0x5668
-	.short 0x7001
-	.short 0x33c0
-	.short 0x0000
-	.short 0x3bd2
-	.short 0x2279
-	.short 0x0000
-	.short 0x2ae0
-	.short 0x3340
-	.short 0x000c
-/* 0x00c3c0: */
-	.short 0x23fc
-	.short 0x0000
-	.short 0x3baa
-	.short 0x0000
-	.short 0x290c
-	.short 0x42b9
-	.short 0x0000
-	.short 0x3bea
-	.short 0x33fc
-	.short 0xffff
-	.short 0x0000
-	.short 0x2926
+	.long _FindDevice                        /* jsr FindDevice */
+
+    movew %d0,%fp@(-40)                     /* local variable: curRez */
+    cmpiw #2,%fp@(-40)                      /* is it 2? (medium) */
+    bnes addr_c342                          /* ...no -> skip */
+
+    movew #639,dev_tab                      /* X max */
+    movew #169,dev_tab + 6                  /* width of pixel in um */
+    movew #4,dev_tab + 26                   /* number of pens available (colours?) */
+    movew #2,inq_tab + 8                    /* number of planes */
+    bras addr_c3ae
+addr_c342:
+    cmpiw #3,%fp@(-40)                      /* Did we switch to high res? */
+    bnes addr_c3ae                          /* No --> skip */
+
+    movew #639,dev_tab                      /* X max */
+    movew #399,dev_tab + 2                  /* Y max */
+    movew #372,dev_tab + 6                  /* pixel width in um */
+    movew #2,dev_tab + 26                   /* number of pens */
+    clrw dev_tab + 70                       /* colour capability flag */
+    movew #2,dev_tab + 78                   /* number of colours available */
+    movew #1,inq_tab + 2                    /* number of colour levels */
+    movew #1,inq_tab + 8                    /* number of planes */
+    clrw inq_tab + 10                       /* no CLUT */
+    movew #9,ram8x8 + 2                     /* ram8x8.point = 9 */
+    movew #10,ram8x16 + 2                   /* ram8x16.point = 10 */
+    eoriw #1,ram8x8 + 66                    /* ram8x8.flags ^= DEFAULT; */
+    oriw #1,ram8x16 + 66                    /* ram8x16.flags |= DEFAULT; */
+
+addr_c3ae:
+    moveq #1,%d0
+    movew %d0,virt_work + 40                /* virt_work.handle */
+
+    moveal ram_unknown19,%a1
+    movew %d0,%a1@(12)
+
+    movel #virt_work,ram_unknown25
+    clrl virt_work + 64
+    movew #-1,line_cw
+
 	.short 0x4eb9
 	.short 0x00fc
 	.short 0xea30

@@ -170,6 +170,12 @@ etv_term:
 .set ram_unknown23,0x2752
 .global ram_unknown23
 
+.set inq_tab,0x27ce
+.global inq_tab
+
+.set dev_tab,0x2828
+.global dev_tab
+
 .set ram_unknown22,0x283c
 .global ram_unknown22
 
@@ -178,6 +184,9 @@ etv_term:
 
 .set ram_unknown20,0x291c
 .global ram_unknown20
+
+.set line_cw,0x2926
+.global line_cw
 
 .set disab_cnt,0x2982
 .global disab_cnt
@@ -277,8 +286,18 @@ etv_term:
 .set stack_top,0x378a
 .global stack_top
 
+/* Virtual workstation "ATTRIBUTE" structure (308+ bytes) */
+.set virt_work,0x3baa
+.global virt_work
+
 .set ram_unknown17,0x52c8
 .global ram_unknown17
+
+/* A big font struct */
+.set ram8x8,0x52ca
+.global ram8x8
+.set ram8x16,0x5626
+.global ram8x16
 
 .set ram_unknown6,0x5622
 .global ram_unknown6
