@@ -179,11 +179,55 @@ etv_term:
 .set ram_unknown20,0x291c
 .global ram_unknown20
 
-.set ram_unknown28,0x2982
-.global ram_unknown28
+.set disab_cnt,0x2982
+.global disab_cnt
 
-.set ram_unknown27,0x2ab6
-.global ram_unknown27
+/* Background colour */
+.set v_col_bg,0x2ab6
+.global v_col_bg
+
+/* Foreground colour */
+.set v_col_fg,0x2ab8
+.global v_col_fg
+
+/* Cursor location? */
+.set v_cur_ad,0x2aba
+.global v_cur_ad
+
+.set v_cur_off,0x2abe
+.global v_cur_off
+
+.set v_curcx,0x2ac0
+.global v_curcx
+
+.set vct_init,0x2ac4
+.global vct_init
+
+.set v_cur_tim,0x2ac5
+.global v_cur_tim
+
+.set v_curcy,0x2ac2
+.global v_curcy
+
+/* Video characteristics */
+.set v_stat_0,0x2ad6
+.global v_stat_0
+
+/* Cursor redisplay interval */
+.set v_delay,0x2ad7
+.global v_delay
+
+/* Video memory config parameters: */
+.set v_hz_rez,0x2ad0
+.global v_hz_rez
+.set v_vt_rez,0x2ad8
+.global v_vt_rez
+.set bytes_lin,0x2ada
+.global bytes_lin
+.set v_planes,0x2adc
+.global v_planes
+.set v_lin_wr,0x2ade
+.global v_lin_wr
 
 .set ram_unknown19,0x2ae0
 .global ram_unknown19
@@ -194,8 +238,17 @@ etv_term:
 .set ram_unknown21,0x2b00
 .global ram_unknown21
 
+.set ram_unknown54,0x2b56
+.global ram_unknown54
+
 .set ram_unknown29,0x2b7e
 .global ram_unknown29
+
+.set ram_unknown53,0x2b82
+.global ram_unknown53
+
+.set blt_mode,0x2b86
+.global blt_mode
 
 .set ram_unknown48,0x3426
 .global ram_unknown48
@@ -419,6 +472,8 @@ cart_boot:
 .set video_res,0xffff8260                   /* -32160 */
 .set psg,0xffff8800
 .set mfp_pp,0xfffffa01                      /* -1535 */
+.set mfp_timerbc,0xfffffa1a
+.set mfp_timerb,0xfffffa20
 
 .global memctrl
 .global video_baseh
@@ -428,6 +483,8 @@ cart_boot:
 .global video_res
 .global psg
 .global mfp_pp
+.global mfp_timerbc
+.global mfp_timerb
 
 .set STACK_SIZE,448
 .set uda_size,74+(4*STACK_SIZE)

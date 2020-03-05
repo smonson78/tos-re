@@ -33,146 +33,147 @@ boot:
 	movew #0x2700,%sr
 	reset
 	subal %a5,%a5
-	cmpil #0xfa52235f,cart_magic    /* Is cartridge present? */
+	cmpil #0xfa52235f,cart_magic            /* Is cartridge present? */
 	bnes no_cart
-	lea %pc@(no_cart),%fp           /* Return address */
-	jmp cart_boot                   /* Jump to cartridge */
+	lea %pc@(no_cart),%fp                   /* Return address */
+	jmp cart_boot                           /* Jump to cartridge */
 no_cart:
-	lea %pc@(no_ram),%fp            /* Return address */
-	braw addr_66a                   /* RAM test */
+	lea %pc@(no_ram),%fp                    /* Return address */
+	braw addr_66a                           /* RAM test */
 no_ram:
 	bnes addr_5e
-	moveb %a5@(1060),%a5@(memctrl + 1) /* Get memctrl */
+	moveb %a5@(1060),%a5@(memctrl + 1)      /* Get memctrl */
 addr_5e:
-	cmpil #0x31415926,%a5@(1062)    /* resvalid, revector valid ? */
-	bnes os_beg0                    /* No */
-	movel %a5@(resvector),%d0       /* Load resvector */
-	tstb %a5@(resvector)            /* Test bits 31-24 */
-	bnes os_beg0                    /* Set - vector invalid */
-    btst #0,%d0                     /* Address odd? */
-	bnes os_beg0                    /* Yes, invalid */
-	moveal %d0,%a0                  /* Load address */
-	lea %pc@(addr_5e),%fp           /* Load return address */
-	jmp %a0@                        /* Jump via vector */
+	cmpil #0x31415926,%a5@(1062)            /* resvalid, revector valid ? */
+	bnes os_beg0                            /* No */
+	movel %a5@(resvector),%d0               /* Load resvector */
+	tstb %a5@(resvector)                    /* Test bits 31-24 */
+	bnes os_beg0                            /* Set - vector invalid */
+    btst #0,%d0                             /* Address odd? */
+	bnes os_beg0                            /* Yes, invalid */
+	moveal %d0,%a0                          /* Load address */
+	lea %pc@(addr_5e),%fp                   /* Load return address */
+	jmp %a0@                                /* Jump via vector */
 
+/* Runs on first startup, otherwise goes to resvector */
 os_beg0:
 	subal %a5,%a5
-	lea %a5@(psg),%a0               /* Load address of PSG */
-	moveb #7,%a0@                   /* Port A and B */
-	.short 0x117c,0x00c0,0x0002     /* moveb #0xc0,%a0@(2) - GAS assembles this differently. Comment: To output */
-	moveb #0x0E,%a0@                /* Select port A */
-	moveb #7,%a0@(2)                /* Deselect floppies */   
-	btst #0,%pc@(os_conf + 1)       /* PAL version? */
-	beqs addr_b0                    /* No */
-	lea %pc@(addr_aa),%fp			/* Load return address */
-	braw addr_dc2					
+	lea %a5@(psg),%a0                       /* Load address of PSG */
+	moveb #7,%a0@                           /* Port A and B */
+	.short 0x117c,0x00c0,0x0002             /* moveb #0xc0,%a0@(2) - GAS assembles this differently. Comment: To output */
+	moveb #0x0E,%a0@                        /* Select port A */
+	moveb #7,%a0@(2)                        /* Deselect floppies */   
+	btst #0,%pc@(os_conf + 1)               /* PAL version? */
+	beqs addr_b0                            /* No */
+	lea %pc@(addr_aa),%fp			        /* Load return address */
+	braw waitvbl					
 	
 addr_aa:
-	moveb #2,%a5@(shifter_sync_mode) /* Sync mode to 50Hz PAL */
+	moveb #2,%a5@(shifter_sync_mode)        /* Sync mode to 50Hz PAL - I guess 60Hz is the default. */
 
 addr_b0:
-	lea %a5@(palette),%a1           /* Address of the colour palette */
-	movew #15,%d0                   /* 16 colours */
-	lea %pc@(default_palette),%a0   /* Address of the default colour table */
+	lea %a5@(palette),%a1                   /* Address of the colour palette */
+	movew #15,%d0                           /* 16 colours */
+	lea %pc@(default_palette),%a0           /* Address of the default colour table */
 addr_bc:
-	movew %a0@+,%a1@+               /* Copy colour into palette */
-	dbf %d0,addr_bc                 /* Next colour */
+	movew %a0@+,%a1@+                       /* Copy colour into palette */
+	dbf %d0,addr_bc                         /* Next colour */
 
-	moveb #1,%a5@(video_baseh + 1)  /* dbaseh - set video address to 0x10000 */
-	clrb %a5@(video_basem + 1)      /* dbasel */
+	moveb #1,%a5@(video_baseh + 1)          /* dbaseh - set video address to 0x10000 */
+	clrb %a5@(video_basem + 1)              /* dbasel */
 
-	moveb %a5@(memcntlr),%d6        /* memctrl */
-	movel %a5@(phystop),%d5         /* phystop */
-	lea %pc@(addr_dc),%fp           /* Load return address */
-	braw addr_66a                   /* Memory configuration valid? */
+	moveb %a5@(memcntlr),%d6                /* memctrl */
+	movel %a5@(phystop),%d5                 /* phystop */
+	lea %pc@(addr_dc),%fp                   /* Load return address */
+	braw addr_66a                           /* Memory configuration valid? */
 addr_dc:
-	beqw addr_1f2                   /* Yes */
-	clrw %d6                        /* Start value for memory controller */
-	moveb #10,%a5@(memctrl + 1)     /* Memory controller to 2 * 2MB */
+	beqw addr_1f2                           /* Yes */
+	clrw %d6                                /* Start value for memory controller */
+	moveb #10,%a5@(memctrl + 1)             /* Memory controller to 2 * 2MB */
 
-	moveaw #8,%a0                   /* Start address for memory test - 0x8 */
-	lea 0x200008,%a1                /* A1 points to second bank - 0x200008 */
-	clrw %d0                        /* Clear bit pattern to be written */
+	moveaw #8,%a0                           /* Start address for memory test - 0x8 */
+	lea 0x200008,%a1                        /* A1 points to second bank - 0x200008 */
+	clrw %d0                                /* Clear bit pattern to be written */
 addr_f4:
-	movew %d0,%a0@+                 /* Write pattern to addresses 0x00000008 to 0x00000406 */
-	movew %d0,%a1@+                 /* Write to other address range 0x00200008 to 0x00200406 */
-	.short 0xd07c,0xfa54            /* GNU as assembles this differently. addw #0xfa54,%d0 - next bit pattern */
-	cmpal #0x200,%a0                /* End address reached? */
-	bnes addr_f4                    /* No, keep looping */
+	movew %d0,%a0@+                         /* Write pattern to addresses 0x00000008 to 0x00000406 */
+	movew %d0,%a1@+                         /* Write to other address range 0x00200008 to 0x00200406 */
+	.short 0xd07c,0xfa54                    /* GNU as assembles this differently. addw #0xfa54,%d0 - next bit pattern */
+	cmpal #0x200,%a0                        /* End address reached? */
+	bnes addr_f4                            /* No, keep looping */
 
-	movel #0x200000,%d1             /* D1 equals second bank */
+	movel #0x200000,%d1                     /* D1 equals second bank */
 addr_10a:
 	lsrw #2,%d6                     
-	moveaw #0x208,%a0               /* Is bit pattern at 0x208? */
-	lea %pc@(addr_118),%a5          /* Load return address */   
-	braw memtest                    /* Memory test */
+	moveaw #0x208,%a0                       /* Is bit pattern at 0x208? */
+	lea %pc@(addr_118),%a5                  /* Load return address */   
+	braw memtest                            /* Memory test */
 
 addr_118:
-	beqs addr_13a                   /* OK, 128KB */
-	moveaw #1032,%a0                /* At 0x408? */
-	lea %pc@(addr_126),%a5          /* Load return address */
-	braw memtest                    /* Memory test */
+	beqs addr_13a                           /* OK, 128KB */
+	moveaw #1032,%a0                        /* At 0x408? */
+	lea %pc@(addr_126),%a5                  /* Load return address */
+	braw memtest                            /* Memory test */
 addr_126:
-	beqs addr_138                   /* OK, 512KB */
-	moveaw #8,%a0                   /* At 0x8 */
-	lea %pc@(addr_134),%a5          /* Load return address */
-	braw memtest                    /* Memory test */
+	beqs addr_138                           /* OK, 512KB */
+	moveaw #8,%a0                           /* At 0x8 */
+	lea %pc@(addr_134),%a5                  /* Load return address */
+	braw memtest                            /* Memory test */
 addr_134:
-	bnes addr_13a                   /* Nothing in this bank */
+	bnes addr_13a                           /* Nothing in this bank */
 	addqw #4,%d6
 addr_138:
-	addqw #4,%d6                    /* Configuration bank to 2MB */
+	addqw #4,%d6                            /* Configuration bank to 2MB */
 
 addr_13a:
-	.short 0x92bc                   /* as assembles this differently: subl #0x200000,%d1 - next bank */
+	.short 0x92bc                           /* as assembles this differently: subl #0x200000,%d1 - next bank */
 	.short 0x0020
 	.short 0x0000
 
-	beqs addr_10a                   /* Test for first bank */
+	beqs addr_10a                           /* Test for first bank */
 	
-	.short 0x13c6                   /* moveb %d6,0xffff8001 - Program memory controller */
+	.short 0x13c6                           /* moveb %d6,0xffff8001 - Program memory controller */
 	.short 0xffff                   
 	.short 0x8001
 
 	lea 0x8000,%sp                  
-    moveal vector_bus_error,%a4     /* moveal 0x8,%a4 - Save Bus Error vector */
-	lea %pc@(ram_test_fail),%a0     /* Address of routine to terminate RAM test */
-    movel %a0,vector_bus_error      /* Set */
+    moveal vector_bus_error,%a4             /* moveal 0x8,%a4 - Save Bus Error vector */
+	lea %pc@(ram_test_fail),%a0             /* Address of routine to terminate RAM test */
+    movel %a0,vector_bus_error              /* Set */
 
-	movew #0xfb55,%d3               /* Start bit pattern */
-	movel #0x20000,%d7              /* Start address is 128K */
-	moveal %d7,%a0                  /* Save current */
+	movew #0xfb55,%d3                       /* Start bit pattern */
+	movel #0x20000,%d7                      /* Start address is 128K */
+	moveal %d7,%a0                          /* Save current */
 
 addr_16a:
-	moveal %a0,%a1                  /* address */
+	moveal %a0,%a1                          /* address */
 	movew %d0,%d2
-	moveq #42,%d1                   /* 43 words */
+	moveq #42,%d1                           /* 43 words */
 
 addr_170:
-    movew %d2,%a1@-                 /* Write bit pattern in RAM */
-    addw %d3,%d2                    /* Change pattern */
-    dbf %d1,addr_170                /* Write next bit pattern */
-    moveal %a0,%a1                  /* Repeat address */
-    moveq #42,%d1                   /* 43 words */
+    movew %d2,%a1@-                         /* Write bit pattern in RAM */
+    addw %d3,%d2                            /* Change pattern */
+    dbf %d1,addr_170                        /* Write next bit pattern */
+    moveal %a0,%a1                          /* Repeat address */
+    moveq #42,%d1                           /* 43 words */
 addr_17c:
-    cmpw %a1@-,%d0                  /* Is bit pattern in RAM? */
-    bnes ram_test_fail              /* No, terminate test */
-    clrw %a1@                       /* Clear RAM */
-    addw %d3,%d0                    /* Change bit pattern */
-    dbf %d1,addr_17c                /* Test next word */
-    addal %d7,%a0                   /* Increment address by 128K */
-    bras addr_16a                   /* Continue testing */
+    cmpw %a1@-,%d0                          /* Is bit pattern in RAM? */
+    bnes ram_test_fail                      /* No, terminate test */
+    clrw %a1@                               /* Clear RAM */
+    addw %d3,%d0                            /* Change bit pattern */
+    dbf %d1,addr_17c                        /* Test next word */
+    addal %d7,%a0                           /* Increment address by 128K */
+    bras addr_16a                           /* Continue testing */
 
 addr_18c:
 ram_test_fail:
-    subal %d7,%a0                   /* Address minus 128K - to go back to the last block that passed */
-    movel %a0,%d5                   /* Save */
-    movel %a4,vector_bus_error      /* Restore old bus-error vector */
+    subal %d7,%a0                           /* Address minus 128K - to go back to the last block that passed */
+    movel %a0,%d5                           /* Save */
+    movel %a4,vector_bus_error              /* Restore old bus-error vector */
     subal %a5,%a5                   
 
     /* Locate screen buffer in RAM - in the top 32KB (note this wastes a few bytes) */
-    movel %d5,%d0                   /* Highest address for clear */
-    .short 0x90bc,0x0000,0x8000     /* subl #32768,%d0 - minus 32KB */
+    movel %d5,%d0                           /* Highest address for clear */
+    .short 0x90bc,0x0000,0x8000             /* subl #32768,%d0 - minus 32KB */
     lsrw #8,%d0                     
     moveb %d0,%a5@(video_basem + 1)
     swap %d0
@@ -180,21 +181,21 @@ ram_test_fail:
 
     /* Clear RAM from top downwards to 0x400 */
     moveal %d5,%a0
-    movel #0x400,%d4                /* Lower bound for clear */
-    moveq #0,%d0                    /* Clear d0-d3 */ 
+    movel #0x400,%d4                        /* Lower bound for clear */
+    moveq #0,%d0                            /* Clear d0-d3 */ 
     moveq #0,%d1
     moveq #0,%d2
     moveq #0,%d3
 addr_1bc:
-    moveml %d0-%d3,%a0@-                /* Clear 16 bytes */
-    moveml %d0-%d3,%a0@-                /* Clear 16 bytes */
-    moveml %d0-%d3,%a0@-                /* Clear 16 bytes */
-    moveml %d0-%d3,%a0@-                /* Clear 16 bytes */
-    cmpal %d4,%a0                       /* Lower bound reached? */
-    bnes addr_1bc                       /* No, continue */
-    subal %a5,%a5                       /* Clear a5 (I think it was already clear) */
-    moveb %d6,%a5@(memcntlr)            /* TOS's copy of the contents of memctrl register */
-    movel %d5,%a5@(phystop)             /* Highest RAM address as phystop */
+    moveml %d0-%d3,%a0@-                    /* Clear 16 bytes */
+    moveml %d0-%d3,%a0@-                    /* Clear 16 bytes */
+    moveml %d0-%d3,%a0@-                    /* Clear 16 bytes */
+    moveml %d0-%d3,%a0@-                    /* Clear 16 bytes */
+    cmpal %d4,%a0                           /* Lower bound reached? */
+    bnes addr_1bc                           /* No, continue */
+    subal %a5,%a5                           /* Clear a5 (I think it was already clear) */
+    moveb %d6,%a5@(memcntlr)                /* TOS's copy of the contents of memctrl register */
+    movel %d5,%a5@(phystop)                 /* Highest RAM address as phystop */
 
     /* RAM-valid magic numbers - to skip this test next time */
     movel #0x752019f3,%a5@(memvalid)
@@ -203,19 +204,19 @@ addr_1bc:
 
     /* Clear RAM from 0x980 to 0x10000 one word at a time */
 addr_1f2:
-    subal %a5,%a5                   /* Clear a5 (even though it's still already clear) */
-    moveal #0x980,%a0               /* End of system variables */
-    moveal #0x10000,%a1             /* To current video address (eh? no it isn't) */
+    subal %a5,%a5                           /* Clear a5 (even though it's still already clear) */
+    moveal #0x980,%a0                       /* End of system variables */
+    moveal #0x10000,%a1                     /* To current video address (eh? no it isn't) */
     moveq #0,%d0
 addr_202:    
-    movew %d0,%a0@+                 /* Clear memory */
-    cmpal %a0,%a1                   /* End address reached? */
-    bnes addr_202                   /* No, continue */
+    movew %d0,%a0@+                         /* Clear memory */
+    cmpal %a0,%a1                           /* End address reached? */
+    bnes addr_202                           /* No, continue */
 
-    moveal %a5@(phystop),%a0        /* Top of memory */
-    subal #0x8000,%a0               /* minus 32KB */
-    movew #0x7ff,%d1                /* 2048 * 16 = 32KB screen size (almost) */
-    movel %a0,%a5@(_v_bas_ad)       /* Last 32KB of RAM --> video out address */
+    moveal %a5@(phystop),%a0                /* Top of memory */
+    subal #0x8000,%a0                       /* minus 32KB */
+    movew #0x7ff,%d1                        /* 2048 * 16 = 32KB screen size (almost) */
+    movel %a0,%a5@(_v_bas_ad)               /* Last 32KB of RAM --> video out address */
 
     /* Set up the screen a second time */
     moveb %a5@(_v_bas_ad + 1),%a5@(video_baseh + 1)     /* High byte of video address (bits 24-17) */
@@ -265,23 +266,23 @@ addr_242:
     cmpil #0xfa52235f,cart_magic            /* Diagnostic cartridge inserted? */
     beqs addr_32c                           /* Yes */
 
-    lea %pc@(addr_b0a),%a1          /* Indicate address for exception */
-    addal #0x2000000,%a1            /* Vector number in bits 24-31 to 2 */
-    lea vector_bus_error,%a0        /* Start with Bus Error */
-    movew #61,%d0                   /* 62 vectors */
+    lea %pc@(addr_b0a),%a1                  /* Indicate address for exception */
+    addal #0x2000000,%a1                    /* Vector number in bits 24-31 to 2 */
+    lea vector_bus_error,%a0                /* Start with Bus Error */
+    movew #61,%d0                           /* 62 vectors */
 addr_31a:
-    movel %a1,%a0@+                 /* Set vector */
-    addal #0x1000000,%a1            /* Increment vector number */
-    dbf %d0,addr_31a                /* Initialise next exception vector */
-    movel %a3,vector_divide_by_zero /* Division By Zero to rte */
+    movel %a1,%a0@+                         /* Set vector */
+    addal #0x1000000,%a1                    /* Increment vector number */
+    dbf %d0,addr_31a                        /* Initialise next exception vector */
+    movel %a3,vector_divide_by_zero         /* Division By Zero to rte */
 addr_32c:
-    moveq #6,%d0                    /* Loop 7 times for autovectors */
-    lea %a5@(autovectors),%a1       /* Load target address (0x64) */
+    moveq #6,%d0                            /* Loop 7 times for autovectors */
+    lea %a5@(autovectors),%a1               /* Load target address (0x64) */
 addr_332:
-    movel #dummy_exception,%a1@+    /* Set up dummy vector */
-    dbf %d0,addr_332                /* Next vector */
+    movel #dummy_exception,%a1@+            /* Set up dummy vector */
+    dbf %d0,addr_332                        /* Next vector */
     
-    movel #autovec_lvl_4,%a5@(autovectors + 12) /* Level 4 autovector */
+    movel #autovec_lvl_4,%a5@(autovectors + 12) /* Level 4 autovector (on VBL) */
     movel #autovec_lvl_2,%a5@(autovectors + 4)  /* Level 2 autovector */
     movel %a3,%a5@(traps + 8)                   /* Trap #2 (AES/VDI) */
     movel #trap13_handler,%a5@(traps + 52)      /* Trap #13 (BIOS) */
@@ -328,14 +329,14 @@ addr_3d8:
     moveb %a5@(mfp_pp),%d0                      /* MFP parallel port register */
     bmis addr_3f6                               /* No mono monitor? */
     lea %pc@(addr_3ea),%fp                      /* Return address */
-    braw addr_dc2                               /* Something to do with Timer B */
+    braw waitvbl
 addr_3ea:
     moveb #2,%a5@(video_res)                    /* Go to high res (2) */
-    moveb #2,%a5@(sshiftmod)                    /* Also place high res in sshiftmod variable */
+    moveb #2,%a5@(sshiftmod)
 addr_3f6:    
-    bsrw addr_ec6                               
-    jsr addr_b552                               /* Initialise screen output */
-    jsr addr_b4c8
+    bsrw blittest                               /* Test if the blitter is installed */                               
+    jsr addr_b552                               /* Initialise line-a routines */
+    jsr esc_init
     cmpib #1,%a5@(sshiftmod)                    /* sshiftmod */
     bnes addr_414                               /* Not medium res? */
     movew %a5@(palette + 30),%a5@(palette + 6)  /* Copy colour 15 (black) to colour 3 */

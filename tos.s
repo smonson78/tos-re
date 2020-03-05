@@ -642,7 +642,7 @@ addr_a9c:
     bsrw addr_7a2
     moveb %a5@(sshiftmod),%a5@(video_res)   /* Setting the video register from sshiftmod */
     clrw %a5@(vblsem)
-    jsr addr_b4c8
+    jsr esc_init
     movew #1,%a5@(vblsem)
 addr_ac2:    
     rts
@@ -1055,38 +1055,31 @@ bomb_image:
 	.short 0x00e0
 
 addr_dc2:
-.global addr_dc2
-	.short 0x41f9
-	.short 0xffff
-	.short 0xfa21
-	.short 0x43f9
-	.short 0xffff
-	.short 0xfa1b
-	.short 0x12bc
-	.short 0x0010
-	.short 0x7801
-	.short 0x12bc
-	.short 0x0000
-	.short 0x10bc
-	.short 0x00f0
-	.short 0x13fc
-	.short 0x0008
-	.short 0xffff
-	.short 0xfa1b
-	.short 0x1010
-	.short 0xb004
-	.short 0x66fa
-	.short 0x1810
-	.short 0x363c
-	.short 0x0267
-	.short 0xb810
-	.short 0x66f6
-	.short 0x51cb
-	.short 0xfffa
-	.short 0x12bc
-	.short 0x0010
-	.short 0x4ed6
+waitvbl:
+.global waitvbl
+    lea mfp_timerb + 1,%a0
+    lea mfp_timerbc + 1,%a1
+    moveb #16,%a1@                          /* Reset timer B */
+    moveq #1,%d4                            /* Wait for the timer to expire */
+    moveb #0,%a1@                           /* Stop timer B */
+    moveb #0xf0,%a0@                        /* Event every 240 scanlines */
+    moveb #8,mfp_timerbc + 1                /* Timer B: event count mode (HBL) */
+addr_de4:
+    moveb %a0@,%d0
+    cmpb %d4,%d0                            /* Wait for HBL 239 scanlines to pass */
+    bnes addr_de4
+addr_dea:
+    moveb %a0@,%d4
+    movew #615,%d3                          /* Wait until we are inside the VBL area */
+addr_df0:
+    cmpb %a0@,%d4
+    bnes addr_dea
+    dbf %d3,addr_df0
+    moveb #16,%a1@                          /* Reset timer B */
+    jmp %fp@
+
 addr_dfe:
+run_reset_resident:
 .global addr_dfe
 	.short 0x2079
 /* 0x000e00: */
@@ -1189,13 +1182,14 @@ addr_e62:
 	.short 0xc045
 	.short 0x8044
 	.short 0x4eb9
-	.short 0x00fc
-/* 0x000ec0: */
-	.short 0xb5aa
+
+	.long rout_init
 	.short 0x3003
 	rts
+
 addr_ec6:
-.global addr_ec6
+blittest:
+.global blittest
     .short 0x40c1
 	.short 0x303c
 	.short 0x0000
@@ -20731,6 +20725,7 @@ addr_9eaa:
 	.short 0x4ed0
 
 addr_a320:    
+normal_ascii:
 	.short 0xb27c
 	.short 0x0020
 	.short 0x6c00
@@ -21698,7 +21693,9 @@ addr_a694:
 	.short 0x206c
 	.short 0x000e
 	.short 0x2050
-addr_aa70:    
+
+addr_aa70:
+gl_f_init:
 	.short 0x49f9
 	.short 0x0000
 	.short 0x2ad6
@@ -22717,6 +22714,7 @@ linea_handler:
 	rts
 
 addr_b222:
+v_clrwk:
 	.short 0x2f00
 	.short 0x3039
 	.short 0x0000
@@ -23078,96 +23076,88 @@ paltab16:
 	rts
 
 addr_b4c8:
-.global addr_b4c8
-    moveb sshiftmod,%d0
+esc_init:
+.global esc_init
+    moveb sshiftmod,%d0                     /* Get TOS copy of shifter mode */
     moveq #3,%d1
     andw %d1,%d0
     cmpw %d1,%d0
-    bnes addr_b4d8
+    bnes addr_b4d8                          /* Ensure it's within range 0-2, invalid value 3 converts to 2 */
     moveq #2,%d0
 addr_b4d8:    
-    movew %d0,%sp@-
-    bsrw addr_b56c
-    lea addr_28ec6,%a0
-    movew %sp@+,%d0
-    .short 0xb07c,0x0002                    /* cmpw #2,%d0 */
-    bnes addr_b4f2
-    lea addr_2a922,%a0
+    movew %d0,%sp@-                         /* Save it during call */
+    bsrw rezinit
+    lea f8x8,%a0                            /* Address of 8x8 font */
+    movew %sp@+,%d0                         /* Restore shifter mode */
+    .short 0xb07c,0x0002                    /* cmpw #2,%d0 - is it mono? */
+    bnes addr_b4f2                          /* Nope -> skip */
+    lea f8x16,%a0                           /* Use 8x16 font instead */
 addr_b4f2:    
-    bsrw addr_aa70
+    bsrw gl_f_init                          /* Probably inits fonts from the name */
     clrw %d0
-    movew %d0,ram_unknown27                 /* 2ab6 */
-    movew %d0,ram_unknown27 + 10
-    movew %d0,ram_unknown27 + 12
-    movew %d0,ram_unknown27 + 8
-    moveb %d0,ram_unknown27 + 33
+    movew %d0,v_col_bg                      /* Background colour is all zeroes */
+    movew %d0,v_curcx
+    movew %d0,v_curcy
+    movew %d0,v_cur_off
+    moveb %d0,v_delay                       /* Cursor redisplay interval (immediate) */
     notw %d0
-    movew %d0,ram_unknown27 + 2
-    movel _v_bas_ad,ram_unknown27 + 4
+    movew %d0,v_col_fg                      /* Foreground colour is all ones */
+    movel _v_bas_ad,v_cur_ad                /* Home cursor */
     moveq #1,%d0
-    moveb %d0,ram_unknown27 + 32
-    movew %d0,ram_unknown28
+    moveb %d0,v_stat_0                      /* Flash, nowrap, normal video */
+    movew %d0,disab_cnt                     /* Cursor disabled 1 level deep */
     moveq #30,%d0
-    moveb %d0,ram_unknown27 + 15
-    moveb %d0,ram_unknown27 + 14
-    movel #addr_a320,con_state
-    braw addr_b222
+    moveb %d0,v_cur_tim                     /* .5 sec blink rate @ 60Hz */
+    moveb %d0,vct_init                      /* .5 sec blink rate @ 60Hz */
+    movel #normal_ascii,con_state
+    braw v_clrwk                            /* Clear screen */
 
 addr_b552:
 .global addr_b552
-    movel #addr_b602,ram_unknown29 + 4
-    movel #addr_b5da,ram_unknown29
-    .short 0x4ef9                           /* jmp addr_b5aa */
-    .long addr_b5aa
-addr_b56c:    
-    lslw #3,%d0
-    lea %pc@(addr_b592,%d0:w),%a0
-    movew %a0@+,ram_unknown27 + 38
-    movew %a0@,ram_unknown27 + 40
-    movew %a0@+,ram_unknown27 + 36
-    movew %a0@+,ram_unknown27 + 34
-    movew %a0@,ram_unknown27 + 26
+    movel #addr_b602,ram_unknown29 + 4      /* A couple of code pointers */
+    movel #addr_b5da,ram_unknown29          /* la_routines (la is linea) */
+    .short 0x4ef9                           /* jmp rout_init */
+    .long rout_init
+
+addr_b56c:
+rezinit:    
+    lslw #3,%d0                             /* Lookup value from table */
+    lea %pc@(reztab,%d0:w),%a0
+    movew %a0@+,v_planes
+    movew %a0@,v_lin_wr
+    movew %a0@+,bytes_lin
+    movew %a0@+,v_vt_rez
+    movew %a0@,v_hz_rez
     rts
 
-addr_b592:
-	.short 0x0004
-	.short 0x00a0
-	.short 0x00c8
-	.short 0x0140
-	.short 0x0002
-	.short 0x00a0	
-    .short 0x00c8
-	.short 0x0280
-	.short 0x0001
-	.short 0x0050
-	.short 0x0190
-    .short 0x0280
+reztab:
+	.short 4,160,200,320
+	.short 2,160,200,640
+	.short 1,80,400,640
 
-addr_b5aa:	
-	.short 0x33c0
-	.short 0x0000
-	.short 0x2b86
-	.short 0x2079
-	.short 0x0000
-	.short 0x2b82
-	.short 0x0800
-	.short 0x0000
-	.short 0x6706
-	.short 0x2079
-	.short 0x0000
-/* 0x00b5c0: */
-	.short 0x2b7e
-	.short 0x43f9
-	.short 0x0000
-	.short 0x2b56
-	.short 0x7009
-	.short 0x22d8
-	.short 0x51c8
-	.short 0xfffc
+/*  Set the BLASTER primitive vector list then call initialize routine. 
+    in:           d0      blit mode word
+                  bit0    0:soft                  1:hard
+                  bit1    0:no hardware assist    1:hardware assist
+*/
+addr_b5aa:
+rout_init:
+    movew %d0,blt_mode                      /* Store present mode selection */
+    moveal ram_unknown53,%a0                /* Current device structure la_softroutines */
+    btst #0,%d0
+    beqs rout_init_set_blt_0
+    moveal ram_unknown29,%a0                /* la_routines */
+rout_init_set_blt_0:
+    lea ram_unknown54,%a1                   /* userdevinit */
+    moveq #9,%d0
+rout_init_copy_loop:
+    movel %a0@+,%a1@+
+    dbf %d0,rout_init_copy_loop
 	rts
+
 	.short 0x3039
 	.short 0x0000
-	.short 0x2b86
+	.short blt_mode
 	rts
 
 addr_b5da:	
@@ -84824,7 +84814,8 @@ addr_2877a:
 	.short 0x0800
 	.short 0x0000
 	
-addr_28ec6:    
+addr_28ec6:
+f8x8:
     .short 0x0001
 	.short 0x0009
 	.short 0x3878
@@ -88308,7 +88299,8 @@ addr_28ec6:
 	.short 0x0000
 	.short 0x0000
 
-addr_2a922:    
+addr_2a922:
+f8x16:
 	.short 0x0001
 	.short 0x000a
 	.short 0x3878
