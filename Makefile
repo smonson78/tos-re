@@ -5,6 +5,7 @@ OBJDUMP=m68k-elf-objdump
 
 ASFLAGS=-m68000 --no-pad-sections
 LDFLAGS=-m68000 -nostdlib
+CFLAGS=-m68000 -g -I. -O3
 
 OBJECTS=extern.o boot.o tos.o
 

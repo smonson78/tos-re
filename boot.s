@@ -198,7 +198,11 @@ addr_1bc:
     movel %d5,%a5@(phystop)                 /* Highest RAM address as phystop */
 
     /* RAM-valid magic numbers - to skip this test next time */
-    movel #0x752019f3,%a5@(memvalid)
+    /*movel #0x752019f3,%a5@(memvalid)*/
+    jmp debug_init
+    nop
+debug_return:
+.global debug_return
     movel #0x237698aa,%a5@(memval2)
     movel #0x5555aaaa,%a5@(memval3)
 

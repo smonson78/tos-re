@@ -278,8 +278,14 @@ etv_term:
 .set INTIN,0x2ae4
 .global INTIN
 
+.set PTSIN,0x2ae8
+.global PTSIN
+
 .set INTOUT,0x2aec
 .global INTOUT
+
+.set PTSOUT,0x2ae8
+.global PTSOUT
 
 .set ram_unknown21,0x2b00
 .global ram_unknown21
@@ -642,15 +648,12 @@ typedef struct _bcb
 .set ram_unknown81,0xa820
 .global ram_unknown81
 
-/* Not to be confused with contrl, two different variables */
+/* Not to be confused with contrl, two different variables (24 bytes) */
 .set _contrl,0xa828
 .global _contrl
 
-.set ram_unknown65,0xa832
-.global ram_unknown65
-
-.set ram_unknown64,0xa834
-.global ram_unknown64
+.set _d_xywh,0xa840
+.global _d_xywh
 
 
 /* The end of RAM used by GEM is a84e */
@@ -720,3 +723,9 @@ cart_boot:
 /* but it's 0x745e in 1.4 */
 .set _D,0x745e                              /* sizeof(THEGLO) */
 .global _D
+
+
+.set DEBUG_POINTER,3000000-4
+.global DEBUG_POINTER
+.set DEBUG_STRING,3000000
+.global DEBUG_STRING

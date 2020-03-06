@@ -256,7 +256,7 @@ autovec_lvl_4:
     
     /* In colour modes: */
     btst #7,%d1                             /* Check mono detect */
-    bnes lvl4_vec_nochange                  /* No mono monitor --> skip */
+    bras lvl4_vec_nochange                  /* No mono monitor --> skip */
 
     movew #2000,%d0                         /* Delay loop */
 lvl4_vec_delay:                          
@@ -268,7 +268,7 @@ lvl4_vec_delay:
 addr_0702:
     /* In mono: */
     btst #7,%d1                             /* Check mono detect */
-    beqs lvl4_vec_nochange                  /* Monitor is present */
+    bras lvl4_vec_nochange                  /* Monitor is present */
     moveb %a5@(defshiftmod),%d0             /* Get default shifter mode */
     .short 0xb03c,0x0002                    /* cmpb #2,%d0 */
     blts lvl4_vec_chmode                    /* Default shifter mode compatible with colour monitor --> jump over */
@@ -624,23 +624,23 @@ getrez:
 /* void Setscreen(void *laddr, void *paddr, int16_t rez) */
 addr_a7e:
 setscreen:
-    tstl %sp@(4)                            /* Check longword on stack */
-    bmis addr_a8a                               
+    tstl %sp@(4)                            /* Check laddr */
+    bmis addr_a8a
     movel %sp@(4),%a5@(_v_bas_ad)           /* If positive, copy it to logical screen address */
 addr_a8a:    
-    tstl %sp@(8)                            /* Check next longword on stack */
+    tstl %sp@(8)                            /* Check paddr */
     bmis addr_a9c
     moveb %sp@(9),%a5@(video_baseh + 1)     /* If positive, copy it to the video base address */
     moveb %sp@(10),%a5@(video_basem + 1)
 addr_a9c:    
-    tstw %sp@(12)                           /* Check next word on stack */
+    tstw %sp@(12)                           /* Check rez */
     bmis addr_ac2
     moveb %sp@(13),%a5@(sshiftmod)          /* If positive, update screen resolution */
     bsrw vsync
     moveb %a5@(sshiftmod),%a5@(video_res)   /* Setting the video register from sshiftmod */
-    clrw %a5@(vblsem)
-    jsr esc_init
-    movew #1,%a5@(vblsem)
+    clrw %a5@(vblsem)                       /* Disable vblank */
+    jsr esc_init                            /* Re-initialise "glass-tty" routines */
+    movew #1,%a5@(vblsem)                   /* Reenable vblank */
 addr_ac2:    
     rts
 
@@ -15505,8 +15505,11 @@ addr_60be:
 	.short 0x200d
 	.short 0x6724
 	.short 0x4aae
+
 	.short 0x000a
-	.short 0x6604
+	
+addr_7b12:
+    .short 0x6604
 	.short 0x4280
 	.short 0x601c
 	.short 0x006d
@@ -15528,6 +15531,7 @@ addr_60be:
 	.short 0x2000
 	.short 0x4e5e
 	rts
+
 	.short 0x4e56
 /* 0x007b40: */
 	.short 0x0000
@@ -15567,10 +15571,12 @@ addr_60be:
 	.short 0x3f06
 	.short 0x2f2e
 	.short 0x000c
+
 	.short 0x2f2e
 	.short 0x0008
 	.short 0x4eb9
 	.short 0x00fc
+
 	.short 0x6c76
 	.short 0xdefc
 	.short 0x000a
@@ -21741,36 +21747,51 @@ gl_f_init:
 	rts
 
 /* Trap 2 handler for opcode 115 (VDI) */
+/*
+* _GSX_ENTRY
+*  This module is the front end of the built-in screen GIOS for the Atari RBP.
+*  The application will have arrived at this point via
+*
+*       ...
+*
+*       move    #115,d0
+*       move.l  #PB,d1
+*       trap    #2
+*/
 addr_aac6:
 vdi_dispatcher:
 _gsx_entry:
     moveml %d1-%fp,%sp@-            /* Save all regs except d0 and sp */
-    moveal %d1,%a0                  /* Source address in d1 */
+    moveal %d1,%a0                  /* Source address in d1 (caller's parameter block) */
     
-    lea contrl,%a1
+    /* INTIN[0] = 0x602e */
+
+    lea contrl,%a1                  /* Local parameter block, starting with contrl */
     lea ptsin_array,%a3
 
-    moveal %a0@+,%a2                /* Copy first 4 bytes into a2 */
-    movel %a2,%a1@+                 /* then put it in the dest */
-    movel %a0@+,%a1@+               /* Copy next 4 bytes to dest */
-    moveal %a0@+,%a4                /* Copy next 4 bytes into a4 */
-    movel %a3,%a1@+                 /* Switch destination */
-    movel %a0@+,%a1@+               /* Copy next 4 bytes to new dest */
-    movel %a0@+,%a1@+               /* Copy next 4 bytes to dest */
-    movew %a2@(2),%d0               /* Copy word from a2 (the first 4 bytes of the original source) over d0 */
-    movew %d0,%sp@-                 /* Put it on the stack */
-    beqs addr_ab20                  /* Was it zero? Then skip the next bit */
+    moveal %a0@+,%a2                /* caller's contrl --> a2 */
+    movel %a2,%a1@+                 /* --> local_pb.contrl */
+    movel %a0@+,%a1@+               /* caller's intin --> local intin */
+    moveal %a0@+,%a4                /* caller's ptsin --> a4 */
+    movel %a3,%a1@+                 /* ptsin_array */
+    movel %a0@+,%a1@+               /* intout */
+    movel %a0@+,%a1@+               /* ptsout */
+
+    movew %a2@(2),%d0               /* d0 = number of "vertices" (ptsin entries) from CONTRL[0] */
+    movew %d0,%sp@-                 /* Save copy since driver may alter original */
+    beqs addr_ab20                  /* No entries to copy? Then skip the next bit */
     movew #512,%d1
-    cmpw %d1,%d0                    /* d0 <= 512? */
-    bles addr_aafc                  /* yes, skip ahead */
-    movew %d1,%d0                   /* No - just use 512 */
-    movew %d1,%a2@(2)               /* Store 512 in the word we picked out of the source string earlier */
-addr_aafc:    
+    cmpw %d1,%d0                    /* Maximum is 512 */
+    bles addr_aafc                  /* If less, skip ahead */
+    movew %d1,%d0                   /* Use maximum */
+    movew %d1,%a2@(2)               /* Truncate value in caller's CONTRL array */
+
+addr_aafc:
     movew %d0,%d1                   /* Put the final number in d1 */
     asrw #3,%d0                     /* Divide by 8 */
     andiw #7,%d1                    /* Get mod 8 */
     addw %d1,%d1                    /* Double it */
-    negw %d1                        /* Get the negative */
+    negw %d1                        /* Make it an index from the bottom */
     jmp %pc@(addr_ab1c,%d1:w)       /* jump to: addr_ab1c - (2 * (d0 % 8)) - this is basically Duff's Device */
 addr_ab0c:
     movel %a4@+,%a3@+               /* Copy 8 * 4 = 32 bytes */
@@ -21785,6 +21806,9 @@ addr_ab1c:
     dbf %d0,addr_ab0c               /* Repeat d0 times. We will now have copied d0 * 4 bytes */
 addr_ab20:
 
+    /* INTIN[0] = 2 */
+
+    /* jump to SCREEN, front end of C routines for screen GIOS */
     .short 0x4eb9                   /* jsr _screen */
     .long _screen
     
@@ -22793,8 +22817,11 @@ init_g:
 
 addr_b2b6:
 _FindDevice:
-    movew #4,%sp@-
-    trap #14                                /* Getrez() - get current video mode */
+    /*movew #4,%sp@-
+    trap #14*/                                /* Getrez() - get current video mode */
+
+    jmp _FindDevice3
+
     addql #2,%sp
     moveb %d0,%d2                           /* Save the original resolution value */
     .short 0xb43c,0x0002                    /* cmpb #2,%d2 - current rez = mono? */
@@ -23215,6 +23242,9 @@ addr_b62a:
 _screen:
     linkw %fp,#0
     moveml %d5-%d7/%a4-%a5,%sp@-            /* Save regs */
+
+    /* INTIN[0] = 2 */
+
     moveal contrl,%a5
     movew %a5@(12),%d6                      /* r = contrl[6] */
     movew %a5@,%d7                          /* opcode = contrl[0] */
@@ -23287,10 +23317,11 @@ addr_b74c:
     moveaw %d7,%a0
     addal %a0,%a0
     addal %a0,%a0
-    moveal #jmptb1,%a1
+    moveal #jmptb1,%a1                      /* A pointer table */
     moveal %a0@(0000000000000000,%a1:l),%a0
 
     jsr %a0@                                /* Call something */
+addr_b76c: /* this is on the stack when v_opnwk is called at boot time */
 
     bras addr_b790
 addr_b76e:
@@ -24759,7 +24790,10 @@ v_opnwk:
     linkw %fp,#-40                          /* Locals */
     moveml %d6-%d7/%a4-%a5,%sp@-
 
-    moveal #rom_dev_tab,%a5                 /* Copy 45 words from rom_dev_tab to dev_tab */
+    moveal #rom_dev_tab,%a5                 /* Copy 45 words from rom_dev_tab to dev_tab. This is the setup for low resolution. */
+
+    /* INTIN[0] = 2 */
+    
     moveal #dev_tab,%a4
     clrw %d7
     bras addr_c298
@@ -24805,6 +24839,9 @@ addr_c2ea:
     dbf %d0,addr_c2ea
 
     moveal #f8x16,%a1
+
+    /* INTIN[0] = 2 */
+
     moveal #ram8x16,%a0
     moveq #44,%d0                           /* Copy 45 words from f8x16 to ram8x16 (font headers?) */
 addr_c2fe:    
@@ -24815,6 +24852,7 @@ addr_c2fe:
 
 	.short 0x4eb9
 	.long _FindDevice                       /* jsr FindDevice */
+addr_c314: /* Seen on stack during boot as return addr */
 
     movew %d0,%fp@(-40)                     /* return value ==> curRez */
     cmpiw #2,%fp@(-40)                      /* is it 2? (medium) */
@@ -40635,7 +40673,7 @@ addr_13c1e:
     addal #init_size,%fp                    /* add sizeof uda */
     movel %fp,%a5@(62)                      /* initialize stack pointer in uda */
     moveal %fp,%sp
-    .short 0x4eb9                           /* jsr addr_13cb0 - _gem_main */
+    .short 0x4eb9                           /* jsr addr_13cb0 - gem_main() */
     .long gem_main
     bras begin                              /* Loop forever */
 
@@ -50273,16 +50311,16 @@ addr_18684:
 /* object 16 is the high res button */
 /* obj[16].ob_state = 8 (DISABLED) */
 
-    movew #8,%a0@       /* movew #8,%a0@ */ /* RESMOD */
+    movew #0,%a0@       /* movew #8,%a0@ */ /* RESMOD */
 
     bras addr_186be
 addr_186a6:
     moveal %d7,%a0
     addal #346,%a0
-    movew #8,%a0@                           /* LOW res button .ob_state */ /* RESMOD */
+    movew #0,%a0@                           /* LOW res button .ob_state */ /* RESMOD */
     moveal %d7,%a0
     addal #370,%a0
-    movew #8,%a0@                           /* MED res button .ob_state */ /* RESMOD */
+    movew #0,%a0@                           /* MED res button .ob_state */ /* RESMOD */
 addr_186be:
     movew _gl_restype,%d4
     subqw #2,%d4
@@ -69819,14 +69857,15 @@ addr_1f926:
 	
 addr_21aec:
 gsx_acode:
-    lea %sp@(4),%a0
+    lea %sp@(4),%a0                         /* Param 1 */
     lea _contrl,%a1
 
-    movel %a0@+,%a1@+
+    movel %a0@+,%a1@+                       /* _contrl = param1[0] */
     addql #2,%a1
-    movew %a0@+,%a1@
+    movew %a0@+,%a1@                        /* _contrl + 6 bytes = param1[1] */
     addql #6,%a1
-    movew _gl_handle,%a1@
+    movew _gl_handle,%a1@                   /* _contrl + 12 bytes = _gl_handle */
+
     .short 0x4ef9                           /* jmp gsx2 */
     .long gsx2
 
@@ -69889,7 +69928,7 @@ addr_21b74:
     bras addr_21b84
     movew %sp@(4),%d0
 addr_21b84:
-    movew %d0,ram_unknown65
+    movew %d0,_contrl+10                    /* _contrl[5] */
     moveq #5,%d0
     braw vdi_short
 
@@ -70179,12 +70218,12 @@ av_opnwk:
     movel %sp@(4),iioff                     /* _intin array is pwork_in */
     moveal %sp@(12),%a1                     /* a1 -> pwork_out */
     movel %a1,iooff                         /* _intout array is pwork_out */
-    lea %a1@(90),%a1                        /* a1 -> pwork_out+45 */
-    movel %a1,pooff                         /* _ptsout array is pwork_out+45 */
+    lea %a1@(90),%a1                        /* a1 -> pwork_out[45] */
+    movel %a1,pooff                         /* _ptsout array is pwork_out[45] */
     moveq #3,%d0
     bsrw vdi_call                           /* v_opnwk() */
     moveal %sp@(8),%a1                      /* a1 -> phandle */
-    movew ram_unknown64,%a1@                /* phandle <- workstation handle */
+    movew _contrl+12,%a1@                   /* phandle <- workstation handle */
     movel #_intin,iioff
     movel #ram_unknown62,iooff
     movel #ptsout,pooff
@@ -70293,13 +70332,13 @@ av_opnwk:
 addr_21ed0:
 vdi_short:
     clrl %sp@-
-    bras addr_21ee4                         /* Jump in halfway - no params! */
+    bras addr_21ee4                         /* Jump in halfway - one params */
 
 addr_21ed4:
 vdi_call:
     lea %pc@(vdi_list,%d0:w),%a2            /* Get address into table from d0 */
     clrw %d0
-    moveb %a2@+,%d0                         /* Push 3 params onto stack from table */
+    moveb %a2@+,%d0                         /* Pass 3 bytes from table as parameters to function call ahead */
     movew %d0,%sp@-
     moveb %a2@+,%d0
     movew %d0,%sp@-
@@ -70314,7 +70353,7 @@ addr_21ee4:
 addr_1ef6:
 vdi_list:
 	.byte 37,0,111
-    .byte 11,0,1
+    .byte 11,0,1                            /* v_opnwk() */
 	.byte 1,2,129
 	.byte 0,1,12
 	.byte 1,2,114
@@ -78307,8 +78346,8 @@ addr_25b86:
 addr_25b88:
 gsx2:
     lea pblock,%a0
-    movel #_contrl,%a0@
-    movel %a0,%d1
+    movel #_contrl,%a0@                     /* pblock = &_contrl */
+    movel %a0,%d1                           /* %d1 = pblock */
 
     moveq #115,%d0
     trap #2
@@ -88588,6 +88627,7 @@ addr_2ad74:
 	.short 0x000a
 	.short 0x000c
 	.short 0x000e
+
 	.short 0x000b
 	.short 0x000d
 	.short 0x0000
@@ -88596,6 +88636,7 @@ addr_2ad74:
 	.short 0x0006
 	.short 0x0004
 	.short 0x0007
+
 	.short 0x0005
 	.short 0x0008
 	.short 0x0009
@@ -88604,6 +88645,7 @@ addr_2ad74:
 	.short 0x000e
 	.short 0x000c
 	.short 0x000f
+
 	.short 0x000d
 	.short 0x0001
 
@@ -98873,531 +98915,274 @@ addr_2f9b6:
 	.short 0xffff
 	.short 0xffff
 /* 0x02fc00: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fc40: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fc80: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fcc0: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fd00: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fd40: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fd80: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fdc0: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fe00: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fe40: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fe80: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fec0: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02ff00: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02ff40: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02ff80: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02ffc0: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
 
+_FindDevice3:
+
+    movew #'F',%sp@-                        /* Log 'F' indicating that FindDevice was called */
+    bsr debug_add
+    lea %sp@(2),%sp
+
+    movew #4,%sp@-
+    trap #14                                /* Getrez() - get current video mode */
+    addql #2,%sp
+
+    moveb %d0,%d2                           /* Save the original resolution value */
+    extw %d2
+
+    /* Log current res returned from GetRez() */
+    movew %d2,%sp@-
+    bsr debug_add_word
+    lea %sp@(2),%sp
+
+    moveal INTIN,%a0
+    movew %a0@,%d0                          /* get something from a global variable and put it in d0, this must be the requested res */
+
+    movew #'>',%sp@-                        /* Log '>' indicating that we went down the colour path */
+    bsr debug_add
+    lea %sp@(2),%sp
+
+    movel %a0,%sp@-
+    movel _gl_restype,%a0
+    movew _gl_restype,%sp@-                         /* Log requested resolution */
+    bsr debug_add_word
+    lea %sp@(2),%sp
+    movel %sp@+,%a0
+
+    movew #'\n',%sp@-                        /* CR */
+    bsr debug_add
+    lea %sp@(2),%sp
+    movew #'\r',%sp@-                        /* CR */
+    bsr debug_add
+    lea %sp@(2),%sp
+
+
+    /* Where did we come in from? */
+tp1:
+/*
+    movew %sp@(198),%sp@-                         
+    bsr debug_add_word
+    lea %sp@(2),%sp
+
+    movew #' ',%sp@-
+    bsr debug_add
+    lea %sp@(2),%sp
+
+    movew %sp@(200),%sp@-                         
+    bsr debug_add_word
+    lea %sp@(2),%sp
+
+
+    movew #'\n',%sp@-
+    bsr debug_add
+    lea %sp@(2),%sp
+    movew #'\r',%sp@-
+    bsr debug_add
+    lea %sp@(2),%sp
+*/
+
+    .short 0xb07c,0x0001                    /* cmpw #1,%d0 */
+    bnes fd3_not_1                          /* 1 not requested, go here */
+
+    tstb %d2                                
+    beq fd3_low_pal                         /* Originally low, mode "1" now selected - go here */
+    cmpb #2,%d2
+    beq fd3_high_pal                        /* Originally high, mode "1" now selected - go here */
+    bra fd3_med_pal                         /* Originally medium, mode "1" now selected - go here */
+
+fd3_not_1:
+    tstb %d2                                
+    beq fd3_orig_low                       /* Originally low */
+
+    cmpb #2,%d2                            /* originally high */
+    beq fd3_orig_high                      /* Yes */
+
+fd3_orig_med:
+    cmpw #4,%d0                             /* Switch to high res? */
+    beq fd3_goto_high
+
+    cmpw #3,%d0                             /* Stay in medium? */
+    beq fd3_med_pal
+
+fd3_goto_low:
+    clrw %sp@-
+    moveq #-1,%d0
+    movel %d0,%sp@-
+    movel %d0,%sp@-
+    movew #5,%sp@-
+    trap #14                                /* Setscreen(-1, -1, 0) - change to low res */
+    lea %sp@(12),%sp
+
+/* Set up 16-colour palette */
+fd3_low_pal:
+    .short 0x4879                           /* pea paltab16 */
+    .long paltab16
+    movew #6,%sp@-
+    trap #14                                /* Setpalette(void *pallptr) */
+    addql #6,%sp
+    moveq #1,%d0                            /* return 1 */
+
+    movew #'r',%sp@-                         /* Log return value */
+    bsr debug_add
+    lea %sp@(2),%sp
+    movew %d0,%sp@-                         /* Log return value */
+    bsr debug_add_word
+    lea %sp@(2),%sp
+
+	rts
+
+fd3_orig_low:
+    cmpw #3,%d0                             /* Switch to medium res? */
+    beqs fd3_goto_med                       /* yes */
+
+    cmpw #4,%d0                             /* Switch to high res? */
+    beqs fd3_goto_high                      /* yes THIS IS THE PROBLEMATIC ONE AT BOOT */
+
+    bra fd3_low_pal                         /* Stay in low */
+
+/* Mode "3" requested */
+fd3_goto_med:    
+    moveq #1,%d0
+    cmpb %d0,%d2                            
+    beqs fd3_med_pal                        /* mode "1" originally -> */
+    movew %d0,%sp@-
+    moveq #-1,%d0
+    movel %d0,%sp@-
+    movel %d0,%sp@-
+    movew #5,%sp@-
+    trap #14                                /* Setscreen(-1, -1, 1) - change to medium res */
+    lea %sp@(12),%sp
+
+/* Set up 4-colour palette */
+fd3_med_pal:
+    .short 0x4879                           /* pea paltab4 */
+    .long paltab4
+    movew #6,%sp@-
+    trap #14                                /* Setpalette(void *pallptr) */
+    addql #6,%sp
+    moveq #2,%d0                            /* return 2 */
+
+    movew #'m',%sp@-                         /* Log return value */
+    bsr debug_add
+    lea %sp@(2),%sp
+    movew %d0,%sp@-                         /* Log return value */
+    bsr debug_add_word
+    lea %sp@(2),%sp
+
+	rts
+
+fd3_orig_high:
+    cmpb #3,%d0
+    beq fd3_goto_med                        /* change to medium */
+    cmpb #4,%d0
+    beq fd3_high_pal                        /* stay in high */
+    bra fd3_goto_low
+
+
+fd3_goto_high:
+    moveq #2,%d0
+    movew %d0,%sp@-
+    moveq #-1,%d0
+    movel %d0,%sp@-
+    movel %d0,%sp@-
+    movew #5,%sp@-
+    trap #14                                /* Setscreen(-1, -1, 2) - change to high res */
+    lea %sp@(12),%sp
+
+fd3_high_pal:
+    .short 0x4879                           /* pea paltab4 */
+    .long paltab4
+    movew #6,%sp@-
+    trap #14                                /* Setpalette(void *pallptr) */
+    addql #6,%sp
+    moveq #3,%d0                            /* return 3 (high) */
+
+    movew #'r',%sp@-                         /* Log return value */
+    bsr debug_add
+    lea %sp@(2),%sp
+    movew %d0,%sp@-                         /* Log return value */
+    bsr debug_add_word
+    lea %sp@(2),%sp
+
+	rts
+
+debug_init:
+.global debug_init
+    movel #0x752019f3,%a5@(memvalid)
+    moveb #0,DEBUG_STRING
+    movel #DEBUG_STRING,DEBUG_POINTER
+
+    movew #'B',%sp@-                         /* Log return value */
+    bsr debug_add
+    lea %sp@(2),%sp
+
+    jmp debug_return
+
+debug_add:
+    movel %a1,%sp@-
+    moveal DEBUG_POINTER,%a1
+    moveb %sp@(9),%a1@+
+    moveb #0,%a1@
+    movel %a1,DEBUG_POINTER
+    movel %sp@+,%a1
+    rts
+
+hex_digits:
+    .ascii "0123456789abcdef"
+
+debug_add_word:
+	moveml %d0-%d2/%a0-%a3,%sp@-
+	movew %sp@(32),%d2
+	beqs debug_add_word_2
+
+    lea hex_digits,%a3
+
+debug_add_word_loop:
+	movew %d2,%d0
+	moveq #12,%d1
+	lsrw %d1,%d0
+	andil #65535,%d0
+	moveb %a3@(0000000000000000,%d0:l),%d0
+	extw %d0
+	movew %d0,%sp@-
+	jsr debug_add
+	addql #2,%sp
+	lslw #4,%d2
+	bnes debug_add_word_loop
+
+debug_add_word_3:
+	moveml %sp@+,%d0-%d2/%a0-%a3
+	rts
+    
+debug_add_word_2:
+	moveq #'0',%d0
+	movew %d0,%sp@-
+	jsr debug_add
+	jsr debug_add
+	jsr debug_add
+	jsr debug_add
+	addql #2,%sp
+	jmp debug_add_word_3
+
+
+check_intin:    
+
+    /* The instruction that was replaced: */
+    lea contrl,%a1
+
+    movew #'=',%sp@-                         /* = sign meaning INTIN */
+    bsr debug_add
+    lea %sp@(2),%sp
+
+    movel %a0,%sp@-
+    moveal INTIN,%a0
+    movew %a0@,%sp@-                         /* Log value */
+    bsr debug_add_word
+    lea %sp@(2),%sp
+    movel %sp@+,%a0
+
+    jsr _screen
+
+
+    jmp check_intin_return
+check_intin_return:
+    
