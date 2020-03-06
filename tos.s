@@ -22740,6 +22740,9 @@ v_clrwk:
 	.short 0x508f
 	.short 0x201f
 	rts
+
+addr_b252:
+init_g:
 	.short 0x23fc
 	.short 0x00fc
 	.short 0xb220
@@ -22801,8 +22804,8 @@ _FindDevice:
     .short 0xb43c,0x0002                    /* cmpb #2,%d2 - current rez = mono? */
     beqs addr_b332                          /* Yes - can't be changed */
 
-    moveal ram_unknown51,%a0
-    movew %a0@,%d0                          /* get something from a global variable and put it in d0, this must be the requested res */
+    moveal intin,%a0
+    movew %a0@,%d0                          /* get something from a variable and put it in d0, this must be the requested res */
     .short 0xb07c,0x0001                    /* cmpw #1,%d0 */
     bnes addr_b2da                          /* 1 not requested, go here */
     tstb %d2                                
@@ -23113,7 +23116,8 @@ addr_b4f2:
     braw v_clrwk                            /* Clear screen */
 
 addr_b552:
-.global addr_b552
+linea_init:
+.global linea_init
     movel #addr_b602,ram_unknown29 + 4      /* A couple of code pointers */
     movel #addr_b5da,ram_unknown29          /* la_routines (la is linea) */
     .short 0x4ef9                           /* jmp rout_init */
@@ -23208,7 +23212,7 @@ addr_b602:
 addr_b62a:
     linkw %fp,#0
     moveml %d5-%d7/%a4-%a5,%sp@-            /* Save regs */
-    moveal ram_unknown19,%a5
+    moveal contrl,%a5
     movew %a5@(12),%d6
     movew %a5@,%d7
     clrw %a5@(4)
@@ -24737,87 +24741,68 @@ addr_b790:
 	.short 0x2080
 	.short 0x4e5e
 	rts
-	.short 0x4e56
-	.short 0xffd8
-/* 0x00c280: */
-	.short 0x48e7
-	.short 0x030c
-	.short 0x2a7c
-	.short 0x00fe
-	.short 0xac20
-	.short 0x287c
-	.short 0x0000
-	.short 0x2828
-	.short 0x4247
-	.short 0x6004
-	.short 0x38dd
-	.short 0x5247
-	.short 0xbe7c
-	.short 0x002d
-	.short 0x6df6
-	.short 0x2a7c
-	.short 0x00fe
-	.short 0xac92
-	.short 0x287c
-	.short 0x0000
-	.short 0x27ce
-	.short 0x4247
-	.short 0x6004
-	.short 0x38dd
-	.short 0x5247
-	.short 0xbe7c
-	.short 0x002d
-	.short 0x6df6
-	.short 0x33f9
-	.short 0x00fe
-	.short 0xa97c
-	.short 0x0000
-/* 0x00c2c0: */
-	.short 0x27ea
-	.short 0x2a7c
-	.short 0x00fe
-	.short 0xac7a
-	.short 0x287c
-	.short 0x0000
-	.short 0x28ea
-	.short 0x4247
-	.short 0x6004
-	.short 0x38dd
-	.short 0x5247
-	.short 0xbe7c
-	.short 0x000c
-	.short 0x6df6
-	.short 0x227c
-	.short 0x00fe
-	.short 0x8ec6
-	.short 0x207c
-	.short 0x0000
-	.short 0x52ca
-	.short 0x702c
-	.short 0x30d9
-	.short 0x51c8
-	.short 0xfffc
-	.short 0x227c
-	.short 0x00fe
-	.short 0xa922
-	.short 0x207c
-	.short 0x0000
-	.short 0x5626
-	.short 0x702c
-	.short 0x30d9
-/* 0x00c300: */
-	.short 0x51c8
-	.short 0xfffc
-	.short 0x23fc
-	.short 0x0000
-	.short 0x52ca
-	.short 0x0000
-	.short 0x2918
 
-    /* This is inside v_openwk() */
+addr_c27c:
+v_opnwk:
+    linkw %fp,#-40                          /* Locals */
+    moveml %d6-%d7/%a4-%a5,%sp@-
+
+    moveal #rom_dev_tab,%a5                 /* Copy 45 words from rom_dev_tab to dev_tab */
+    moveal #dev_tab,%a4
+    clrw %d7
+    bras addr_c298
+
+addr_c294:
+    movew %a5@+,%a4@+                       /* Copy one word */
+    addqw #1,%d7
+addr_c298:
+    .short 0xbe7c,45                        /* cmpw #45,%d7 - Loop 0 to 44 */
+    blts addr_c294
+
+    moveal #rom_inq_tab,%a5                 /* Same again, for inq_tab */
+    moveal #inq_tab,%a4
+    clrw %d7
+    bras addr_c2b2
+
+addr_c2ae:
+    movew %a5@+,%a4@+
+    addqw #1,%d7
+addr_c2b2:
+    .short 0xbe7c,45                        /* cmpw #45,%d7 */
+    blts addr_c2ae
+
+    movew max_vert,inq_tab + 28                 
+
+    moveal #rom_siz_tab,%a5                 /* Copy 12 words from rom_siz_tab to siz_tab */
+    moveal #siz_tab,%a4
+    clrw %d7
+    bras addr_c2d6
+
+addr_c2d2:
+    movew %a5@+,%a4@+
+    addqw #1,%d7
+addr_c2d6:
+    .short 0xbe7c,12                        /* cmpw #12,%d7 */
+    blts addr_c2d2
+
+    moveal #f8x8,%a1
+    moveal #ram8x8,%a0
+    moveq #44,%d0                           /* Copy 44 words from f8x8 to ram8x8 (font headers?) */
+addr_c2ea:
+    movew %a1@+,%a0@+
+    dbf %d0,addr_c2ea
+
+    moveal #f8x16,%a1
+    moveal #ram8x16,%a0
+    moveq #44,%d0                           /* Copy 44 words from f8x16 to ram8x16 (font headers?) */
+addr_c2fe:    
+    movew %a1@+,%a0@+
+    dbf %d0,addr_c2fe
+
+    movel #ram8x8,ram_unknown55             /* font_ring[1] = &ram8x8 */
 
 	.short 0x4eb9
-	.long _FindDevice                        /* jsr FindDevice */
+	.long _FindDevice                       /* jsr FindDevice */
 
     movew %d0,%fp@(-40)                     /* local variable: curRez */
     cmpiw #2,%fp@(-40)                      /* is it 2? (medium) */
@@ -24848,126 +24833,75 @@ addr_c342:
 
 addr_c3ae:
     moveq #1,%d0
-    movew %d0,virt_work + 40                /* virt_work.handle */
+    movew %d0,virt_work + 40                /* virt_work.handle = 1 */
 
-    moveal ram_unknown19,%a1
+    moveal contrl,%a1                       /* contrl[6] = 1 */
     movew %d0,%a1@(12)
 
-    movel #virt_work,ram_unknown25
-    clrl virt_work + 64
-    movew #-1,line_cw
+    movel #virt_work,ram_unknown25          /* LV(cur_work) = &virt_work; */
+    clrl virt_work + 64                     /* virt_work.next_work */
+    movew #-1,line_cw                       /* Invalidate current line width */
 
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0xea30
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0xdfc0
-	.short 0x4279
-	.short 0x0000
-	.short 0x2928
-	.short 0x4279
-	.short 0x0000
-	.short 0x297e
-	.short 0x4279
-	.short 0x0000
-	.short 0x290a
-	.short 0x4279
-	.short 0x0000
-	.short 0x297c
-	.short 0x3039
-	.short 0x0000
-/* 0x00c400: */
-	.short 0x2828
-	.short 0x48c0
-	.short 0x81fc
-	.short 0x0002
-	.short 0x33c0
-	.short 0x0000
-	.short 0x2882
-	.short 0x3039
-	.short 0x0000
-	.short 0x282a
-	.short 0x48c0
-	.short 0x81fc
-	.short 0x0002
-	.short 0x33c0
-	.short 0x0000
-	.short 0x2884
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0xb252
-	.short 0x2d79
-	.short 0x0000
-	.short 0x2ae4
-	.short 0xfffc
-	.short 0x2d79
-	.short 0x0000
-	.short 0x2aec
-	.short 0xfff8
-	.short 0x2d79
-	.short 0x0000
-	.short 0x2ae0
-	.short 0xfff4
-	.short 0x41ee
-/* 0x00c440: */
-	.short 0xffe6
-	.short 0x23c8
-	.short 0x0000
-	.short 0x2ae0
-	.short 0x41ee
-	.short 0xffe2
-	.short 0x23c8
-	.short 0x0000
-	.short 0x2ae4
-	.short 0x41ee
-	.short 0xffda
-	.short 0x23c8
-	.short 0x0000
-	.short 0x2aec
-	.short 0x3d7c
-	.short 0x0001
-	.short 0xffe4
-	.short 0x287c
-	.short 0x0000
-	.short 0x288a
-	.short 0x4bee
-	.short 0xffdc
-	.short 0x4247
-	.short 0x6016
-	.short 0x3d47
-	.short 0xffe2
-	.short 0x4eb9
-	.short 0x00fd
-	.short 0x1d86
-	.short 0x38d5
-	.short 0x38ed
-	.short 0x0002
-/* 0x00c480: */
-	.short 0x38ed
-	.short 0x0004
-	.short 0x5247
-	.short 0xbe79
-	.short 0x0000
-	.short 0x2842
-	.short 0x6de2
-	.short 0x23ee
-	.short 0xfff4
-	.short 0x0000
-	.short 0x2ae0
-	.short 0x23ee
-	.short 0xfffc
-	.short 0x0000
-	.short 0x2ae4
-	.short 0x23ee
-	.short 0xfff8
-	.short 0x0000
-	.short 0x2aec
-	.short 0x4a9f
-	.short 0x4cdf
-	.short 0x3080
-	.short 0x4e5e
-	rts
+    .short 0x4eb9                           /* jsr text_init - Initialise the SIZ_TAB info */
+    .long text_init
+
+    .short 0x4eb9                           /* jsr init_wk */
+    .long init_wk
+
+    /* Input must be initialised here and not in init_wk() */
+    clrw loc_mode                           /* Default is request mode (same for all 4 of these) */
+    clrw val_mode
+    clrw chc_mode
+    clrw str_mode
+
+    movew dev_tab,%d0
+    extl %d0
+    divsw #2,%d0
+    movew %d0,gcurx
+    movew dev_tab + 2,%d0
+    extl %d0
+    divsw #2,%d0
+    movew %d0,gcury
+    .short 0x4eb9                           /* jsr init_g */
+    .long init_g
+
+    movel intin,%fp@(-4)                    /* Save original values */
+    movel intout,%fp@(-8)
+    movel contrl,%fp@(-12)
+
+    lea %fp@(-26),%a0                       /* Replace pointers with addresses of local vars "new_contrl" etc */
+    movel %a0,contrl
+    lea %fp@(-30),%a0
+    movel %a0,intin
+    lea %fp@(-38),%a0
+    movel %a0,intout
+
+    movew #1,%fp@(-28)                      /* new_initin[1] = 1 */
+
+    moveal #req_col,%a4
+    lea %fp@(-36),%a5                       /* new_intout + 1 */
+    clrw %d7
+    bras addr_c486
+addr_c470:
+    movew %d7,%fp@(-30)                     /* new_intin[0] = i; */
+    .short 0x4eb9                           /* jsr vq_color */
+    .long vq_color
+    movew %a5@,%a4@+                        /* Copy 6 bytes */
+    movew %a5@(2),%a4@+
+    movew %a5@(4),%a4@+
+    addqw #1,%d7
+addr_c486:
+    cmpw dev_tab + 26,%d7
+    blts addr_c470
+
+    movel %fp@(-12),contrl                  /* Restore the pointers */
+    movel %fp@(-4),intin
+    movel %fp@(-8),intout
+    tstl %sp@+
+    moveml %sp@+,%d7/%a4-%a5
+    unlk %fp
+    rts
+
 	.short 0x4e56
 	.short 0x0000
 	.short 0x48e7
@@ -28541,6 +28475,9 @@ addr_c3ae:
 	.short 0x4e5e
 	rts
 /* 0x00dfc0: */
+
+addr_dfc0:
+init_wk:
 	.short 0x4e56
 	.short 0x0000
 	.short 0x48e7
@@ -29918,6 +29855,9 @@ addr_c3ae:
 	.short 0x3000
 	.short 0x4e5e
 	rts
+
+addr_ea30:
+text_init:
 	.short 0x4e56
 	.short 0xfffa
 	.short 0x48e7
@@ -36695,6 +36635,9 @@ addr_c3ae:
 	rts
 	.short 0x7200
 	rts
+
+addr_11d86:
+vq_color:
 	.short 0x2f04
 	.short 0x2079
 	.short 0x0000
@@ -88288,6 +88231,9 @@ f8x16:
 	.short 0x0000
 	.short 0x0000
 	.short 0x0000
+
+addr_2a97c:
+max_vert:
 	.short 0x0200
 	.short 0xffff
 /* 0x02a980: */
@@ -88629,6 +88575,7 @@ f8x16:
 	.short 0x8080
 	.short 0x8080
 	.short 0x8080
+
 	.short 0x8080
 	.short 0x8080
 	.short 0x0000
@@ -88637,6 +88584,9 @@ f8x16:
 	.short 0x0003
 	.short 0x0007
 	.short 0x000f
+
+addr_2ac20:
+rom_dev_tab:
 	.short 0x013f
 	.short 0x00c7
 	.short 0x0000
@@ -88683,6 +88633,9 @@ f8x16:
 	.short 0x0001
 	.short 0x0001
 	.short 0x0002
+
+addr_2ac7a:
+rom_siz_tab:
 	.short 0x0000
 	.short 0x0007
 	.short 0x0000
@@ -88696,6 +88649,9 @@ f8x16:
 	.short 0x000b
 	.short 0x0078
 	.short 0x0058
+
+addr_2ac92:
+rom_inq_tab:
 	.short 0x0004
 	.short 0x0200
 	.short 0x001f
@@ -88845,8 +88801,9 @@ f8x16:
 	.short 0x000f
 	.short 0x000d
 	.short 0x0001
-	.short 0x00fc
-	.short 0xc27c
+    
+	.long v_opnwk
+
 	.short 0x00fc
 	.short 0xc578
 	.short 0x00fc

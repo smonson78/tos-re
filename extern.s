@@ -179,14 +179,41 @@ etv_term:
 .set ram_unknown22,0x283c
 .global ram_unknown22
 
+.set gcurx,0x2882
+.global gcurx
+
+.set gcury,0x2884
+.global gcury
+
+.set req_col,0x288a
+.global req_col
+
+.set siz_tab,0x28ea
+.global siz_tab
+
+.set chc_mode,0x290a
+.global chc_mode
+
 .set ram_unknown25,0x290c
 .global ram_unknown25
+
+.set ram_unknown55,0x2918
+.global ram_unknown55
 
 .set ram_unknown20,0x291c
 .global ram_unknown20
 
 .set line_cw,0x2926
 .global line_cw
+
+.set loc_mode,0x2928
+.global loc_mode
+
+.set str_mode,0x297c
+.global str_mode
+
+.set val_mode,0x297e
+.global val_mode
 
 .set disab_cnt,0x2982
 .global disab_cnt
@@ -238,11 +265,14 @@ etv_term:
 .set v_lin_wr,0x2ade
 .global v_lin_wr
 
-.set ram_unknown19,0x2ae0
-.global ram_unknown19
+.set contrl,0x2ae0
+.global contrl
 
-.set ram_unknown51,0x2ae4
-.global ram_unknown51
+.set intin,0x2ae4
+.global intin
+
+.set intout,0x2aec
+.global intout
 
 .set ram_unknown21,0x2b00
 .global ram_unknown21
@@ -296,11 +326,12 @@ etv_term:
 /* A big font struct */
 .set ram8x8,0x52ca
 .global ram8x8
-.set ram8x16,0x5626
-.global ram8x16
 
 .set ram_unknown6,0x5622
 .global ram_unknown6
+
+.set ram8x16,0x5626
+.global ram8x16
 
 .set ram_unknown9,0x5680
 .global ram_unknown9

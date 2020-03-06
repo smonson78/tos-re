@@ -335,7 +335,7 @@ addr_3ea:
     moveb #2,%a5@(sshiftmod)
 addr_3f6:    
     bsrw blittest                               /* Test if the blitter is installed */                               
-    jsr addr_b552                               /* Initialise line-a routines */
+    jsr linea_init                              /* Initialise line-a routines */
     jsr esc_init
     cmpib #1,%a5@(sshiftmod)                    /* sshiftmod */
     bnes addr_414                               /* Not medium res? */
