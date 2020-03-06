@@ -333,17 +333,14 @@ dummy_exception:
 	rte
 
 addr_7a2:
-	.short 0x40e7
-	.short 0x027c
-	.short 0xf8ff
-	.short 0x2039
-	.short 0x0000
-	.short 0x0466
-	.short 0xb0b9
-	.short 0x0000
-	.short 0x0466
-	.short 0x67f8
-	.short 0x46df
+vsync:
+    movew %sr,%sp@-                         /* Save sr */
+    andiw #0xf8ff,%sr
+    movel _frlock,%d0                       /* Frame counter */
+addr_7ae:
+    cmpl _frlock,%d0                        /* Keep looping until it changes. */
+    beqs addr_7ae
+    movew %sp@+,%sr                         /* Restore sr */
 	rts
 
 	.short 0x2f39
@@ -639,7 +636,7 @@ addr_a9c:
     tstw %sp@(12)                           /* Check next word on stack */
     bmis addr_ac2
     moveb %sp@(13),%a5@(sshiftmod)          /* If positive, update screen resolution */
-    bsrw addr_7a2
+    bsrw vsync
     moveb %a5@(sshiftmod),%a5@(video_res)   /* Setting the video register from sshiftmod */
     clrw %a5@(vblsem)
     jsr esc_init
