@@ -21741,14 +21741,12 @@ gl_f_init:
 
 /* Trap 2 handler for opcode 115 (VDI) */
 vdi_dispatcher:
+_gsx_entry:
     moveml %d1-%fp,%sp@-            /* Save all regs except d0 and sp */
     moveal %d1,%a0                  /* Source address in d1 */
     
-    .short 0x43f9                   /* lea 0x2ae0,%a1 - dest address: 0x2ae0 */
-    .long 0x00002ae0
-
-    .short 0x47f9                   /* lea 0x1b1c,%a3 - other dest address: 0x1b1c */
-    .long 0x00001b1c
+    lea contrl,%a1
+    lea ptsin_array,%a3
 
     moveal %a0@+,%a2                /* Copy first 4 bytes into a2 */
     movel %a2,%a1@+                 /* then put it in the dest */
@@ -21785,14 +21783,13 @@ addr_ab1c:
     dbf %d0,addr_ab0c               /* Repeat d0 times. We will now have copied d0 * 4 bytes */
 addr_ab20:
 
-    .short 0x4eb9                   /* jsr addr_b62a */
-    .long addr_b62a
+    .short 0x4eb9                   /* jsr _screen */
+    .long _screen
     
-    .short 0x2079,0x0000,0x2ae0     /* moveal 0x2ae0,%a0 */
-
+    moveal contrl,%a0
     movew %sp@+,%a0@(2)             /* pop off stack into 0x2ae0+2 */
     moveml %sp@+,%d1-%fp            /* restore saved registers */
-    movew ram_unknown24,%d0         /* Return value */
+    movew _flip_y,%d0               /* Return value */
     rts
 
 linea_handler:
@@ -22907,6 +22904,9 @@ paltab16:
 /* 0x00b380: */
 	.short 0x2a9e
 	rts
+
+addr_b384:
+dinit_g:
 	.short 0x2f39
 	.short 0x0000
 	.short 0x2a9e
@@ -22928,6 +22928,8 @@ paltab16:
 	.short 0x2908
 	.short 0x7001
 	rts
+
+
 	.short 0x7203
 	.short 0x40c0
 	.short 0x007c
@@ -23207,6 +23209,7 @@ addr_b602:
 	.short 0x2bf2
 
 addr_b62a:
+_screen:
     linkw %fp,#0
     moveml %d5-%d7/%a4-%a5,%sp@-            /* Save regs */
     moveal contrl,%a5
@@ -23214,10 +23217,10 @@ addr_b62a:
     movew %a5@,%d7
     clrw %a5@(4)
     clrw %a5@(8)
-    clrw ram_unknown24 
-    .short 0xbe7c,0x0001 /* cmpw #1,%d7 */
+    clrw _flip_y 
+    .short 0xbe7c,0x0001                    /* cmpw #1,%d7 */
     beqw addr_b74c
-    .short 0xbe7c,0x0064 /* cmpw #100,%d7 */
+    .short 0xbe7c,0x0064                    /* cmpw #100,%d7 */
     beqw addr_b74c
     moveal #15274,%a4
 addr_b662:    
@@ -23228,7 +23231,7 @@ addr_b662:
     bnes addr_b662
     braw addr_b790
 addr_b674:    
-    movel %a4,ram_unknown25
+    movel %a4,cur_work
     movew %a4@(2),%d0
     movew %d0,ram_unknown21 + 18
     movew %d0,ram_unknown23 + 162           /* 0x000027f4 */
@@ -24796,7 +24799,7 @@ addr_c2fe:
     movew %a1@+,%a0@+
     dbf %d0,addr_c2fe
 
-    movel #ram8x8,ram_unknown55             /* font_ring[1] = &ram8x8 */
+    movel #ram8x8,font_ring + 4             /* font_ring[1] = &ram8x8 */
 
 	.short 0x4eb9
 	.long _FindDevice                       /* jsr FindDevice */
@@ -24835,7 +24838,7 @@ addr_c3ae:
     moveal contrl,%a1                       /* contrl[6] = 1 */
     movew %d0,%a1@(12)
 
-    movel #virt_work,ram_unknown25          /* LV(cur_work) = &virt_work; */
+    movel #virt_work,cur_work               /* LV(cur_work) = &virt_work; */
     clrl virt_work + 64                     /* virt_work.next_work */
     movew #-1,line_cw                       /* Invalidate current line width */
 
@@ -25002,43 +25005,32 @@ addr_c486:
 	.short 0x3080
 	.short 0x4e5e
 	rts
-	.short 0x4e56
-	.short 0xfff8
-	.short 0x4ab9
-	.short 0x0000
-/* 0x00c580: */
-	.short 0x3bea
-	.short 0x6732
-	.short 0x23f9
-	.short 0x0000
-	.short 0x3bea
-	.short 0x0000
-	.short 0x290c
-	.short 0x2079
-	.short 0x0000
-	.short 0x290c
-	.short 0x2d68
-	.short 0x0040
-	.short 0xfffc
-	.short 0x2eb9
-	.short 0x0000
-	.short 0x290c
-	.short 0x3f3c
-	.short 0x0049
-	.short 0x4eb9
-	.short 0x00fd
-	.short 0x061a
-	.short 0x548f
-	.short 0x23ee
-	.short 0xfffc
-	.short 0x0000
-	.short 0x290c
-	.short 0x66d8
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0xb384
-	.short 0x4e5e
-	rts
+
+/* VDI #2 - Close workstation */
+addr_c578:
+v_clswk:
+    linkw %fp,#-8
+    tstl virt_work + 64
+    beqs addr_c5b6
+    movel virt_work + 64,cur_work
+addr_c58e:
+    moveal cur_work,%a0
+    movel %a0@(64),%fp@(-4)                 /* next_work = cur_work->next_work; */
+    
+    movel cur_work,%sp@
+    movew #73,%sp@-
+    .short 0x4eb9                           /* jsr mfree - Mfree(cur_work) */
+    .long mfree
+    addql #2,%sp
+
+    movel %fp@(-4),cur_work                 /* cur_work = next_work */
+    bnes addr_c58e
+addr_c5b6:
+    .short 0x4eb9                           /* jsr dinit_g */
+    .long dinit_g
+    unlk %fp
+    rts
+
 /* 0x00c5c0: */
 	.short 0x4e56
 	.short 0x0000
@@ -33540,6 +33532,9 @@ text_init:
 	.short 0x7001
 	.short 0x2a5f
 	rts
+
+addr_1061a:
+mfree:
 	.short 0x23df
 	.short 0x0000
 	.short 0x298a
@@ -33548,6 +33543,7 @@ text_init:
 	.short 0x0000
 	.short 0x298a
 	rts
+
 	.short 0x3039
 	.short 0x0000
 	.short 0x2b34
@@ -88798,88 +88794,50 @@ rom_inq_tab:
 	.short 0x000f
 	.short 0x000d
 	.short 0x0001
-    
-	.long v_opnwk
 
-	.short 0x00fc
-	.short 0xc578
-	.short 0x00fc
-	.short 0xb222
-/* 0x02adc0: */
-	.short 0x00fc
-	.short 0xb220
-	.short 0x00fc
-	.short 0xa292
-	.short 0x00fc
-	.short 0xc5c0
-	.short 0x00fc
-	.short 0xc65a
-	.short 0x00fc
-	.short 0xe314
-	.short 0x00fc
-	.short 0xc7a0
-	.short 0x00fc
-	.short 0xb220
-	.short 0x00fc
-	.short 0xc7ac
-	.short 0x00fc
-	.short 0xeb64
-	.short 0x00fc
-	.short 0xefd0
-	.short 0x00fd
-	.short 0x1cd4
-	.short 0x00fc
-	.short 0xb8a6
-	.short 0x00fc
-	.short 0xb8f0
-	.short 0x00fc
-	.short 0xb9ac
-	.short 0x00fc
-	.short 0xba88
-	.short 0x00fc
-	.short 0xb9fc
+/* VDI functions 1-39 */
+jmptb1:
+	.long v_opnwk
+	.long v_clswk
+	.long v_clrwk
+	.long 0x00fcb220
+	.long 0x00fca292
+	.long 0x00fcc5c0
+	.long 0x00fcc65a
+	.long 0x00fce314
+	.long 0x00fcc7a0
+	.long 0x00fcb220 /* 10 */
+	.long 0x00fcc7ac
+	.long 0x00fceb64
+	.long 0x00fcefd0
+	.long 0x00fd1cd4
+	.long 0x00fcb8a6
+	.long 0x00fcb8f0
+	.long 0x00fcb9ac
+	.long 0x00fcba88
+	.long 0x00fcb9fc
 /* 0x02ae00: */
-	.short 0x00fc
-	.short 0xbad8
-	.short 0x00fc
-	.short 0xf00a
-	.short 0x00fc
-	.short 0xf0ee
-	.short 0x00fc
-	.short 0xbb2e
-	.short 0x00fc
-	.short 0xbb7a
-	.short 0x00fc
-	.short 0xbbe2
-	.short 0x00fd
-	.short 0x1d86
-	.short 0x00fc
-	.short 0xb220
-	.short 0x00fc
-	.short 0xbc32
-	.short 0x00fc
-	.short 0xbd84
-	.short 0x00fc
-	.short 0xbd8c
-	.short 0x00fc
-	.short 0xbe16
-	.short 0x00fc
-	.short 0xbf1a
-	.short 0x00fc
-	.short 0xbf74
-	.short 0x00fc
-	.short 0xb220
-	.short 0x00fc
-	.short 0xc95c
+	.long 0x00fcbad8 /* 20 */
+	.long 0x00fcf00a
+	.long 0x00fcf0ee
+	.long 0x00fcbb2e
+	.long 0x00fcbb7a
+	.long 0x00fcbbe2
+	.long 0x00fd1d86
+	.long 0x00fcb220
+	.long 0x00fcbc32
+	.long 0x00fcbd84
+	.long 0x00fcbd8c /* 30 */
+	.long 0x00fcbe16
+	.long 0x00fcbf1a
+	.long 0x00fcbf74
+	.long 0x00fcb220
+	.long 0x00fcc95c
 /* 0x02ae40: */
-	.short 0x00fc
-	.short 0xc9b8
-	.short 0x00fc
-	.short 0xca18
-	.short 0x00fc
-	.short 0xf13e
-	.short 0x00fc
-	.short 0xef74
+	.long 0x00fcc9b8
+	.long 0x00fcca18
+	.long 0x00fcf13e
+	.long 0x00fcef74 /* 39 */
 
 /* A function lookup table for the VDI dispatcher */
 addr_2ae50:

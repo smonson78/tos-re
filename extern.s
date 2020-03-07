@@ -159,13 +159,16 @@ etv_term:
 .set saved_vectors,0x1814
 .global saved_vectors
 
-/* This is a 1KB disk buffer from 0x181c to 0x221c */
+/* This is a 1KB disk buffer from 0x181c to 0x221c (maybe it's just a pointer to the buffer) */
 .set disk_buffer,0x181c
 .global disk_buffer
 
 /* This is used by TOS but appears to be within the above buffer */
-.set ram_unknown24,0x1860
-.global ram_unknown24
+.set _flip_y,0x1860
+.global _flip_y
+
+.set ptsin_array,0x1b1c
+.global ptsin_array
 
 .set ram_unknown23,0x2752
 .global ram_unknown23
@@ -194,11 +197,12 @@ etv_term:
 .set chc_mode,0x290a
 .global chc_mode
 
-.set ram_unknown25,0x290c
-.global ram_unknown25
+.set cur_work,0x290c
+.global cur_work
 
-.set ram_unknown55,0x2918
-.global ram_unknown55
+/* This is an array of 4 pointers to struct font_head. */
+.set font_ring,0x2914
+.global font_ring
 
 .set ram_unknown20,0x291c
 .global ram_unknown20
@@ -316,7 +320,7 @@ etv_term:
 .set stack_top,0x378a
 .global stack_top
 
-/* Virtual workstation "ATTRIBUTE" structure (308+ bytes) */
+/* Virtual workstation "ATTRIBUTE" structure (308+ bytes - to 3cde) */
 .set virt_work,0x3baa
 .global virt_work
 
