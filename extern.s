@@ -173,9 +173,11 @@ etv_term:
 .set ram_unknown23,0x2752
 .global ram_unknown23
 
+/* 45 words from 27ce to 2828 */
 .set inq_tab,0x27ce
 .global inq_tab
 
+/* 45 words from 2828 to 2882 */
 .set dev_tab,0x2828
 .global dev_tab
 
