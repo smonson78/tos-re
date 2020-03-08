@@ -24804,7 +24804,7 @@ addr_c2fe:
 	.short 0x4eb9
 	.long _FindDevice                       /* jsr FindDevice */
 
-    movew %d0,%fp@(-40)                     /* local variable: curRez */
+    movew %d0,%fp@(-40)                     /* return value ==> curRez */
     cmpiw #2,%fp@(-40)                      /* is it 2? (medium) */
     bnes addr_c342                          /* ...no -> skip */
 

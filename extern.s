@@ -179,10 +179,6 @@ etv_term:
 .set dev_tab,0x2828
 .global dev_tab
 
-.set ram_unknown22,0x283c
-.global ram_unknown22
-
-
 .set gcurx,0x2882
 .global gcurx
 
