@@ -28467,124 +28467,104 @@ addr_c5b6:
 
 addr_dfc0:
 init_wk:
-	.short 0x4e56
-	.short 0x0000
-	.short 0x48e7
-	.short 0x031c
-	.short 0x2a79
-	.short 0x0000
-	.short 0x2ae4
-	.short 0x548d
-	.short 0x2679
-	.short 0x0000
-	.short 0x290c
-	.short 0x3e1d
-	.short 0xbe7c
-	.short 0x0007
-	.short 0x6e04
-	.short 0x4a47
-	.short 0x6c04
-	.short 0x4240
-	.short 0x6004
-	.short 0x3007
-	.short 0x5340
-	.short 0x3740
-	.short 0x0030
-	.short 0x3e1d
-	.short 0xbe79
-	.short 0x0000
-	.short 0x2842
-	.short 0x6c04
-	.short 0x4a47
-	.short 0x6c02
-	.short 0x7e01
-	.short 0x3047
-/* 0x00e000: */
-	.short 0xd1c8
-	.short 0xd1fc
-	.short 0x00fe
-	.short 0xad74
-	.short 0x3750
-	.short 0x002c
-	.short 0x3e1d
-	.short 0x5347
-	.short 0xbe7c
-	.short 0x0006
-	.short 0x6c04
-	.short 0x4a47
-	.short 0x6c04
-	.short 0x7002
+    linkw %fp,#0
+    moveml %d6-%d7/%a3-%a5,%sp@-
+    moveal intin,%a5
+    addql #2,%a5
+    moveal cur_work,%a3
+    movew %a5@+,%d7
+    .short 0xbe7c,0x0007                    /* cmpw #7,%d7 */
+    bgts addr_dfe2
+    tstw %d7
+    bges addr_dfe6
+addr_dfe2:
+    clrw %d0
+    bras addr_dfea
+addr_dfe6:    
+    movew %d7,%d0
+    subqw #1,%d0
+addr_dfea:
+    movew %d0,%a3@(48)
+    movew %a5@+,%d7
+    cmpw ram_unknown59,%d7
+    bges addr_dffc
+    tstw %d7
+    bges addr_dffe
+addr_dffc:
+    moveq #1,%d7
+addr_dffe:
+    moveaw %d7,%a0
+    addal %a0,%a0
+    addal #addr_2ad74,%a0
+    movew %a0@,%a3@(44)
+    movew %a5@+,%d7
+    subqw #1,%d7
+    .short 0xbe7c,0x0006                    /* cmpw #6,%d7 */
+    bges addr_e01a
+    tstw %d7
+    bges addr_e01e
+addr_e01a:
+    moveq #2,%d0
+    bras addr_e020
+addr_e01e:
+    movew %d7,%d0
+addr_e020:
+    movew %d0,%a3@(60)
+    movew %a5@+,%d7
+    cmpw ram_unknown59,%d7
+    bges addr_e032
+    tstw %d7
+    bges addr_e034
+addr_e032:
+    moveq #1,%d7
+addr_e034:
+    moveaw %d7,%a0
+    addal %a0,%a0
+    addal #addr_2ad74,%a0
+    movew %a0@,%a3@(56)
+    addql #2,%a5
+    movew %a5@+,%d7
+    cmpw ram_unknown59,%d7
+    bges addr_e052
+    tstw %d7
+    bges addr_e054
+addr_e052:
+    moveq #1,%d7
+addr_e054:
+    moveaw %d7,%a0
+    addal %a0,%a0
+    addal #addr_2ad74,%a0
+    movew %a0@,%a3@(162)
+    movew ram_unknown60,%a3@(58)
+    movew #1,%a3@(62)
+    movew %a5@+,%d7
+    .short 0xbe7c,0x0004                    /* cmpw #4,%d7 */
+    bgts addr_e07c
+    tstw %d7
+    bges addr_e080
+addr_e07c:
+    clrw %d0
+    bras addr_e082
+addr_e080:
+    movew %d7,%d0
+addr_e082:
+    movew %d0,%a3@(36)
+    movew %a5@+,%d7
+    .short 0x0c6b,0x0002,0x0024             /* cmpiw #2,%a3@(36) */
+    bnes addr_e0a6
+    .short 0xbe7c,0x0018                    /* cmpw #24,%d7 */
+    bgts addr_e09c
+    .short 0xbe7c,0x0001                    /* cmpw #1,%d7 */
+    bges addr_e0a0
+addr_e09c:
+    moveq #1,%d0
+	
 	.short 0x6002
-	.short 0x3007
-	.short 0x3740
-	.short 0x003c
-	.short 0x3e1d
-	.short 0xbe79
-	.short 0x0000
-	.short 0x2842
-	.short 0x6c04
-	.short 0x4a47
-	.short 0x6c02
-	.short 0x7e01
-	.short 0x3047
-	.short 0xd1c8
-	.short 0xd1fc
-	.short 0x00fe
-	.short 0xad74
-	.short 0x3750
-/* 0x00e040: */
-	.short 0x0038
-	.short 0x548d
-	.short 0x3e1d
-	.short 0xbe79
-	.short 0x0000
-	.short 0x2842
-	.short 0x6c04
-	.short 0x4a47
-	.short 0x6c02
-	.short 0x7e01
-	.short 0x3047
-	.short 0xd1c8
-	.short 0xd1fc
-	.short 0x00fe
-	.short 0xad74
-	.short 0x3750
-	.short 0x00a2
-	.short 0x3779
-	.short 0x0000
-	.short 0x28fc
-	.short 0x003a
-	.short 0x377c
-	.short 0x0001
-	.short 0x003e
-	.short 0x3e1d
-	.short 0xbe7c
-	.short 0x0004
-	.short 0x6e04
-	.short 0x4a47
-	.short 0x6c04
-	.short 0x4240
-	.short 0x6002
-/* 0x00e080: */
-	.short 0x3007
-	.short 0x3740
-	.short 0x0024
-	.short 0x3e1d
-	.short 0x0c6b
-	.short 0x0002
-	.short 0x0024
-	.short 0x6616
-	.short 0xbe7c
-	.short 0x0018
-	.short 0x6e06
-	.short 0xbe7c
-	.short 0x0001
-	.short 0x6c04
-	.short 0x7001
-	.short 0x6002
+addr_e0a0:
 	.short 0x3007
 	.short 0x3e00
 	.short 0x6014
+addr_e0a6:
 	.short 0xbe7c
 	.short 0x000c
 	.short 0x6e06
@@ -88759,9 +88739,11 @@ rom_inq_tab:
 	.short 0x0000
 	.short 0x0000
 	.short 0x0003
+
 	.short 0xfffc
 	.short 0x0000
-	.short 0x0000
+addr_2ad74:
+    .short 0x0000
 	.short 0x000f
 	.short 0x0001
 	.short 0x0002
