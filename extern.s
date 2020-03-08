@@ -182,8 +182,6 @@ etv_term:
 .set ram_unknown22,0x283c
 .global ram_unknown22
 
-.set ram_unknown59,0x2842
-.global ram_unknown59
 
 .set gcurx,0x2882
 .global gcurx

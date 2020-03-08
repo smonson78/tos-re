@@ -23250,7 +23250,7 @@ addr_b6d4:
     clrw ram_unknown21 + 16
 addr_b6da:    
     movel %a4@(52),ram_unknown20
-    movew %a4@(68),ram_unknown22
+    movew %a4@(68),dev_tab + 20
     movew %a4@(8),ram_unknown21 + 30
     movew %a4@(28),ram_unknown21 + 32
     movew %a4@(70),ram_unknown21 + 66
@@ -28463,7 +28463,6 @@ addr_c5b6:
 	.short 0x30c0
 	.short 0x4e5e
 	rts
-/* 0x00dfc0: */
 
 addr_dfc0:
 init_wk:
@@ -28471,7 +28470,7 @@ init_wk:
     moveml %d6-%d7/%a3-%a5,%sp@-
     moveal intin,%a5
     addql #2,%a5
-    moveal cur_work,%a3
+    moveal cur_work,%a3                     /* a3 is work_ptr in C source */
     movew %a5@+,%d7
     .short 0xbe7c,0x0007                    /* cmpw #7,%d7 */
     bgts addr_dfe2
@@ -28484,9 +28483,9 @@ addr_dfe6:
     movew %d7,%d0
     subqw #1,%d0
 addr_dfea:
-    movew %d0,%a3@(48)
-    movew %a5@+,%d7
-    cmpw ram_unknown59,%d7
+    movew %d0,%a3@(48)                      /* work_ptr->line_index */
+    movew %a5@+,%d7                         /* l = *pointer++ */
+    cmpw dev_tab + 26,%d7
     bges addr_dffc
     tstw %d7
     bges addr_dffe
@@ -28511,7 +28510,7 @@ addr_e01e:
 addr_e020:
     movew %d0,%a3@(60)
     movew %a5@+,%d7
-    cmpw ram_unknown59,%d7
+    cmpw dev_tab + 26,%d7
     bges addr_e032
     tstw %d7
     bges addr_e034
@@ -28524,7 +28523,7 @@ addr_e034:
     movew %a0@,%a3@(56)
     addql #2,%a5
     movew %a5@+,%d7
-    cmpw ram_unknown59,%d7
+    cmpw dev_tab + 26,%d7
     bges addr_e052
     tstw %d7
     bges addr_e054
