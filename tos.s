@@ -24742,6 +24742,7 @@ addr_b790:
 	.short 0x4e5e
 	rts
 
+/* void v_opnwk(int16_t *work_in, int16_t *handle, int16_t *work_out); */
 addr_c27c:
 v_opnwk:
     linkw %fp,#-40                          /* Locals */
@@ -24787,14 +24788,14 @@ addr_c2d6:
 
     moveal #f8x8,%a1
     moveal #ram8x8,%a0
-    moveq #44,%d0                           /* Copy 44 words from f8x8 to ram8x8 (font headers?) */
+    moveq #44,%d0                           /* Copy 45 words from f8x8 to ram8x8 (font headers?) */
 addr_c2ea:
     movew %a1@+,%a0@+
     dbf %d0,addr_c2ea
 
     moveal #f8x16,%a1
     moveal #ram8x16,%a0
-    moveq #44,%d0                           /* Copy 44 words from f8x16 to ram8x16 (font headers?) */
+    moveq #44,%d0                           /* Copy 45 words from f8x16 to ram8x16 (font headers?) */
 addr_c2fe:    
     movew %a1@+,%a0@+
     dbf %d0,addr_c2fe

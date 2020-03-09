@@ -274,6 +274,7 @@ etv_term:
 .set contrl,0x2ae0
 .global contrl
 
+/* A reusable pointer to the intin table */
 .set INTIN,0x2ae4
 .global INTIN
 
