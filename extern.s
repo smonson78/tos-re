@@ -423,11 +423,29 @@ typedef struct _bcb
 .set _drawaddr,0x666a
 .global _drawaddr
 
+.set iioff,0x6af2
+.global iioff
+
+.set iooff,0x6afa
+.global iooff
+
+.set pooff,0x6afe
+.global pooff
+
 .set _drwaddr,0x6b02
 .global _drwaddr
 
 .set _tikaddr,0x6b06
 .global _tikaddr
+
+.set ram_unknown62,0x6c56
+.global ram_unknown62
+
+.set ram_unknown63,0x6c6a
+.global ram_unknown63
+
+.set ram_unknown67,0x6d5c
+.global ram_unknown67
 
 .set ram_unknown35,0x6dc0
 .global ram_unknown35
@@ -437,6 +455,9 @@ typedef struct _bcb
 
 .set _sh_iscart,0x6de0
 .global _sh_iscart
+
+.set ram_unknown68,0x6e10
+.global ram_unknown68
 
 .set ram_unknown33,0x6e1a
 .global ram_unknown33
@@ -462,6 +483,12 @@ typedef struct _bcb
 .set _sh_isgem,0x708a
 .global _sh_isgem
 
+.set ram_unknown66,0x70ea
+.global ram_unknown66
+
+.set ram_unknown61,0x715e
+.global ram_unknown61
+
 .set _DOS_ERR,0x742a
 .global _DOS_ERR
 
@@ -486,6 +513,13 @@ typedef struct _bcb
 
 .set ram_unknown36,0xa792
 .global ram_unknown36
+
+.set ram_unknown65,0xa832
+.global ram_unknown65
+
+.set ram_unknown64,0xa834
+.global ram_unknown64
+
 
 /* The end of RAM used by GEM is a84e */
 

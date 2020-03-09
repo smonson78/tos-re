@@ -70008,74 +70008,47 @@ addr_1f926:
 	.short 0x4fef
 	.short 0x000c
 	rts
-	.short 0x7003
-	.short 0x610c
-	.short 0x6000
-	.short 0x0198
-	.short 0x7011
-	.short 0x6004
-/* 0x021b80: */
-	.short 0x302f
-	.short 0x0004
-	.short 0x33c0
-	.short 0x0000
-	.short 0xa832
-	.short 0x7005
-	.short 0x6000
-	.short 0x0342
-	.short 0x43f9
-	.short 0x0000
-	.short 0x715e
-	.short 0x2449
-	.short 0x7009
-	.short 0x32fc
-	.short 0x0001
-	.short 0x51c8
-	.short 0xfffa
-	.short 0x32bc
-	.short 0x0002
-	.short 0x34b9
-	.short 0x0000
-	.short 0x6122
-	.short 0x4879
-	.short 0x0000
-	.short 0x70ea
-	.short 0x4879
-	.short 0x0000
-	.short 0x6d5c
-	.short 0x4852
-	.short 0x6100
-	.short 0x020c
-	.short 0x4fef
-/* 0x021bc0: */
-	.short 0x000c
-	.short 0x43f9
-	.short 0x0000
-	.short 0x70ea
-	.short 0x45f9
-	.short 0x0000
-	.short 0x6122
-	.short 0x34bc
-	.short 0x0003
-	.short 0x0c59
-	.short 0x013f
-	.short 0x6606
-	.short 0x34bc
-	.short 0x0002
-	.short 0x600a
-	.short 0x0c51
-	.short 0x018f
-	.short 0x6604
-	.short 0x34bc
-	.short 0x0004
-
+    
+addr_21b74:
+    moveq #3,%d0
+    bsrs addr_21b84
+    braw addr_21d12
+    moveq #17,%d0
+    bras addr_21b84
+    movew %sp@(4),%d0
+addr_21b84:
+    movew %d0,ram_unknown65
+    moveq #5,%d0
+    braw addr_21ed0
+    lea ram_unknown61,%a1
+    moveal %a1,%a2
+    moveq #9,%d0
+addr_21b9a:
+    movew #1,%a1@+
+    dbf %d0,addr_21b9a
+    movew #2,%a1@
+    movew _gl_restype,%a2@
+    pea ram_unknown66
+    pea ram_unknown67
+    pea %a2@
+    bsrw av_opnwk
+    lea %sp@(12),%sp
+    lea ram_unknown66,%a1
+    lea _gl_restype,%a2
+    movew #3,%a2@
+    cmpiw #319,%a1@+
+    bnes addr_21bde
+    movew #2,%a2@
+    bras addr_21be8
+addr_21bde:
+    cmpiw #399,%a1@
+    bnes addr_21be8
+    movew #4,%a2@
+addr_21be8:
     clrw _gl_rschange
-
-	.short 0x33fc
-	.short 0x0001
-	.short 0x0000
-	.short 0x6e10
+    movew #1,ram_unknown68
 	rts
+
 	.short 0x7002
 	.short 0x6000
 	.short 0x02d4
@@ -70222,6 +70195,8 @@ addr_1f926:
 	.short 0x0000
 	.short 0x6e14
 	rts
+
+addr_21d12:
 	.short 0x23f9
 	.short 0x0000
 	.short 0x6dba
@@ -70316,45 +70291,23 @@ addr_1f926:
 	.short 0x0000
 	.short 0x707c
 	rts
-	.short 0x23ef
-	.short 0x0004
-	.short 0x0000
-	.short 0x6af2
-	.short 0x226f
-	.short 0x000c
-	.short 0x23c9
-	.short 0x0000
-	.short 0x6afa
-	.short 0x43e9
-	.short 0x005a
-	.short 0x23c9
-	.short 0x0000
-	.short 0x6afe
-	.short 0x7003
-	.short 0x6100
-	.short 0x00ec
-	.short 0x226f
-	.short 0x0008
-	.short 0x32b9
-	.short 0x0000
-	.short 0xa834
-	.short 0x23fc
-	.short 0x0000
-	.short 0x715e
-	.short 0x0000
-	.short 0x6af2
-	.short 0x23fc
-/* 0x021e00: */
-	.short 0x0000
-	.short 0x6c56
-	.short 0x0000
-	.short 0x6afa
-	.short 0x23fc
-	.short 0x0000
-	.short 0x6c6a
-	.short 0x0000
-	.short 0x6afe
-	rts
+
+addr_21dc8:
+av_opnwk:   
+    movel %sp@(4),iioff                     /* _intin array is pwork_in */
+    moveal %sp@(12),%a1                     /* a1 -> pwork_out */
+    movel %a1,iooff                         /* _intout array is pwork_out */
+    lea %a1@(90),%a1                        /* a1 -> pwork_out+45 */
+    movel %a1,pooff                         /* _ptsout array is pwork_out+45 */
+    moveq #3,%d0
+    bsrw vdi_call                           /* v_opnwk() */
+    moveal %sp@(8),%a1                      /* a1 -> phandle */
+    movew ram_unknown64,%a1@                /* phandle <- workstation handle */
+    movel #ram_unknown61,iioff
+    movel #ram_unknown62,iooff
+    movel #ram_unknown63,pooff
+    rts
+
 	.short 0x41ef
 	.short 0x0004
 	.short 0x4267
@@ -70448,12 +70401,18 @@ addr_1f926:
 	.short 0x22d8
 	.short 0x22d8
 	rts
+
 	.short 0x23d8
 	.short 0x0000
 	.short 0x6af6
 	rts
-	.short 0x42a7
-	.short 0x6010
+
+addr_21ed0:
+    clrl %sp@-
+    bras addr_21ee4                         /* Jump in halfway! */
+
+addr_21ed4:
+vdi_call:    
 	.short 0x45fb
 	.short 0x0020
 	.short 0x4240
@@ -70462,6 +70421,7 @@ addr_1f926:
 	.short 0x101a
 	.short 0x3f00
 	.short 0x101a
+addr_21ee4:
 	.short 0x3f00
 	.short 0xf050
 	.short 0x5c8f
@@ -70471,6 +70431,7 @@ addr_1f926:
 	.short 0x0000
 	.short 0x6af6
 	rts
+
 	.short 0x2500
 	.short 0x6f0b
 	.short 0x0001
