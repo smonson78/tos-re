@@ -22798,7 +22798,7 @@ _FindDevice:
     .short 0xb43c,0x0002                    /* cmpb #2,%d2 - current rez = mono? */
     beqs addr_b332                          /* Yes - can't be changed */
 
-    moveal intin,%a0
+    moveal INTIN,%a0
     movew %a0@,%d0                          /* get something from a variable and put it in d0, this must be the requested res */
     .short 0xb07c,0x0001                    /* cmpw #1,%d0 */
     bnes addr_b2da                          /* 1 not requested, go here */
@@ -24865,16 +24865,16 @@ addr_c3ae:
     .short 0x4eb9                           /* jsr init_g */
     .long init_g
 
-    movel intin,%fp@(-4)                    /* Save original values */
-    movel intout,%fp@(-8)
+    movel INTIN,%fp@(-4)                    /* Save original values */
+    movel INTOUT,%fp@(-8)
     movel contrl,%fp@(-12)
 
     lea %fp@(-26),%a0                       /* Replace pointers with addresses of local vars "new_contrl" etc */
     movel %a0,contrl
     lea %fp@(-30),%a0
-    movel %a0,intin
+    movel %a0,INTIN
     lea %fp@(-38),%a0
-    movel %a0,intout
+    movel %a0,INTOUT
 
     movew #1,%fp@(-28)                      /* new_initin[1] = 1 */
 
@@ -24895,8 +24895,8 @@ addr_c486:
     blts addr_c470
 
     movel %fp@(-12),contrl                  /* Restore the pointers */
-    movel %fp@(-4),intin
-    movel %fp@(-8),intout
+    movel %fp@(-4),INTIN
+    movel %fp@(-8),INTOUT
     tstl %sp@+
     moveml %sp@+,%d7/%a4-%a5
     unlk %fp
@@ -28468,7 +28468,7 @@ addr_dfc0:
 init_wk:
     linkw %fp,#0
     moveml %d6-%d7/%a3-%a5,%sp@-
-    moveal intin,%a5
+    moveal INTIN,%a5
     addql #2,%a5
     moveal cur_work,%a3                     /* a3 is work_ptr in C source */
     movew %a5@+,%d7
@@ -70020,33 +70020,42 @@ addr_21b84:
     movew %d0,ram_unknown65
     moveq #5,%d0
     braw addr_21ed0
-    lea ram_unknown61,%a1
-    moveal %a1,%a2
+
+/* Quite a few differences from tos306's version */
+addr_21b90:
+_gsx_wsopen:
+    lea _intin,%a1
+    moveal %a1,%a2                          /* a2 <- &intin[0] */
     moveq #9,%d0
+
 addr_21b9a:
     movew #1,%a1@+
-    dbf %d0,addr_21b9a
-    movew #2,%a1@
-    movew _gl_restype,%a2@
-    pea ram_unknown66
-    pea ram_unknown67
+    dbf %d0,addr_21b9a                      /* intin[0] to intin[9] are all set to 1 */
+
+    movew #2,%a1@                           /* intin[10] <- 2 */
+    movew _gl_restype,%a2@                  
+
+    pea _gl_ws     
+    pea _gl_handle                       
     pea %a2@
-    bsrw av_opnwk
+    bsrw av_opnwk                           /* av_opnwk(intin[0], &_gl_handle, &_gl_ws); */
     lea %sp@(12),%sp
-    lea ram_unknown66,%a1
+
+    lea _gl_ws,%a1
     lea _gl_restype,%a2
-    movew #3,%a2@
-    cmpiw #319,%a1@+
+    movew #3,%a2@                           /* Default _gl_restype = 3 (medium) */
+
+    cmpiw #319,%a1@+                        /* If _gl_ws[0] == 319 */
     bnes addr_21bde
-    movew #2,%a2@
+    movew #2,%a2@                           /* Then _gl_restype = 2 (low) */
     bras addr_21be8
 addr_21bde:
-    cmpiw #399,%a1@
+    cmpiw #399,%a1@                         /* Otherwise: check for y = 399 */
     bnes addr_21be8
-    movew #4,%a2@
+    movew #4,%a2@                           /* Then _gl_restype = 4 (high) */
 addr_21be8:
-    clrw _gl_rschange
-    movew #1,ram_unknown68
+    clrw _gl_rschange                       /* Res change not needed */
+    movew #1,_gl_graphic
 	rts
 
 	.short 0x7002
@@ -70292,6 +70301,7 @@ addr_21d12:
 	.short 0x707c
 	rts
 
+/* WORD av_opnwk(WORD *pwork_in, WORD *phandle, WORD *pwork_out) */
 addr_21dc8:
 av_opnwk:   
     movel %sp@(4),iioff                     /* _intin array is pwork_in */
@@ -70303,7 +70313,7 @@ av_opnwk:
     bsrw vdi_call                           /* v_opnwk() */
     moveal %sp@(8),%a1                      /* a1 -> phandle */
     movew ram_unknown64,%a1@                /* phandle <- workstation handle */
-    movel #ram_unknown61,iioff
+    movel #_intin,iioff
     movel #ram_unknown62,iooff
     movel #ram_unknown63,pooff
     rts

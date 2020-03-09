@@ -274,11 +274,11 @@ etv_term:
 .set contrl,0x2ae0
 .global contrl
 
-.set intin,0x2ae4
-.global intin
+.set INTIN,0x2ae4
+.global INTIN
 
-.set intout,0x2aec
-.global intout
+.set INTOUT,0x2aec
+.global INTOUT
 
 .set ram_unknown21,0x2b00
 .global ram_unknown21
@@ -444,8 +444,8 @@ typedef struct _bcb
 .set ram_unknown63,0x6c6a
 .global ram_unknown63
 
-.set ram_unknown67,0x6d5c
-.global ram_unknown67
+.set _gl_handle,0x6d5c
+.global _gl_handle
 
 .set ram_unknown35,0x6dc0
 .global ram_unknown35
@@ -456,8 +456,8 @@ typedef struct _bcb
 .set _sh_iscart,0x6de0
 .global _sh_iscart
 
-.set ram_unknown68,0x6e10
-.global ram_unknown68
+.set _gl_graphic,0x6e10
+.global _gl_graphic
 
 .set ram_unknown33,0x6e1a
 .global ram_unknown33
@@ -483,11 +483,11 @@ typedef struct _bcb
 .set _sh_isgem,0x708a
 .global _sh_isgem
 
-.set ram_unknown66,0x70ea
-.global ram_unknown66
+.set _gl_ws,0x70ea
+.global _gl_ws
 
-.set ram_unknown61,0x715e
-.global ram_unknown61
+.set _intin,0x715e
+.global _intin
 
 .set _DOS_ERR,0x742a
 .global _DOS_ERR
