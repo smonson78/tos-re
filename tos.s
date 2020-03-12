@@ -18548,6 +18548,7 @@ addr_91b0:
                       201 = appl_yield
     d1              - contains address of parameter block AESPB 
 */
+addr_921e:
 trap2_handler:
     tstw %d0                        /* d0 = 0? This value seems undocumented */
     beqs addr_9246
@@ -21740,6 +21741,7 @@ gl_f_init:
 	rts
 
 /* Trap 2 handler for opcode 115 (VDI) */
+addr_aac6:
 vdi_dispatcher:
 _gsx_entry:
     moveml %d1-%fp,%sp@-            /* Save all regs except d0 and sp */
@@ -23208,33 +23210,40 @@ addr_b602:
 	.short 0x00fd
 	.short 0x2bf2
 
+/* Screen driver entry point */
 addr_b62a:
 _screen:
     linkw %fp,#0
     moveml %d5-%d7/%a4-%a5,%sp@-            /* Save regs */
     moveal contrl,%a5
-    movew %a5@(12),%d6
-    movew %a5@,%d7
-    clrw %a5@(4)
-    clrw %a5@(8)
+    movew %a5@(12),%d6                      /* r = contrl[6] */
+    movew %a5@,%d7                          /* opcode = contrl[0] */
+
+    /* No ints out and no pts out */
+    clrw %a5@(4)                            /* contrl[2] = 0 */
+    clrw %a5@(8)                            /* contrl[4] = 0 */
+
     clrw _flip_y 
-    .short 0xbe7c,0x0001                    /* cmpw #1,%d7 */
+
+    .short 0xbe7c,0x0001                    /* cmpw #1,%d7 - if opcode == 1 */
     beqw addr_b74c
-    .short 0xbe7c,0x0064                    /* cmpw #100,%d7 */
+    .short 0xbe7c,0x0064                    /* cmpw #100,%d7 - if opcode == 100 */
     beqw addr_b74c
-    moveal #15274,%a4
+
+    /* Search the chain of handles to find the correct attribute area */
+    moveal #virt_work,%a4                   /* work_ptr = &virt_work */
 addr_b662:    
-    cmpw %a4@(40),%d6
+    cmpw %a4@(40),%d6                       /* if r == work_ptr->handle */
     beqs addr_b674
     moveal %a4@(64),%a4
     movel %a4,%d0
     bnes addr_b662
-    braw addr_b790
+    braw addr_b790                          /* return; */
 addr_b674:    
     movel %a4,cur_work
     movew %a4@(2),%d0
     movew %d0,ram_unknown21 + 18
-    movew %d0,ram_unknown23 + 162           /* 0x000027f4 */
+    movew %d0,ram_unknown23 + 162           /*  */
     movew %a4@(300),ram_unknown21 + 20
     movew %a4@(304),ram_unknown21 + 22
     movew %a4@(302),ram_unknown21 + 24
@@ -23267,16 +23276,18 @@ addr_b6da:
     movew %a4@(38),disk_buffer + 40
     movew %a4@(294),disk_buffer + 42
     movew %a4@,ram_unknown21 + 68
+
 addr_b74c:
-    .short 0xbe7c,0x0001 /* cmpw #1,%d7 */
+    .short 0xbe7c,0x0001                    /* cmpw #1,%d7 - if opcode >= 1 */
     blts addr_b76e
-    .short 0xbe7c,0x0027 /* cmpw #39,%d7 */
+    .short 0xbe7c,0x0027                    /* cmpw #39,%d7 - and <= 39 then continue */
     bgts addr_b76e
-    subqw #1,%d7
+
+    subqw #1,%d7                            /* jump to jmptb1[opcode - 1] (in longwords) */
     moveaw %d7,%a0
     addal %a0,%a0
     addal %a0,%a0
-    moveal #16690612,%a1
+    moveal #jmptb1,%a1
     moveal %a0@(0000000000000000,%a1:l),%a0
 
     jsr %a0@                                /* Call something */
@@ -23293,7 +23304,7 @@ addr_b76e:
     addal %a0,%a0
     addal %a0,%a0
 
-    moveal #addr_2ae50,%a1
+    moveal #jmptb2,%a1
     moveal %a0@(0000000000000000,%a1:l),%a0 /* Add 0xfeae50 */
     
     jsr %a0@                                /* Call something */
@@ -78431,6 +78442,8 @@ addr_25b82:
 addr_25b86:
     .short 0xf801
 
+
+/* GSX entry to GIOS and support for GSXBIND.C */
 addr_25b88:
 gsx2:
     lea pblock,%a0
@@ -88735,6 +88748,7 @@ addr_2ad74:
 	.short 0x0001
 
 /* VDI functions 1-39 */
+addr_2adb4:
 jmptb1:
 	.long v_opnwk
 	.long v_clswk
@@ -88780,6 +88794,7 @@ jmptb1:
 
 /* A function lookup table for the VDI dispatcher */
 addr_2ae50:
+jmptb2:
 	.long 0x00fce1d0
 	.long 0x00fce262
 	.long 0x00fcc4b0
