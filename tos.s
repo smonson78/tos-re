@@ -41976,64 +41976,59 @@ addr_1428c:
 	.short 0x5c8f
 	.short 0xf028
 	rts
-	.short 0x41ef
-	.short 0x0004
-	.short 0x48e7
-	.short 0x1818
-	.short 0x47f9
-	.short 0x0000
-	.short 0x715e
-	.short 0x49f9
-	.short 0x0000
-	.short 0xa828
-	.short 0x3f13
-	.short 0x3618
-	.short 0x3018
-/* 0x0146c0: */
-	.short 0x3818
-	.short 0x426c
-	.short 0x0002
-	.short 0x397c
-	.short 0x0001
-	.short 0x0006
-	.short 0x3979
-	.short 0x0000
-	.short 0x6d5c
-	.short 0x000c
-	.short 0x41f9
-	.short 0x0000
-	.short 0x6dd8
-	.short 0xb050
-	.short 0x670a
-	.short 0x38bc
-	.short 0x0020
-	.short 0x3680
-	.short 0x3080
-	.short 0xf038
-	.short 0x4a43
-	.short 0x670e
-	.short 0x41f9
-	.short 0x0000
-	.short 0x6f26
-	.short 0xb850
-	.short 0x6718
-	.short 0x7016
-	.short 0x600c
-	.short 0x41f9
-	.short 0x0000
-	.short 0x6e12
-/* 0x014700: */
-	.short 0xb850
-	.short 0x670a
-	.short 0x7011
-	.short 0x3880
-	.short 0x3684
-	.short 0x3084
-	.short 0xf038
-	.short 0x369f
-	.short 0x4cdf
-	.short 0x1818
-	rts
+	
+addr_146a6:
+gsx_attr:
+    lea %sp@(4),%a0                         /* a0 <-- parameters */
+    moveml %d3-%d4/%a3-%a4,%sp@-
+    lea _intin,%a3                          /* a3 <-- intin[0] */
+    lea _contrl,%a4                         /* a4 <-- contrl[0] */
+    movew %a3@,%sp@-                        /* Save intin[0] */
+    movew %a0@+,%d3                         /* d3 <-- text */
+    movew %a0@+,%d0                         /* d0 <-- mode */
+    movew %a0@+,%d4                         /* d4 <-- color */
+    
+    clrw %a4@(2)                            /* contrl[1] <-- 0 */
+    movew #1,%a4@(6)                        /* contrl[3] <-- 1 */
+    movew _gl_handle,%a4@(12)               /* contrl[6] <-- gl_handle */
+    
+    lea _gl_mode,%a0                        /* Skip this call if the requested mode is the same as the currently selected mode */
+    cmpw %a0@,%d0
+    beqs addr_146e8
+
+    movew #32,%a4@                          /* contrl[0] <-- SET_WRITING_MODE */
+    movew %d0,%a3@                          /* intin[0] <-- mode */
+    movew %d0,%a0@                          /* gl_mode <-- mode */
+    .short 0xf038                           /* gsx2() */
+
+addr_146e8:
+    tstw %d3                                /* text=1 => text color */
+    beqs addr_146fa                         /* text=0 => line color */
+
+    lea _gl_tcolor,%a0                      /* If the requested text color is the same as the current text colour, */
+    cmpw %a0@,%d4                           /* don't waste time with the VDI call */
+    beqs addr_1470e
+
+    moveq #22,%d0                           /* d0 <-- SET_TEXT_COLOR */
+    bras addr_14706
+
+addr_146fa:
+    lea _gl_lcolor,%a0                      /* If the requested line colour matches the current */
+    cmpw %a0@,%d4                           /* default line colour, skip the VDI call to reset it */
+    beqs addr_1470e
+
+    moveq #17,%d0                           /* d0 <-- SET_LINE_COLOR */
+addr_14706:
+    movew %d0,%a4@                          /* contrl[0] <-- opcode */
+    movew %d4,%a3@                          /* intin[0] <-- color */
+    movew %d4,%a0@                          /* set gl_tcolor or gl_lcolor */
+    .short 0xf038                           /* gsx2() */
+addr_1470e:
+    movew %sp@+,%a3@
+    moveml %sp@+,%d3-%d4/%a3-%a4
+    rts
+
+
 	.short 0x206f
 	.short 0x0004
 	.short 0x2018
@@ -78405,56 +78400,47 @@ addr_23da2:
 	.short 0x0010
 	.short 0x9044
 	.short 0x9043
-	.short 0x226e
-	.short 0x001c
-/* 0x025b40: */
-	.short 0x3280
-	.short 0x302e
-	.short 0x0012
-	.short 0x9046
-	.short 0x9045
-	.short 0x226e
-	.short 0x0020
-	.short 0x3280
-	.short 0xf03f
-	.short 0x4e56
-	.short 0x0000
-	.short 0x48e7
-	.short 0x0104
-	.short 0xf818
-	.short 0x4279
-	.short 0x0000
-	.short 0x702a
-	.short 0x42b9
-	.short 0x0000
-	.short 0x705c
-	.short 0x23f9
-	.short 0x0000
-	.short 0xa7cc
-	.short 0x0000
-	.short 0x7060
-	.short 0x2a79
-	.short 0x0000
-	.short 0x6dd0
-	.short 0x4a55
-	.short 0x670a
-	.short 0x6004
-	.short 0x2e8d
-/* 0x025b80: */
-	.short 0xf960
-	.short 0x4a55
-	.short 0x66f8
-	.short 0xf801
-	.short 0x41f9
-	.short 0x0000
-	.short 0x6aee
-	.short 0x20bc
-	.short 0x0000
-	.short 0xa828
-	.short 0x2208
-	.short 0x7073
-	.short 0x4e42
-	rts
+
+	moveal %fp@(28),%a1
+    movew %d0,%a1@
+    movew %fp@(18),%d0
+    subw %d6,%d0
+    subw %d5,%d0
+    moveal %fp@(32),%a1
+    movew %d0,%a1@
+    .short 0xf03f
+
+addr_25b52:
+    linkw %fp,#0
+    moveml %d7/%a5,%sp@-
+    .short 0xf818
+    clrw ram_unknown69
+    clrl ram_unknown70
+    movel ram_unknown71,ram_unknown72
+    moveal ram_unknown68,%a5
+    tstw %a5@
+    beqs addr_25b86
+    bras addr_25b82
+addr_25b7e:
+    movel %a5,%sp@
+    .short 0xf960
+
+addr_25b82:
+    tstw %a5@
+    bnes addr_25b7e
+addr_25b86:
+    .short 0xf801
+
+addr_25b88:
+gsx2:
+    lea pblock,%a0
+    movel #_contrl,%a0@
+    movel %a0,%d1
+
+    moveq #115,%d0
+    trap #2
+    rts
+
 	.short 0x302f
 	.short 0x0006
 	.short 0xd040
@@ -82353,7 +82339,7 @@ lineftab:
 	.long 0x00fe1e28
 	.long 0x00fe1e14
 	.long 0x00fe1da8
-	.long 0x00fe5b88
+	.long gsx2                              /* 14 (0xf038) - gsx2() */
 	.long 0x00fe1d8c
 	.long 0x00fe1e8c
 	.long 0x00fe1e7a

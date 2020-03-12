@@ -424,6 +424,9 @@ typedef struct _bcb
 .set _drawaddr,0x666a
 .global _drawaddr
 
+.set pblock,0x6aee
+.global pblock
+
 .set iioff,0x6af2
 .global iioff
 
@@ -445,11 +448,17 @@ typedef struct _bcb
 .set ram_unknown63,0x6c6a
 .global ram_unknown63
 
+.set _gl_mode,0x6dd8
+.global _gl_mode
+
 .set _gl_handle,0x6d5c
 .global _gl_handle
 
 .set ram_unknown35,0x6dc0
 .global ram_unknown35
+
+.set ram_unknown68,0x6dd0
+.global ram_unknown68
 
 .set ram_unknown34,0x6dd4
 .global ram_unknown34
@@ -459,6 +468,9 @@ typedef struct _bcb
 
 .set _gl_graphic,0x6e10
 .global _gl_graphic
+
+.set _gl_lcolor,0x6e12
+.global _gl_lcolor
 
 .set ram_unknown33,0x6e1a
 .global ram_unknown33
@@ -475,11 +487,23 @@ typedef struct _bcb
 .set _sh_gem,0x6f0c
 .global _sh_gem
 
+.set _gl_tcolor,0x6f26
+.global _gl_tcolor
+
 .set _g_wsend,0x6fee
 .global _g_wsend
 
 .set _sh_doexec,0x7006
 .global _sh_doexec
+
+.set ram_unknown69,0x702a
+.global ram_unknown69
+
+.set ram_unknown70,0x705c
+.global ram_unknown70
+
+.set ram_unknown72,0x7060
+.global ram_unknown72
 
 .set _sh_isgem,0x708a
 .global _sh_isgem
@@ -514,6 +538,13 @@ typedef struct _bcb
 
 .set ram_unknown36,0xa792
 .global ram_unknown36
+
+.set ram_unknown71,0xa7cc
+.global ram_unknown71
+
+/* Not to be confused with contrl, two different variables */
+.set _contrl,0xa828
+.global _contrl
 
 .set ram_unknown65,0xa832
 .global ram_unknown65
