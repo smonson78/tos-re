@@ -70429,31 +70429,29 @@ addr_21ed0:
     bras addr_21ee4                         /* Jump in halfway! */
 
 addr_21ed4:
-vdi_call:    
-	.short 0x45fb
-	.short 0x0020
-	.short 0x4240
-	.short 0x101a
-	.short 0x3f00
-	.short 0x101a
-	.short 0x3f00
-	.short 0x101a
+vdi_call:
+    lea %pc@(vdi_list,%d0:w),%a2            /* Table */
+    clrw %d0
+    moveb %a2@+,%d0
+    movew %d0,%sp@-
+    moveb %a2@+,%d0
+    movew %d0,%sp@-
+    moveb %a2@+,%d0
 addr_21ee4:
-	.short 0x3f00
-	.short 0xf050
-	.short 0x5c8f
-	.short 0x23fc
-	.short 0x0000
-	.short 0x742c
-	.short 0x0000
-	.short 0x6af6
-	rts
+    movew %d0,%sp@-
+    .short 0xf050                           /* _gsx_acode? */
+    addql #6,%sp
+    movel #ptsin,pioff                      /* ptsin, pioff - reset pointer */
+    rts
 
+addr_1ef6:
+vdi_list:
 	.short 0x2500
 	.short 0x6f0b
 	.short 0x0001
 	.short 0x0102
 	.short 0x8100
+
 /* 0x021f00: */
 	.short 0x010c
 	.short 0x0102

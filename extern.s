@@ -430,6 +430,9 @@ typedef struct _bcb
 .set iioff,0x6af2
 .global iioff
 
+.set pioff,0x6af6
+.global pioff
+
 .set iooff,0x6afa
 .global iooff
 
@@ -516,6 +519,9 @@ typedef struct _bcb
 
 .set _DOS_ERR,0x742a
 .global _DOS_ERR
+
+.set ptsin,0x742c
+.global ptsin
 
 .set ram_unknown40,0x776c
 .global ram_unknown40
