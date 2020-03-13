@@ -69973,23 +69973,20 @@ addr_1f926:
 	.short 0x61ce
 	.short 0x5c8f
 	rts
-	.short 0x616c
-	.short 0xf244
-	.short 0x6130
-	.short 0x707c
-	.short 0x6100
-	.short 0x03a4
-	.short 0x41f9
-	.short 0x0000
-	.short 0x6c6a
-	.short 0x33d8
-	.short 0x0000
-	.short 0x6cde
-	.short 0x33d8
-	.short 0x0000
-	.short 0x6ce0
-/* 0x021b40: */
-	rts
+
+/* */
+addr_21b22:
+gsx_init:
+    bsrs _gsx_wsopen
+    .short 0xf244                           /* gsx_start() */
+    bsrs setmb
+    moveq #124,%d0
+    bsrw vdi_short
+    lea ptsout,%a0
+    movew %a0@+,xrat
+    movew %a0@+,yrat
+    rts
+
 	.short 0x302f
 	.short 0x0004
 	.short 0x43f9
@@ -70001,6 +69998,9 @@ addr_1f926:
 	.short 0x6720
 	.short 0x7002
 	.short 0x612c
+
+addr_21b58:  
+setmb:
 	.short 0x4879
 	.short 0x0000
 	.short 0x6b02
@@ -70026,7 +70026,7 @@ addr_21b74:
 addr_21b84:
     movew %d0,ram_unknown65
     moveq #5,%d0
-    braw addr_21ed0
+    braw vdi_short
 
 /* Quite a few differences from tos306's version */
 addr_21b90:
@@ -70322,7 +70322,7 @@ av_opnwk:
     movew ram_unknown64,%a1@                /* phandle <- workstation handle */
     movel #_intin,iioff
     movel #ram_unknown62,iooff
-    movel #ram_unknown63,pooff
+    movel #ptsout,pooff
     rts
 
 	.short 0x41ef
@@ -70425,8 +70425,9 @@ av_opnwk:
 	rts
 
 addr_21ed0:
+vdi_short:
     clrl %sp@-
-    bras addr_21ee4                         /* Jump in halfway! */
+    bras addr_21ee4                         /* Jump in halfway - no params! */
 
 addr_21ed4:
 vdi_call:

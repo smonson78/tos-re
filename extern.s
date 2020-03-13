@@ -448,8 +448,14 @@ typedef struct _bcb
 .set ram_unknown62,0x6c56
 .global ram_unknown62
 
-.set ram_unknown63,0x6c6a
-.global ram_unknown63
+.set ptsout,0x6c6a
+.global ptsout
+
+.set xrat,0x6cde
+.global xrat
+
+.set yrat,0x6ce0
+.global yrat
 
 .set _gl_mode,0x6dd8
 .global _gl_mode
