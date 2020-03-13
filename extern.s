@@ -457,17 +457,41 @@ typedef struct _bcb
 .set yrat,0x6ce0
 .global yrat
 
+.set gl_bdelay,0x6cec
+.global gl_bdelay
+
+.set gl_bclick,0x6d56
+.global gl_bclick
+
+.set ram_unknown76,0x6d5e
+.global ram_unknown76
+
 .set _gl_mode,0x6dd8
 .global _gl_mode
 
 .set _gl_handle,0x6d5c
 .global _gl_handle
 
+.set ram_unknown77,0x6d88
+.global ram_unknown77
+
+.set gl_recd,0x6db0
+.global gl_recd
+
+.set gl_bdesired,0x6db2
+.global gl_bdesired
+
+.set ram_unknown89,0x6db6
+.global ram_unknown89
+
 .set ram_unknown35,0x6dc0
 .global ram_unknown35
 
-.set ram_unknown68,0x6dd0
-.global ram_unknown68
+.set ram_unknown78,0x6dc2
+.global ram_unknown78
+
+.set ad_windspb,0x6dd0
+.global ad_windspb
 
 .set ram_unknown34,0x6dd4
 .global ram_unknown34
@@ -490,11 +514,17 @@ typedef struct _bcb
 .set _ad_envrn,0x6e28
 .global _ad_envrn
 
+.set gl_rbuf,0x6e52
+.global gl_rbuf
+
 .set _pglobal,0x6e6c
 .global _pglobal
 
 .set _sh_gem,0x6f0c
 .global _sh_gem
+
+.set gl_rlen,0x6f14
+.global gl_rlen
 
 .set _gl_tcolor,0x6f26
 .global _gl_tcolor
@@ -502,11 +532,23 @@ typedef struct _bcb
 .set _g_wsend,0x6fee
 .global _g_wsend
 
+.set elinkoff,0x6ff8
+.global elinkoff
+
 .set _sh_doexec,0x7006
 .global _sh_doexec
 
+.set ad_sysglo,0x700a
+.global ad_sysglo
+
 .set ram_unknown69,0x702a
 .global ram_unknown69
+
+.set gl_btrue,0x7040
+.global gl_btrue
+
+.set ram_unknown75,0x7052
+.global ram_unknown75
 
 .set ram_unknown70,0x705c
 .global ram_unknown70
@@ -514,8 +556,17 @@ typedef struct _bcb
 .set ram_unknown72,0x7060
 .global ram_unknown72
 
+.set wind_spb,0x706a
+.global wind_spb
+
 .set _sh_isgem,0x708a
 .global _sh_isgem
+
+.set drawstk,0x70bc
+.global drawstk
+
+.set ram_unknown84,0x70e8
+.global ram_unknown84
 
 .set _gl_ws,0x70ea
 .global _gl_ws
@@ -523,21 +574,45 @@ typedef struct _bcb
 .set _intin,0x715e
 .global _intin
 
+.set cda,0x725e
+.global cda
+
 .set _DOS_ERR,0x742a
 .global _DOS_ERR
 
 .set ptsin,0x742c
 .global ptsin
 
+.set ram_unknown82,0x7454
+.global ram_unknown82
+
+.set ram_unknown85,0x7456
+.global ram_unknown85
+
+.set ram_unknown90,0x745a
+.global ram_unknown90
+
 .set ram_unknown40,0x776c
 .global ram_unknown40
 
-/* rlr is a pointer to pd structure. */
-.set _rlr,0xa792
-.global _rlr
+.set eul,0xa782
+.global eul
 
 .set ram_unknown43,0xa788
 .global ram_unknown43
+
+.set ram_unknown83,0xa78c
+.global ram_unknown83
+
+.set ram_unknown91,0xa78e
+.global ram_unknown91
+
+/* rlr is a pointer to pd structure. */
+.set rlr,0xa792
+.global rlr
+
+.set evx,0xa79a
+.global evx
 
 .set ram_unknown41,0xa7b6
 .global ram_unknown41
@@ -545,14 +620,27 @@ typedef struct _bcb
 .set ram_unknown42,0xa7ba
 .global ram_unknown42
 
+.set ram_unknown92,0xa7be
+.global ram_unknown92
+
 .set ram_unknown32,0xa7c4
 .global ram_unknown32
 
-.set ram_unknown36,0xa792
-.global ram_unknown36
+.set no_aes,0xa7ca
+.global no_aes
 
 .set ram_unknown71,0xa7cc
 .global ram_unknown71
+
+.set er_num,0xa81a
+.global er_num
+
+.set curpid,0xa81c
+.global curpid
+
+/* { int16_t sy_tas; PD *sy_owner; EVB *sy_wait } */
+.set ram_unknown81,0xa820
+.global ram_unknown81
 
 /* Not to be confused with contrl, two different variables */
 .set _contrl,0xa828
