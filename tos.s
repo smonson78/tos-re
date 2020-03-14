@@ -40689,13 +40689,14 @@ gem_main:
     lea %a5@(8038),%a0
     movel %a0,ad_sysglo                     /* ad_sysglo = &DGLO->g_sysglo[0] */
     movel #wind_spb,ad_windspb              /* ad_windspb = &windspb */
+
     movel #0x400,%sp@
     .short 0xf3c0                           /* dos_alloc */
+    
     movel %d0,drawstk                       /* drawstk = dos_alloc(0x400); */
     .short 0x06b9                           /* addil #0x400,drawstk - drawstk += 0x400 */
     .long 0x400                    
     .long drawstk
-    
 
     .short 0xf7e8                           /* hcli() */
     .short 0xf7ec                           /* takecpm() */
