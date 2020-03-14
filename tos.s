@@ -40592,7 +40592,7 @@ addr_13b34:
 addr_13ba4:
     clrw _gl_rschange                       /* Clear out resolution globals */
     movew #1,%d0
-    movew %d0,_gl_restype
+    movew %d0,_gl_restype                   /* Set _gl_restype = 1 */
 
     movew %d0,_sh_isgem                     /* desktop is the next to run  */
     movew %d0,_sh_gem
@@ -69816,34 +69816,28 @@ addr_1f926:
 	.short 0x0000
 	.short 0x6e1c
 	rts
-	.short 0x41ef
-	.short 0x0004
-	.short 0x43f9
-	.short 0x0000
-	.short 0xa828
-	.short 0x22d8
-	.short 0x5489
-	.short 0x3298
-	.short 0x5c89
-	.short 0x32b9
-/* 0x021b00: */
-	.short 0x0000
-	.short 0x6d5c
-	.short 0x4ef9
-	.short 0x00fe
-	.short 0x5b88
-	.short 0x33ef
-	.short 0x0006
-	.short 0x0000
-	.short 0x715e
-	.short 0x2f3c
-	.short 0x0000
-	.short 0x0001
-	.short 0x3f2f
-	.short 0x0008
-	.short 0x61ce
-	.short 0x5c8f
-	rts
+	
+addr_21aec:
+gsx_acode:
+    lea %sp@(4),%a0
+    lea _contrl,%a1
+
+    movel %a0@+,%a1@+
+    addql #2,%a1
+    movew %a0@+,%a1@
+    addql #6,%a1
+    movew _gl_handle,%a1@
+    .short 0x4ef9                           /* jmp gsx2 */
+    .long gsx2
+
+addr_21b0a:
+    movew %sp@(6),_intin
+    movel #1,%sp@-
+    movew %sp@(8),%sp@-
+    bsrs gsx_acode
+    addql #6,%sp
+    rts
+
 
 addr_21b22:
 linef_func513:
@@ -69911,7 +69905,7 @@ addr_21b9a:
     dbf %d0,addr_21b9a                      /* intin[0] to intin[9] are all set to 1 */
 
     movew #2,%a1@                           /* intin[10] <- 2 */
-    movew _gl_restype,%a2@                  
+    movew _gl_restype,%a2@                  /* intin[0] <- _gl_restype */                            
 
     pea _gl_ws     
     pea _gl_handle                       
@@ -70303,36 +70297,31 @@ vdi_short:
 
 addr_21ed4:
 vdi_call:
-    lea %pc@(vdi_list,%d0:w),%a2            /* Table */
+    lea %pc@(vdi_list,%d0:w),%a2            /* Get address into table from d0 */
     clrw %d0
-    moveb %a2@+,%d0
+    moveb %a2@+,%d0                         /* Push 3 params onto stack from table */
     movew %d0,%sp@-
     moveb %a2@+,%d0
     movew %d0,%sp@-
     moveb %a2@+,%d0
 addr_21ee4:
     movew %d0,%sp@-
-    .short 0xf050                           /* _gsx_acode? */
+    .short 0xf050                           /* gsx_acode() */
     addql #6,%sp
     movel #ptsin,pioff                      /* ptsin, pioff - reset pointer */
     rts
 
 addr_1ef6:
 vdi_list:
-	.short 0x2500
-	.short 0x6f0b
-	.short 0x0001
-	.short 0x0102
-	.short 0x8100
+	.byte 37,0,111
+    .byte 11,0,1
+	.byte 1,2,129
+	.byte 0,1,12
+	.byte 1,2,114
+    .byte 1,4,109
+    .byte 3,4,121
+    .byte 0,1,16
 
-/* 0x021f00: */
-	.short 0x010c
-	.short 0x0102
-	.short 0x7201
-	.short 0x046d
-	.short 0x0304
-	.short 0x7900
-	.short 0x0110
 	.short 0x4e56
 	.short 0xfffc
 	.short 0x2eae
@@ -82229,7 +82218,7 @@ lineftab:
 	.long 0x00fe1e7a
 	.long 0x00fe1da8
 	.long 0x00fe1ea2
-	.long 0x00fe1aec                        /* 20 */
+	.long gsx_acode                         /* 20 (0xf050) */
 	.long 0x00fe1e3c
 	.long 0x00fe1b0a
 	.long 0x00fe1eac
