@@ -98927,9 +98927,8 @@ _FindDevice3:
     moveal INTIN,%a0
     movew %a0@,%d0                          /* Get the requested res from INTIN[0] */
     
-    /* Where did we come in from? */
     cmpw #1,%d0
-    bnes fd3_not_1                          /* 1 not requested, go here */
+    bnes fd3_not_1                          /* Mode 1 (no change) not requested, continue here */
 
     tstb %d2                                
     beq fd3_low_pal                         /* Originally low, mode "1" now selected - go here */
@@ -98939,17 +98938,15 @@ _FindDevice3:
 
 fd3_not_1:
     tstb %d2                                
-    beq fd3_orig_low                       /* Originally low */
-
-    cmpb #2,%d2                            /* originally high */
-    beq fd3_orig_high                      /* Yes */
+    beq fd3_orig_low                        /* Originally low */
+    cmpb #2,%d2
+    beq fd3_orig_high                       /* Originally high */
 
 fd3_orig_med:
-    cmpw #4,%d0                             /* Switch to high res? */
-    beq fd3_goto_high
-
-    cmpw #3,%d0                             /* Stay in medium? */
-    beq fd3_med_pal
+    cmpw #4,%d0
+    beq fd3_goto_high                       /* 4 = Switch to high res */
+    cmpw #3,%d0
+    beq fd3_med_pal                         /* 3 = Stay in medium */
 
 fd3_goto_low:
     clrw %sp@-
@@ -98970,20 +98967,16 @@ fd3_low_pal:
 	rts
 
 fd3_orig_low:
-    cmpw #3,%d0                             /* Switch to medium res? */
-    beqs fd3_goto_med                       /* yes */
-
-    cmpw #4,%d0                             /* Switch to high res? */
-    beqs fd3_goto_high                      /* yes THIS IS THE PROBLEMATIC ONE AT BOOT */
+    cmpw #3,%d0
+    beqs fd3_goto_med                       /* 3 = Switch to medium */
+    cmpw #4,%d0
+    beqs fd3_goto_high                      /* 4 = Switch to high */
 
     bra fd3_low_pal                         /* Stay in low */
 
 /* Mode "3" requested */
 fd3_goto_med:    
-    moveq #1,%d0
-    cmpb %d0,%d2                            
-    beqs fd3_med_pal                        /* mode "1" originally -> */
-    movew %d0,%sp@-
+    movew #1,%sp@-
     moveq #-1,%d0
     movel %d0,%sp@-
     movel %d0,%sp@-
@@ -99002,14 +98995,13 @@ fd3_med_pal:
 
 fd3_orig_high:
     cmpb #3,%d0
-    beq fd3_goto_med                        /* change to medium */
+    beq fd3_goto_med                        /* 3 = Switch to medium */
     cmpb #4,%d0
-    beq fd3_high_pal                        /* stay in high */
-    bra fd3_goto_low
+    beq fd3_high_pal                        /* 4 = Stay in high */
+    bra fd3_goto_low                        /* Switch to low */
 
 fd3_goto_high:
-    moveq #2,%d0
-    movew %d0,%sp@-
+    movew #2,%sp@-
     moveq #-1,%d0
     movel %d0,%sp@-
     movel %d0,%sp@-
@@ -99018,9 +99010,7 @@ fd3_goto_high:
     lea %sp@(12),%sp
 
 fd3_high_pal:
-    pea paltab4
-    movew #6,%sp@-
-    trap #14                                /* Setpalette(void *pallptr) */
-    addql #6,%sp
+    movew #1,palette
     moveq #3,%d0                            /* return 3 (high) */
 	rts
+
