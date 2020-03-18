@@ -24858,7 +24858,7 @@ addr_c314: /* Seen on stack during boot as return addr */
     cmpiw #2,%fp@(-40)                      /* is it 2? (medium) */
     bnes addr_c342                          /* ...no -> skip */
 
-    movew #639,dev_tab                      /* X max */
+    movew #639,dev_tab                      /* X max (switch from 319 to 639) */
     movew #169,dev_tab + 6                  /* width of pixel in um */
     movew #4,dev_tab + 26                   /* number of pens available (colours?) */
     movew #2,inq_tab + 8                    /* number of planes */
@@ -98917,11 +98917,6 @@ addr_2f9b6:
 /* 0x02fc00: */
 
 _FindDevice3:
-
-    movew #'F',%sp@-                        /* Log 'F' indicating that FindDevice was called */
-    bsr debug_add
-    lea %sp@(2),%sp
-
     movew #4,%sp@-
     trap #14                                /* Getrez() - get current video mode */
     addql #2,%sp
@@ -98929,58 +98924,11 @@ _FindDevice3:
     moveb %d0,%d2                           /* Save the original resolution value */
     extw %d2
 
-    /* Log current res returned from GetRez() */
-    movew %d2,%sp@-
-    bsr debug_add_word
-    lea %sp@(2),%sp
-
     moveal INTIN,%a0
-    movew %a0@,%d0                          /* get something from a global variable and put it in d0, this must be the requested res */
-
-    movew #'>',%sp@-                        /* Log '>' indicating that we went down the colour path */
-    bsr debug_add
-    lea %sp@(2),%sp
-
-    movel %a0,%sp@-
-    movel _gl_restype,%a0
-    movew _gl_restype,%sp@-                         /* Log requested resolution */
-    bsr debug_add_word
-    lea %sp@(2),%sp
-    movel %sp@+,%a0
-
-    movew #'\n',%sp@-                        /* CR */
-    bsr debug_add
-    lea %sp@(2),%sp
-    movew #'\r',%sp@-                        /* CR */
-    bsr debug_add
-    lea %sp@(2),%sp
-
-
+    movew %a0@,%d0                          /* Get the requested res from INTIN[0] */
+    
     /* Where did we come in from? */
-tp1:
-/*
-    movew %sp@(198),%sp@-                         
-    bsr debug_add_word
-    lea %sp@(2),%sp
-
-    movew #' ',%sp@-
-    bsr debug_add
-    lea %sp@(2),%sp
-
-    movew %sp@(200),%sp@-                         
-    bsr debug_add_word
-    lea %sp@(2),%sp
-
-
-    movew #'\n',%sp@-
-    bsr debug_add
-    lea %sp@(2),%sp
-    movew #'\r',%sp@-
-    bsr debug_add
-    lea %sp@(2),%sp
-*/
-
-    .short 0xb07c,0x0001                    /* cmpw #1,%d0 */
+    cmpw #1,%d0
     bnes fd3_not_1                          /* 1 not requested, go here */
 
     tstb %d2                                
@@ -99014,20 +98962,11 @@ fd3_goto_low:
 
 /* Set up 16-colour palette */
 fd3_low_pal:
-    .short 0x4879                           /* pea paltab16 */
-    .long paltab16
+    pea paltab16
     movew #6,%sp@-
     trap #14                                /* Setpalette(void *pallptr) */
     addql #6,%sp
     moveq #1,%d0                            /* return 1 */
-
-    movew #'r',%sp@-                         /* Log return value */
-    bsr debug_add
-    lea %sp@(2),%sp
-    movew %d0,%sp@-                         /* Log return value */
-    bsr debug_add_word
-    lea %sp@(2),%sp
-
 	rts
 
 fd3_orig_low:
@@ -99054,20 +98993,11 @@ fd3_goto_med:
 
 /* Set up 4-colour palette */
 fd3_med_pal:
-    .short 0x4879                           /* pea paltab4 */
-    .long paltab4
+    pea paltab4
     movew #6,%sp@-
     trap #14                                /* Setpalette(void *pallptr) */
     addql #6,%sp
     moveq #2,%d0                            /* return 2 */
-
-    movew #'m',%sp@-                         /* Log return value */
-    bsr debug_add
-    lea %sp@(2),%sp
-    movew %d0,%sp@-                         /* Log return value */
-    bsr debug_add_word
-    lea %sp@(2),%sp
-
 	rts
 
 fd3_orig_high:
@@ -99076,7 +99006,6 @@ fd3_orig_high:
     cmpb #4,%d0
     beq fd3_high_pal                        /* stay in high */
     bra fd3_goto_low
-
 
 fd3_goto_high:
     moveq #2,%d0
@@ -99089,100 +99018,9 @@ fd3_goto_high:
     lea %sp@(12),%sp
 
 fd3_high_pal:
-    .short 0x4879                           /* pea paltab4 */
-    .long paltab4
+    pea paltab4
     movew #6,%sp@-
     trap #14                                /* Setpalette(void *pallptr) */
     addql #6,%sp
     moveq #3,%d0                            /* return 3 (high) */
-
-    movew #'r',%sp@-                         /* Log return value */
-    bsr debug_add
-    lea %sp@(2),%sp
-    movew %d0,%sp@-                         /* Log return value */
-    bsr debug_add_word
-    lea %sp@(2),%sp
-
 	rts
-
-debug_init:
-.global debug_init
-    movel #0x752019f3,%a5@(memvalid)
-    moveb #0,DEBUG_STRING
-    movel #DEBUG_STRING,DEBUG_POINTER
-
-    movew #'B',%sp@-                         /* Log return value */
-    bsr debug_add
-    lea %sp@(2),%sp
-
-    jmp debug_return
-
-debug_add:
-    movel %a1,%sp@-
-    moveal DEBUG_POINTER,%a1
-    moveb %sp@(9),%a1@+
-    moveb #0,%a1@
-    movel %a1,DEBUG_POINTER
-    movel %sp@+,%a1
-    rts
-
-hex_digits:
-    .ascii "0123456789abcdef"
-
-debug_add_word:
-	moveml %d0-%d2/%a0-%a3,%sp@-
-	movew %sp@(32),%d2
-	beqs debug_add_word_2
-
-    lea hex_digits,%a3
-
-debug_add_word_loop:
-	movew %d2,%d0
-	moveq #12,%d1
-	lsrw %d1,%d0
-	andil #65535,%d0
-	moveb %a3@(0000000000000000,%d0:l),%d0
-	extw %d0
-	movew %d0,%sp@-
-	jsr debug_add
-	addql #2,%sp
-	lslw #4,%d2
-	bnes debug_add_word_loop
-
-debug_add_word_3:
-	moveml %sp@+,%d0-%d2/%a0-%a3
-	rts
-    
-debug_add_word_2:
-	moveq #'0',%d0
-	movew %d0,%sp@-
-	jsr debug_add
-	jsr debug_add
-	jsr debug_add
-	jsr debug_add
-	addql #2,%sp
-	jmp debug_add_word_3
-
-
-check_intin:    
-
-    /* The instruction that was replaced: */
-    lea contrl,%a1
-
-    movew #'=',%sp@-                         /* = sign meaning INTIN */
-    bsr debug_add
-    lea %sp@(2),%sp
-
-    movel %a0,%sp@-
-    moveal INTIN,%a0
-    movew %a0@,%sp@-                         /* Log value */
-    bsr debug_add_word
-    lea %sp@(2),%sp
-    movel %sp@+,%a0
-
-    jsr _screen
-
-
-    jmp check_intin_return
-check_intin_return:
-    
