@@ -18,7 +18,8 @@ tos.bin: $(OBJECTS)
 	$(OBJCOPY) \
 		--remove-section=.ram --remove-section=.cart --remove-section=.mmu \
 		--output-target=binary tos.elf tos.bin
-	@cmp tos.bin tos104uk.img || echo "No match to TOS 1.4!"
+
+	@TMP=$$( cmp tos.bin tos104uk.img | sed -e "s/.*differ: byte \([^ ,]*\).*/\1/ p; d" ); if [ -n "$$TMP" ]; then echo $$TMP | xargs printf "\n*** No match to TOS 1.4 at: 0x%0x\n\n"; fi
 
 clean:
 	$(RM) *.o tos.elf tos.bin

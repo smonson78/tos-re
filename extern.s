@@ -51,6 +51,7 @@ etv_term:
 .set _membot,0x432                          /* Bottom of heap */
 .set _memtop,0x436                          /* Top of heap */
 .set memval2,0x43a                          /* On warm boot, contains 0x237698aa */
+.set flock,0x43e                            /* Tells other routines not to access DMA registers */
 .set seekrate,0x440                         /* Floppy disk seek rate */
 .set _fverify,0x444                         /* Flag indicating floppy writes will be verified */
 .set _bootdev,0x446                         /* Device booted from 0=A, 1=B, and so on */
@@ -96,6 +97,7 @@ etv_term:
 .global _membot
 .global _memtop
 .global memval2
+.global flock
 .global seekrate
 .global _fverify
 .global _bootdev
@@ -293,6 +295,16 @@ cart_boot:
 .set shifter_sync_mode,0xffff820a
 .set palette,0xffff8240
 .set video_res,0xffff8260
+
+/* Some of these are the same, but one's for read and one's for write */
+.set dma_data_register,0xffff8604           /* R */
+.set dma_sector_count,0xffff8604            /* W */
+.set dma_status,0xffff8606                  /* R */
+.set dma_mode_control,0xffff8606            /* W */
+.set dma_pointer_high,0xffff8608
+.set dma_pointer_mid,0xffff860a
+.set dma_pointer_low,0xffff860c
+
 .set psg,0xffff8800
 .set mfp_pp,0xfffffa01
 
@@ -302,6 +314,13 @@ cart_boot:
 .global shifter_sync_mode
 .global palette
 .global video_res
+.global dma_data_register
+.global dma_sector_count
+.global dma_status
+.global dma_mode_control
+.global dma_pointer_high
+.global dma_pointer_mid
+.global dma_pointer_low
 .global psg
 .global mfp_pp
 

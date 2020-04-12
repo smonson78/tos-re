@@ -31,119 +31,89 @@ addr_54a:
 
 addr_54c:
 .global addr_54c
-	.short 0x7e00
-	.short 0x99cc
-	.short 0x6126
-	.short 0x661c
-	.short 0x206c
-	.short 0x04c6
-	.short 0x323c
-	.short 0x00ff
-	.short 0x7000
-	.short 0xd058
-	.short 0x51c9
-	.short 0xfffc
-	.short 0xb07c
-	.short 0x1234
-	.short 0x6606
-	.short 0x206c
-	.short 0x04c6
-	.short 0x4e90
-	.short 0xde3c
-	.short 0x0020
-	.short 0x66d8
+    moveq #0,%d7
+addr_54e:
+    subal %a4,%a4
+    bsrs addr_578
+    bnes addr_570
+    moveal %a4@(_dskbufp),%a0
+    movew #255,%d1
+    moveq #0,%d0
+addr_55e:
+    addw %a0@+,%d0
+    dbf %d1,addr_55e
+    .short 0xb07c,0x1234                    /* cmpw #0x1234,%d0 */
+    bnes addr_570
+    moveal %a4@(_dskbufp),%a0
+    jsr %a0@
+addr_570:
+    .short 0xde3c,0x0020                    /* addb #32,%d7 */
+    bnes addr_54e
+    rts
+
+addr_578:
+    moveq #1,%d5
+addr_57a:
+    lea %a4@(dma_status),%fp
+    lea %a4@(dma_data_register),%a5
+    st %a4@(flock)
+    movel %a4@(_dskbufp),%sp@-
+    moveb %sp@(3),%a4@(dma_pointer_low + 1)
+    moveb %sp@(2),%a4@(dma_pointer_mid + 1)
+    moveb %sp@(1),%a4@(dma_pointer_high + 1)
+    addqw #4,%sp
+    movew #152,%fp@
+    movew #408,%fp@
+    movew #152,%fp@
+    movew #1,%a5@
+    movew #136,%fp@
+    moveb %d7,%d0
+    .short 0x803c,0x0008                    /* orb #8,%d0 */
+    swap %d0
+    movew #138,%d0
+    bsrs addr_60e
+    bnes addr_5f0
+    moveq #3,%d6
+    lea %pc@(addr_5fe),%a0
+addr_5c8:
+    movel %a0@+,%d0
+    bsrs addr_60e
+    bnes addr_5f0
+    dbf %d6,addr_5c8
+    movel #10,%a5@
+    movew #400,%d1
+    bsrs addr_612
+    bnes addr_5f0
+    movew #138,%fp@
+    movew %a5@,%d0
+    .short 0xc07c,0x00ff                    /* andw #255,%d0 */
+    beqs addr_05f2
+    dbf %d5,addr_57a
+addr_5f0:    
+    moveq #-1,%d0
+addr_05f2:    
+    movew #128,%fp@
+    tstb %d0
+    sf %a4@(flock)                          /* Is this right? Seems like it wouldn't do anything */
 	rts
-	.short 0x7a01
-	.short 0x4dec
-	.short 0x8606
-	.short 0x4bec
-/* 0x000580: */
-	.short 0x8604
-	.short 0x50ec
-	.short 0x043e
-	.short 0x2f2c
-	.short 0x04c6
-	.short 0x196f
-	.short 0x0003
-	.short 0x860d
-	.short 0x196f
-	.short 0x0002
-	.short 0x860b
-	.short 0x196f
-	.short 0x0001
-	.short 0x8609
-	.short 0x584f
-	.short 0x3cbc
-	.short 0x0098
-	.short 0x3cbc
-	.short 0x0198
-	.short 0x3cbc
-	.short 0x0098
-	.short 0x3abc
-	.short 0x0001
-	.short 0x3cbc
-	.short 0x0088
-	.short 0x1007
-	.short 0x803c
-	.short 0x0008
-	.short 0x4840
-	.short 0x303c
-	.short 0x008a
-	.short 0x614e
-/* 0x0005c0: */
-	.short 0x662e
-	.short 0x7c03
-	.short 0x41fa
-	.short 0x0038
-	.short 0x2018
-	.short 0x6142
-	.short 0x6622
-	.short 0x51ce
-	.short 0xfff8
-	.short 0x2abc
-	.short 0x0000
-	.short 0x000a
-	.short 0x323c
-	.short 0x0190
-	.short 0x6134
-	.short 0x6610
-	.short 0x3cbc
-	.short 0x008a
-	.short 0x3015
-	.short 0xc07c
-	.short 0x00ff
-	.short 0x6706
-	.short 0x51cd
-	.short 0xff8c
-	.short 0x70ff
-	.short 0x3cbc
-	.short 0x0080
-	.short 0x4a00
-	.short 0x51ec
-	.short 0x043e
-	rts
-	.short 0x0000
-/* 0x000600: */
-	.short 0x008a
-	.short 0x0000
-	.short 0x008a
-	.short 0x0000
-	.short 0x008a
-	.short 0x0001
-	.short 0x008a
-	.short 0x2a80
-	.short 0x720a
-	.short 0xd2ac
-	.short 0x04ba
-	.short 0x082c
-	.short 0x0005
-	.short 0xfa01
-	.short 0x6708
-	.short 0xb2ac
-	.short 0x04ba
-	.short 0x66f2
-	.short 0x72ff
-	rts
+addr_5fe:
+    orib #0x8a,%d0
+    orib #0x8a,%d0
+    orib #0x8a,%d0
+    orib #0x8a,%d1
+addr_60e:    
+    movel %d0,%a5@
+    moveq #10,%d1
+addr_612:    
+    addl %a4@(1210),%d1
+addr_616:
+    btst #5,%a4@(-1535)
+    beqs addr_626
+    cmpl %a4@(1210),%d1
+    bnes addr_616
+    moveq #-1,%d1
+addr_626:    
+    rts
 
 addr_628:
 .global addr_628
