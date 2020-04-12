@@ -30,3 +30,10 @@ view:
 desk.rsc: tos104uk.img
 	dd if=tos104uk.img of=desk.rsc bs=1 skip=183754 count=11240
 
+# to disassemble from an address:
+# dd if=tos104uk.img of=linef.bin bs=1 skip=161872 count=5000
+# m68k-elf-objdump -b binary -m 68000 --adjust-vma=0xfe877a -D 2877a.bin | less
+
+stats:
+	@printf "%.2f%% disassembled\n" \
+	$$(echo "scale=4; (1-((" $$(cat tos.s boot.s | grep -c \.short) "* 2) / 195542))*100" | bc)
