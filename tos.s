@@ -116,7 +116,8 @@ addr_626:
     rts
 
 addr_628:
-.global addr_628
+cartscan:
+.global cartscan
     lea cart_magic,%a0
     cmpil #0xabcdef42,%a0@+
     bnes addr_650
@@ -1026,6 +1027,9 @@ addr_0cfa:
 	.short 0x0000
 	.short 0x04ee
 	rts
+
+addr_d0c:
+.global addr_d0c    
 	.short 0x9bcd
 	.short 0x2b6d
 	.short 0x044e
@@ -2617,6 +2621,9 @@ addr_173c:
 	.short 0x30c0
 	.short 0x4e5e
 	rts
+
+addr_18ec:
+.global addr_18ec    
 	.short 0x4e56
 	.short 0x0000
 	.short 0x48e7
@@ -3131,6 +3138,9 @@ addr_1a24:
 	.short 0xffff
 	.short 0x4e5e
 	rts
+
+addr_1cc6:
+.global addr_1cc6    
 	.short 0x4e56
 	.short 0x0000
 	.short 0x48e7
@@ -6063,6 +6073,9 @@ addr_31a8:
 	.short 0x0006
 	.short 0x46df
 	rts
+
+addr_32f6:
+.global addr_32f6
 	.short 0x082d
 	.short 0x0004
 	.short 0x0eac
@@ -6144,6 +6157,9 @@ addr_31a8:
 	.short 0x720f
 	.short 0x6000
 	.short 0x0c9c
+
+addr_3392:
+.global addr_3392    
 	.short 0x41f9
 	.short 0xffff
 	.short 0xfa01
@@ -6205,6 +6221,9 @@ addr_31a8:
 	.short 0x612c
 	.short 0x301f
 	rts
+
+addr_3408:
+.global addr_3408    
 	.short 0x41f9
 	.short 0x0000
 	.short 0x0c7e
@@ -6218,6 +6237,9 @@ addr_31a8:
 	.short 0x6602
 	.short 0x7000
 	rts
+
+addr_3422:
+.global addr_3422
 	.short 0x302f
 	.short 0x0006
 	.short 0x41f9

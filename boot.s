@@ -234,52 +234,53 @@ addr_226:
     lea %pc@(os_beg),%a0                    /* Else use system addresses */
 
 addr_242:    
-    movel %a0@(4),%a5@(end_os)              /* end_os */
-    movel %a0@(8),%a5@(exec_os)             /* exec_os */
-    movel #addr_16ba,%a5@(hdv_init)         /* hdv_init */
-    movel #addr_1a24,%a5@(hdv_rw)           /* hdv_rw */
-    movel #addr_173c,%a5@(hdv_bpb)          /* hdv_bpb */
-    movel #16521452,%a5@(hdv_mediach)       /* hdv_mediach */
-    movel #16522438,%a5@(hdv_boot)          /* hdv_boot */
-    movel #16528274,%a5@(prt_stat)          /* prt_stat */
-    movel #16528118,%a5@(prt_vec)           /* prt_vec */
-    movel #16528392,%a5@(aux_stat)          /* aux_stat */
-    movel #16528418,%a5@(aux_vec)           /* aux_vec */
-    movel #16518412,%a5@(dump_vec)          /* dump_vec */
-    movel %a5@(1102),%a5@(_memtop)          /* _v_bs_ad to _memtop */
-    movel %a5@(1274),%a5@(_membot)          /* end_os to _membot */
-    lea stack_top,%sp                       /* Initialise system stack pointer */
-    movew #8,%a5@(nvbls)                    /* nvbls - 8 vectors in list */
-    st %a5@(_fverify)                       /* _fverify - yes */
-    movew #3,%a5@(seekrate)                 /* Seek rate 3ms */
-    movel #disk_buffer,%a5@(_dskbufp)       /* Set up disk buffer pointer */
-    movew #-1,%a5@(_dumpflg)                /* Clear _dumpflg */
-    movel #os_entry,%a5@(_sysbase)          /* _sysbase to ROM start */
-    movel #tos_register_buffer,%a5@(savptr) /* savptr for BIOS */
-    movel #dummy_subroutine,%a5@(swv_vec)   /* swv_vec for monitor change */
-    clrl %a5@(_drvbits)                     /* No drives present to start with */
-    clrw %a5@(_longframe)                   /* Use short stack frames */
+    movel %a0@(4),%a5@(end_os)
+    movel %a0@(8),%a5@(exec_os)
+    movel #addr_16ba,%a5@(hdv_init)
+    movel #addr_1a24,%a5@(hdv_rw)
+    movel #addr_173c,%a5@(hdv_bpb)
+    movel #addr_18ec,%a5@(hdv_mediach)
+    movel #addr_1cc6,%a5@(hdv_boot)
+    movel #addr_3392,%a5@(prt_stat)
+    movel #addr_32f6,%a5@(prt_vec)
+    movel #addr_3408,%a5@(aux_stat)
+    movel #addr_3422,%a5@(aux_vec)
+    movel #addr_d0c,%a5@(dump_vec)
+    movel %a5@(_v_bas_ad),%a5@(_memtop)
+    movel %a5@(end_os),%a5@(_membot)
+    
+    lea stack_top,%sp                           /* Initialise system stack pointer */
+    movew #8,%a5@(nvbls)                        /* nvbls - 8 vectors in list */
+    st %a5@(_fverify)                           /* _fverify - yes */
+    movew #3,%a5@(seekrate)                     /* Seek rate 3ms */
+    movel #disk_buffer,%a5@(_dskbufp)           /* Set up disk buffer pointer */
+    movew #-1,%a5@(_dumpflg)                    /* Clear _dumpflg */
+    movel #os_entry,%a5@(_sysbase)              /* _sysbase to ROM start */
+    movel #tos_register_buffer,%a5@(savptr)     /* savptr for BIOS */
+    movel #dummy_subroutine,%a5@(swv_vec)       /* swv_vec for monitor change */
+    clrl %a5@(_drvbits)                         /* No drives present to start with */
+    clrw %a5@(_longframe)                       /* Use short stack frames */
     bsrw addr_e62
-    lea %pc@(dummy_exception),%a3           /* Address rte */
-    lea %pc@(dummy_subroutine),%a4          /* Address rts */
-    cmpil #0xfa52235f,cart_magic            /* Diagnostic cartridge inserted? */
-    beqs addr_32c                           /* Yes */
+    lea %pc@(dummy_exception),%a3               /* Address rte */
+    lea %pc@(dummy_subroutine),%a4              /* Address rts */
+    cmpil #0xfa52235f,cart_magic                /* Diagnostic cartridge inserted? */
+    beqs addr_32c                               /* Yes */
 
-    lea %pc@(addr_b0a),%a1          /* Indicate address for exception */
-    addal #0x2000000,%a1            /* Vector number in bits 24-31 to 2 */
-    lea vector_bus_error,%a0        /* Start with Bus Error */
-    movew #61,%d0                   /* 62 vectors */
+    lea %pc@(addr_b0a),%a1                      /* Indicate address for exception */
+    addal #0x2000000,%a1                        /* Vector number in bits 24-31 to 2 */
+    lea vector_bus_error,%a0                    /* Start with Bus Error */
+    movew #61,%d0                               /* 62 vectors */
 addr_31a:
-    movel %a1,%a0@+                 /* Set vector */
-    addal #0x1000000,%a1            /* Increment vector number */
-    dbf %d0,addr_31a                /* Initialise next exception vector */
-    movel %a3,vector_divide_by_zero /* Division By Zero to rte */
+    movel %a1,%a0@+                             /* Set vector */
+    addal #0x1000000,%a1                        /* Increment vector number */
+    dbf %d0,addr_31a                            /* Initialise next exception vector */
+    movel %a3,vector_divide_by_zero             /* Division By Zero to rte */
 addr_32c:
-    moveq #6,%d0                    /* Loop 7 times for autovectors */
-    lea %a5@(autovectors),%a1       /* Load target address (0x64) */
+    moveq #6,%d0                                /* Loop 7 times for autovectors */
+    lea %a5@(autovectors),%a1                   /* Load target address (0x64) */
 addr_332:
-    movel #dummy_exception,%a1@+    /* Set up dummy vector */
-    dbf %d0,addr_332                /* Next vector */
+    movel #dummy_exception,%a1@+                /* Set up dummy vector */
+    dbf %d0,addr_332                            /* Next vector */
     
     movel #autovec_lvl_4,%a5@(autovectors + 12) /* Level 4 autovector */
     movel #autovec_lvl_2,%a5@(autovectors + 4)  /* Level 2 autovector */
@@ -316,7 +317,7 @@ addr_3b8:
     bsrw addr_54a
     dbf %d0,addr_3b8
     moveq #2,%d0                                /* Bit 2 */
-    bsrw addr_628                               /* cartscan */
+    bsrw cartscan
     subal %a5,%a5
     moveb %a5@(video_res),%d0                   /* Get current video resolution */
     .short 0xc03c,0x0003                        /* andb #3,%d0 - strip all but bottom 2 bits */
@@ -343,10 +344,10 @@ addr_414:
     movel #boot,%a5@(swv_vec)                   /* Reboot on resolution-change vector */
     movew #1,%a5@(vblsem)
     clrw %d0
-    bsrw addr_628                               /* cartscan */
+    bsrw cartscan
     movew #0x2300,%sr                           /* IPL 3 */
     moveq #1,%d0
-    bsrw addr_628                               /* cartscan */
+    bsrw cartscan
     jsr init_dos                                /* Initialise DOS */
     
     .short 0x33f9                               /* movew os_dosdate,ram_unknown2 - creation date in DOS format */
