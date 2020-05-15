@@ -381,10 +381,9 @@ trap14_vectors:
 	.long flopfmt
     /* 11 - uint32_t Dbmsg(int16_t rsrvd, int16_t msg_num, int32_t msg_arg) */
 	.long dbmsg
-	.long addr_3292
-/* 0x000880: */
-	.long 0x00fc3754
-	.long 0x00fc39fe
+	.long midiws                            /* 12 - void Midiws(int16_t cnt, void *ptr); */
+	.long mfpint                            /* 13 - void Mfpint(int16_t number, int16_t (*vector)()); */
+	.long iorec                             /* 14 - IOREC *Iorec(int16_t dev); */
 	.long 0x00fc3a16
 	.long 0x00fc41ac
 	.long 0x00fc1c76
@@ -5837,7 +5836,10 @@ addr_31a8:
 	.short 0x0002
 	rts
 
-addr_3292:    
+/* Midi - write string */
+addr_3292:
+midiws:
+.global midiws
 	.short 0x7600
 	.short 0x362f
 	.short 0x0004
@@ -5848,6 +5850,7 @@ addr_3292:
 	.short 0x51cb
 	.short 0xfffa
 	rts
+
 	.short 0x41ed
 	.short 0x0da0
 	.short 0x43ed
@@ -6485,6 +6488,9 @@ addr_34fc:
 	.short 0x8ff8
 	.short 0x1e20
 	.short 0x2224
+
+addr_3754:
+mfpint:    
 	.short 0x302f
 	.short 0x0004
 	.short 0x246f
@@ -6738,7 +6744,6 @@ addr_34fc:
 	.short 0x0020
 	.short 0xc028
 	.short 0x001f
-/* 0x003940: */
 	.short 0x6630
 	.short 0x1028
 	.short 0x0021
@@ -6765,6 +6770,7 @@ addr_34fc:
 	.short 0x1540
 	.short 0x002e
 	rts
+
 	.short 0x3228
 	.short 0x0008
 	.short 0x6178
@@ -6836,13 +6842,18 @@ addr_34fc:
 	.short 0x6502
 	.short 0x7200
 	rts
+
+/* Obtain address of the input/ output buffer of a serial device. */
+addr_39fe:
+iorec:
+.global iorec
 	.short 0x322f
-/* 0x003a00: */
 	.short 0x0004
 	.short 0xe581
 	.short 0x203b
 	.short 0x1004
 	rts
+    
 	.short 0x0000
 	.short 0x0c70
 	.short 0x0000
