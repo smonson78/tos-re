@@ -379,8 +379,9 @@ trap14_vectors:
 	.long flopwr
     /* 10 - int16_t Flopfmt(void *buf, int32_t filler, int16_t devno, int16_t spt, int16_t trackno, int16_t sideno, int16_t interlv, int32_t magic, int16_t virgin); */
 	.long flopfmt
-	.long 0x00fc1732
-	.long 0x00fc3292
+    /* 11 - uint32_t Dbmsg(int16_t rsrvd, int16_t msg_num, int32_t msg_arg) */
+	.long dbmsg
+	.long addr_3292
 /* 0x000880: */
 	.long 0x00fc3754
 	.long 0x00fc39fe
@@ -1521,8 +1522,8 @@ addr_1260:
 
 addr_127e:
 wmult:
-    moveb %d0,%a2@+                        /* record byte in proto buffer */
-    dbf %d1,wmult                          /* (do it again) */
+    moveb %d0,%a2@+                         /* record byte in proto buffer */
+    dbf %d1,wmult                           /* (do it again) */
 	rts
 
 	.short 0x6100
@@ -2194,13 +2195,24 @@ addr_16ba:
 	.short 0x6dae
 	.short 0x4e5e
 	rts
-	.short 0x4e56
-	.short 0xfffc
-	.short 0x4280
-	.short 0x4e5e
+
+/*
+ * XBIOS #11 - Dbmsg - Output debug message
+ *
+ * Available Only if a resident debugger was loaded,
+ * which supports this call. The only debugger that currently
+ * supports this call is the Atari debugger.
+ * Was never implemented in any offical ROM version.
+ */
+addr_1732:
+dbmsg:
+.global dbmsg
+    linkw %fp,#-4
+    clrl %d0
+    unlk %fp
 	rts
 
-addr_173c:    
+addr_173c:
 .global addr_173c
 	.short 0x4e56
 	.short 0xfff4
@@ -5824,6 +5836,8 @@ addr_31a8:
 	.short 0x1341
 	.short 0x0002
 	rts
+
+addr_3292:    
 	.short 0x7600
 	.short 0x362f
 	.short 0x0004
