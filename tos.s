@@ -1479,53 +1479,52 @@ addr_11f4:
     movew #1400,%d1
     moveb #78,%d0
     bsrw wmult
-    moveb %a5@(ram_unknown22),%a5@(dma_pointer_low + 1)
-    moveb %a5@(ram_unknown24),%a5@(dma_pointer_mid + 1)
-    moveb %a5@(ram_unknown25),%a5@(dma_pointer_high + 1)
-    movew #400,%fp@
-    movew #144,%fp@
-    movew #400,%fp@
-    movew #31,%d7
+    moveb %a5@(fd_buffer + 3),%a5@(dma_pointer_low + 1)
+    moveb %a5@(fd_buffer + 2),%a5@(dma_pointer_mid + 1)
+    moveb %a5@(fd_buffer + 1),%a5@(dma_pointer_high + 1)
+    movew #400,%fp@                         /* Toggle R/W flag */
+    movew #144,%fp@                         /* Toggle R/W flag */
+    movew #400,%fp@                         /* Select sector-count register */
+    movew #31,%d7                           /* (absurd sector count) */
     bsrw wrfdcd7
-    movew #384,%fp@
-    movew #240,%d7
+    movew #384,%fp@                         /* Select 1770 cmd register */
+    movew #240,%d7                          /* Write format_track command */
     bsrw wrfdcd7
     movel #262144,%d7
 addr_1238:
-    btst #5,%a5@(-1535)
-    beqs addr_1260
+    btst #5,%a5@(mfp_pp)                    /* Is 1770 done? */
+    beqs addr_1260                          /* (yes) */
     subql #1,%d7
     bnes addr_1238
     bsrw fdcreset
 addr_1248:    
-    moveq #1,%d7
+    moveq #1,%d7                            /* return error */
     rts
 addr_124c:    
-    cmpw %a5@(fd_spt),%d3
-    beqs addr_11f4
+    cmpw %a5@(fd_spt),%d3                   /* Last sector reached? */
+    beqs addr_11f4                          /* Yes, end of track */
     movew %d3,%d6
     addw %d6,%d6
-    movew %a3@(0,%d6:w),%d4
+    movew %a3@(0,%d6:w),%d4                 /* Pick next sector number from table */
     addqw #1,%d3
     braw addr_1166
 addr_1260:
-    movew #400,%fp@
+    movew #400,%fp@                         /* Check DMA status bit */
     movew %fp@,%d0
-    btst #0,%d0
+    btst #0,%d0                             /* If zero --> DMA error */
     beqs addr_1248
-    movew #384,%fp@
-    bsrw rdfdcd0
-    bsrw fdcerr
+    movew #384,%fp@                         /* Get 1770 status */
+    bsrw rdfdcd0                            /* Check for write protect and lost data */
+    bsrw fdcerr                             /* Return error (NE) on 1770 error */
     .short 0xc03c,0x0044                    /* andb #68,%d0 */
 	rts
 
 addr_127e:
 wmult:
-	.short 0x14c0
-/* 0x001280: */
-	.short 0x51c9
-	.short 0xfffc
+    moveb %d0,%a2@+                        /* record byte in proto buffer */
+    dbf %d1,wmult                          /* (do it again) */
 	rts
+
 	.short 0x6100
 	.short 0x03b8
 	.short 0x70f5

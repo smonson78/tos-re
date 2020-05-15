@@ -195,15 +195,6 @@ etv_term:
 .set fd_buffer,0xa12
 .global fd_buffer
 
-.set ram_unknown25,0xa13
-.global ram_unknown25
-
-.set ram_unknown24,0xa14
-.global ram_unknown24
-
-.set ram_unknown22,0xa15
-.global ram_unknown22
-
 .set fd_spt,0xa16
 .global fd_spt
 
