@@ -384,41 +384,42 @@ trap14_vectors:
 	.long midiws                            /* 12 - void Midiws(int16_t cnt, void *ptr); */
 	.long mfpint                            /* 13 - void Mfpint(int16_t number, int16_t (*vector)()); */
 	.long iorec                             /* 14 - IOREC *Iorec(int16_t dev); */
-	.long 0x00fc3a16
+    /* 15 - int32_t Rsconf(int16_t baud, int16_t ctr, int16_t ucr, int16_t rsr, int16_t tsr, int16_t scr); */
+    .long 0x00fc3a16    
+    /* 16 - KEYTAB *Keytbl(void *unshift, void *shift, void *capslock); */
 	.long 0x00fc41ac
-	.long 0x00fc1c76
+	.long 0x00fc1c76                        /* 17 - int32_t Random(); */
+    /* 18 - void Protobt(void *buf, int32_t serialno, int16_t disktype, int16_t execflag); */
 	.long 0x00fc1d42
-	.long 0x00fc1286
-	.long 0x00fc0cfa
-	.long 0x00fca6c6
-	.long 0x00fc0e4c
-	.long 0x00fc0e3e
-	.long 0x00fc41d8
-	.long 0x00fc3480
-	.long 0x00fc377e
-	.long 0x00fc37b8
-	.long 0x00fc4024
-/* 0x0008c0: */
-	.long 0x00fc4082
-	.long 0x00fc405c
-	.long 0x00fc4172
-	.long 0x00fc41f2
-	.long 0x00fc4206
-	.long 0x00fc423a
-	.long 0x00fc4218
-	.long 0x00fc215c
-	.long 0x00fc07a2
-	.long 0x00fc0950
-	.long 0x00fc0af0
+    /* 19 - int16_t Flopver(void *buf, int32_t filler, int16_t devno, int16_ sectno, int16_t trackno, int16_t sideno, int16_t count); */
+	.long 0x00fc1286                        
+	.long 0x00fc0cfa                        /* 20 - void Scrdmp(); */
+	.long 0x00fca6c6                        /* 21 - int16_t Cursconf(int16_t func, int16_t rate); */
+	.long 0x00fc0e4c                        /* 22 - void Settime(uint32_t time); */
+	.long 0x00fc0e3e                        /* 23 - uint32_t Gettime(); */
+	.long 0x00fc41d8                        /* 24 - void Bioskeys(); */
+	.long 0x00fc3480                        /* 25 - void Ikbdws(int16_t count, const int8_t *ptr); */
+	.long 0x00fc377e                        /* 26 - void Jdisint(int16_t number); */
+	.long 0x00fc37b8                        /* 27 - void Jenabint(int16_t number); */
+	.long 0x00fc4024                        /* 28 - int8_t Giaccess(int16_t data, int16_t regno); */
+	.long 0x00fc4082                        /* 29 - void Offgibit(int16_t bitno); */
+	.long 0x00fc405c                        /* 30 - void Ongibit(int16_t bitno); */
+	.long 0x00fc4172                        /* 31 - void Xbtimer(int16_t timer, int16_t control, int16_t data, void(*vector)()); */
+	.long 0x00fc41f2                        /* 32 - void *Dosound(const int8_t *buf); */
+	.long 0x00fc4206                        /* 33 - int16_t Setprt(int16_t config); */
+	.long 0x00fc423a                        /* 34 - KBDVBASE *Kbdvbase(); */
+	.long 0x00fc4218                        /* 35 - int16_t Kbrate(int16_t initial, int16_t repeat); */
+	.long 0x00fc215c                        /* 36 - int16_t Prtblk(PBDEF *par); */
+	.long 0x00fc07a2                        /* 37 - void Vsync(); */
+	.long 0x00fc0950                        /* 38 - int32_t Supexec(int32_t (*func)()); */
+	.long 0x00fc0af0                        /* 39 - void Puntaes(); */
 	.long dummy_subroutine
-	.long 0x00fc1692
-	.long dummy_subroutine
-	.long dummy_subroutine
-	.long dummy_subroutine
-/* 0x000900: */
+	.long 0x00fc1692                        /* 41 - int16_t Floprate(int16_t devno, int16_t newrate); */
 	.long dummy_subroutine
 	.long dummy_subroutine
 	.long dummy_subroutine
+	.long dummy_subroutine
+   	.long dummy_subroutine
 	.long dummy_subroutine
 	.long dummy_subroutine
 	.long dummy_subroutine
@@ -432,11 +433,11 @@ trap14_vectors:
 	.long dummy_subroutine
 	.long dummy_subroutine
 	.long dummy_subroutine
-/* 0x000940: */
 	.long dummy_subroutine
 	.long dummy_subroutine
 	.long dummy_subroutine
-	.long 0x00fc0e9e
+	.long dummy_subroutine
+	.long 0x00fc0e9e                        /* int16_t Blitmode(int16_t mode);  */
 /* end of vectors */
 
 	.short 0x206f
