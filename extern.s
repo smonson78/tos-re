@@ -216,6 +216,12 @@ etv_term:
 .set fd_curerr,0xa26
 .global fd_curerr
 
+.set ram_unknown13,0xa6e
+.global ram_unknown13
+
+.set ram_unknown14,0xc70
+.global ram_unknown14
+
 /* A mouse vector */
 .set mouseint,0xe3e
 .global mouseint

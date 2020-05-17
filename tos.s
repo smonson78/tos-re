@@ -385,7 +385,7 @@ trap14_vectors:
 	.long mfpint                            /* 13 - void Mfpint(int16_t number, int16_t (*vector)()); */
 	.long iorec                             /* 14 - IOREC *Iorec(int16_t dev); */
     /* 15 - int32_t Rsconf(int16_t baud, int16_t ctr, int16_t ucr, int16_t rsr, int16_t tsr, int16_t scr); */
-    .long 0x00fc3a16    
+    .long rsconf    
     /* 16 - KEYTAB *Keytbl(void *unshift, void *shift, void *capslock); */
 	.long 0x00fc41ac
 	.long 0x00fc1c76                        /* 17 - int32_t Random(); */
@@ -415,11 +415,11 @@ trap14_vectors:
 	.long 0x00fc0af0                        /* 39 - void Puntaes(); */
 	.long dummy_subroutine
 	.long 0x00fc1692                        /* 41 - int16_t Floprate(int16_t devno, int16_t newrate); */
+	.long dummy_subroutine                  /* 42 - int16_t DMAread(int32_t sector, int16_t count, void *buffer, int16_t devno); */
+	.long dummy_subroutine                  /* 43 - int16_t DMAwrite(int32_t sector, int16_t count, void *buffer, int16_t devno); */
+	.long dummy_subroutine                  /* 44 - int32_t Bconmap(int16_t devno); */
 	.long dummy_subroutine
-	.long dummy_subroutine
-	.long dummy_subroutine
-	.long dummy_subroutine
-   	.long dummy_subroutine
+   	.long dummy_subroutine                  /* 46 - int16_t NVMaccess(int16_t op, int16_t start, int16_t count, int8_t *buffer); */
 	.long dummy_subroutine
 	.long dummy_subroutine
 	.long dummy_subroutine
@@ -6396,12 +6396,14 @@ addr_34fc:
 	.short 0x0100
 	.short 0x00fc
 	.short 0x3918
+
 	.short 0x00fc
 	.short 0x3890
 	.short 0x00fc
 	.short 0x38f6
 	.short 0x00fc
 	.short 0x37f2
+addr_36ac:
 	.short 0x48e7
 	.short 0xf8f0
 	.short 0x207c
@@ -6861,100 +6863,70 @@ iorec:
 	.short 0x0c92
 	.short 0x0000
 	.short 0x0da0
-	.short 0x0c6f
-	.short 0xfffe
-	.short 0x0004
-	.short 0x6608
-	.short 0x3039
-	.short 0x0000
-	.short 0x0a6e
+
+addr_3a16:
+rsconf:
+.global rsconf
+    cmpiw #-2,%sp@(4)
+    bnes addr_3a26
+    movew ram_unknown13,%d0
 	rts
-	.short 0x007c
-	.short 0x0700
-	.short 0x41f9
-	.short 0x0000
-	.short 0x0c70
-	.short 0x43f9
-	.short 0xffff
-	.short 0xfa01
-	.short 0x0f49
-	.short 0x0028
-	.short 0x302f
-	.short 0x0006
-	.short 0xb07c
-/* 0x003a40: */
-	.short 0xffff
-	.short 0x6714
-	.short 0x1140
-	.short 0x0020
-	.short 0x670a
-	.short 0xc03c
-	.short 0x00fd
-	.short 0x6704
-	.short 0x103c
-	.short 0x0001
-	.short 0x1140
-	.short 0x0020
-	.short 0x4a6f
-	.short 0x0004
-	.short 0x6b3a
-	.short 0x7000
-	.short 0x1340
-	.short 0x002a
-	.short 0x1340
-	.short 0x002c
-	.short 0x322f
-	.short 0x0004
-	.short 0x33c1
-	.short 0x0000
-	.short 0x0a6e
-	.short 0x45f9
-	.short 0x00fc
-	.short 0x3acc
-	.short 0x1032
-	.short 0x1000
-	.short 0x45f9
-	.short 0x00fc
-/* 0x003a80: */
-	.short 0x3adc
-	.short 0x1432
-	.short 0x1000
-	.short 0x2200
-	.short 0x7003
-	.short 0x6100
-	.short 0xfc20
-	.short 0x7001
-	.short 0x1340
-	.short 0x002a
-	.short 0x1340
-	.short 0x002c
-	.short 0x4a6f
-	.short 0x0008
-	.short 0x6b06
-	.short 0x136f
-	.short 0x0009
-	.short 0x0028
-	.short 0x4a6f
-	.short 0x000a
-	.short 0x6b06
-	.short 0x136f
-	.short 0x000b
-	.short 0x002a
-	.short 0x4a6f
-	.short 0x000c
-	.short 0x6b06
-	.short 0x136f
-	.short 0x000d
-	.short 0x002c
-	.short 0x4a6f
-	.short 0x000e
-/* 0x003ac0: */
-	.short 0x6b06
-	.short 0x136f
-	.short 0x000f
-	.short 0x0026
-	.short 0x2007
+addr_3a26:
+    oriw #0x700,%sr
+    lea ram_unknown14,%a0
+    lea mfp_pp,%a1
+    movepl %a1@(40),%d7
+    movew %sp@(6),%d0
+    .short 0xb07c,0xffff                    /* cmpw #-1,%d0 */
+    beqs addr_3a58
+    moveb %d0,%a0@(32)
+    beqs addr_3a54
+    .short 0xc03c,0x00fd                    /* andb #-3,%d0 */
+    beqs addr_3a54
+    moveb #1,%d0
+addr_3a54:
+    moveb %d0,%a0@(32)
+addr_3a58:
+    tstw %sp@(4)
+    bmis addr_3a98
+    moveq #0,%d0
+    moveb %d0,%a1@(42)
+    moveb %d0,%a1@(44)
+    movew %sp@(4),%d1
+    movew %d1,ram_unknown13
+    .short 0x45f9                           /* lea addr_3acc,%a2 */
+    .long addr_3acc
+    moveb %a2@(0,%d1:w),%d0
+    .short 0x45f9                           /* lea addr_3adc,%a2 */
+    .long addr_3adc
+    moveb %a2@(0,%d1:w),%d2
+    movel %d0,%d1
+    moveq #3,%d0
+    bsrw addr_36ac
+    moveq #1,%d0
+    moveb %d0,%a1@(42)
+    moveb %d0,%a1@(44)
+addr_3a98:
+    tstw %sp@(8)
+    bmis addr_3aa4
+    moveb %sp@(9),%a1@(40)
+addr_3aa4:
+    tstw %sp@(10)
+    bmis addr_3ab0
+    moveb %sp@(11),%a1@(42)
+addr_3ab0:
+    tstw %sp@(12)
+    bmis addr_3abc
+    moveb %sp@(13),%a1@(44)
+addr_3abc:
+    tstw %sp@(14)
+    bmis addr_3ac8
+    moveb %sp@(15),%a1@(38)
+addr_3ac8:    
+    movel %d7,%d0
 	rts
+
+addr_3acc:
 	.short 0x0101
 	.short 0x0101
 	.short 0x0101
@@ -6963,6 +6935,7 @@ iorec:
 	.short 0x0101
 	.short 0x0101
 	.short 0x0202
+addr_3adc:
 	.short 0x0102
 	.short 0x0405
 	.short 0x080a
