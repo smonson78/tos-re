@@ -387,7 +387,7 @@ trap14_vectors:
     /* 15 - int32_t Rsconf(int16_t baud, int16_t ctr, int16_t ucr, int16_t rsr, int16_t tsr, int16_t scr); */
     .long rsconf    
     /* 16 - KEYTAB *Keytbl(void *unshift, void *shift, void *capslock); */
-	.long 0x00fc41ac
+	.long addr_41ac
 	.long 0x00fc1c76                        /* 17 - int32_t Random(); */
     /* 18 - void Protobt(void *buf, int32_t serialno, int16_t disktype, int16_t execflag); */
 	.long 0x00fc1d42
@@ -7796,7 +7796,9 @@ addr_41a6:
 
 	.short 0x0d08
 	.short 0x0504
-	.short 0x4aaf
+	
+addr_41ac:    
+    .short 0x4aaf
 	.short 0x0004
 	.short 0x6b06
 	.short 0x2b6f
