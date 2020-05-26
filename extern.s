@@ -216,11 +216,11 @@ etv_term:
 .set fd_curerr,0xa26
 .global fd_curerr
 
-.set ram_unknown13,0xa6e
-.global ram_unknown13
+.set baudrate,0xa6e
+.global baudrate
 
-.set ram_unknown14,0xc70
-.global ram_unknown14
+.set rs232iorec,0xc70
+.global rs232iorec
 
 /* A mouse vector */
 .set mouseint,0xe3e

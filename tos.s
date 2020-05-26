@@ -6867,17 +6867,18 @@ iorec:
 addr_3a16:
 rsconf:
 .global rsconf
-    cmpiw #-2,%sp@(4)
+    cmpiw #-2,%sp@(4)                       /* -2 = return last baudrate */
     bnes addr_3a26
-    movew ram_unknown13,%d0
+    movew baudrate,%d0
 	rts
 addr_3a26:
-    oriw #0x700,%sr
-    lea ram_unknown14,%a0
+    oriw #0x700,%sr                         /* disable interrupts */
+    lea rs232iorec,%a0
     lea mfp_pp,%a1
+    /* first we grab the old ucs,rsr,tsr,scr contents */
     movepl %a1@(40),%d7
     movew %sp@(6),%d0
-    .short 0xb07c,0xffff                    /* cmpw #-1,%d0 */
+    .short 0xb07c,0xffff                    /* cmpw #-1,%d0 - if -1 then don't change */
     beqs addr_3a58
     moveb %d0,%a0@(32)
     beqs addr_3a54
@@ -6885,7 +6886,7 @@ addr_3a26:
     beqs addr_3a54
     moveb #1,%d0
 addr_3a54:
-    moveb %d0,%a0@(32)
+    moveb %d0,%a0@(32)                      /* set new handshake state */
 addr_3a58:
     tstw %sp@(4)
     bmis addr_3a98
@@ -6893,12 +6894,12 @@ addr_3a58:
     moveb %d0,%a1@(42)
     moveb %d0,%a1@(44)
     movew %sp@(4),%d1
-    movew %d1,ram_unknown13
+    movew %d1,baudrate
     .short 0x45f9                           /* lea addr_3acc,%a2 */
-    .long addr_3acc
+    .long baudctrl
     moveb %a2@(0,%d1:w),%d0
     .short 0x45f9                           /* lea addr_3adc,%a2 */
-    .long addr_3adc
+    .long bauddata
     moveb %a2@(0,%d1:w),%d2
     movel %d0,%d1
     moveq #3,%d0
@@ -6927,23 +6928,13 @@ addr_3ac8:
 	rts
 
 addr_3acc:
-	.short 0x0101
-	.short 0x0101
-	.short 0x0101
-	.short 0x0101
-	.short 0x0101
-	.short 0x0101
-	.short 0x0101
-	.short 0x0202
+baudctrl:
+	.byte 1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2
+
 addr_3adc:
-	.short 0x0102
-	.short 0x0405
-	.short 0x080a
-	.short 0x0b10
-	.short 0x2040
-	.short 0x6080
-	.short 0x8faf
-	.short 0x4060
+bauddata:
+    .byte 1,2,4,5,8,10,11,16,32,64,96,128,143,175,64,96
+
 	.short 0x48e7
 	.short 0xf0f4
 	.short 0x9bcd
