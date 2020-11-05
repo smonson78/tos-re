@@ -15329,6 +15329,8 @@ addr_60be:
 	.short 0x30c0
 	.short 0x4e5e
 	rts
+
+addr_7ab8:
 	.short 0x4e56
 	.short 0x0000
 	.short 0x48e7
@@ -18491,22 +18493,17 @@ user_ex_vec_1:
 	.short 0x2080
 	rts
 
-addr_92a2:    
-	.short 0x4e56
-	.short 0x0000
-	.short 0x206e
-	.short 0x0008
-	.short 0x20ee
-	.short 0x0000
-	.short 0x43ee
-
-	.short 0x0008
-	.short 0x20c9
-	.short 0x20ae
-	.short 0x0004
-	.short 0x4280
-	.short 0x4e5e
+addr_92a2:
+	linkw %fp,#0
+	moveal %fp@(8),%a0
+	.short 0x20ee,0x0000 											/* movel %fp@(0),%a0@+ */
+	lea %fp@(8),%a1
+	movel %a1,%a0@+
+	movel %fp@(4),%a0@
+	clrl %d0
+	unlk %fp
 	rts
+
 	.short 0x4e56
 /* 0x0092c0: */
 	.short 0x0000
@@ -19194,134 +19191,82 @@ addr_97f4:
 
 	.short 0x6000
 	.short 0x0618
-addr_9894:    
-	.short 0x302e
-	.short 0xffe6
-	.short 0xc1fc
-	.short 0x0006
-	.short 0xd0bc
-	.short 0x00fe
-	.short 0x856a
-	.short 0x2d40
-	.short 0xffd6
-	.short 0x206e
-	.short 0xffd6
-	.short 0x3d68
-	.short 0x0004
-	.short 0xffec
-	.short 0x4a6e
-	.short 0xffec
-	.short 0x6700
-	.short 0x026c
-	.short 0x4a6e
-	.short 0xffe6
-	.short 0x6700
-	.short 0x0264
-/* 0x0098c0: */
-	.short 0x0c6e
-	.short 0x000c
-	.short 0xffe6
-	.short 0x6d14
-	.short 0x0c6e
-	.short 0x0010
-	.short 0xffe6
-	.short 0x6d00
-	.short 0x0252
-	.short 0x0c6e
-	.short 0x0013
-	.short 0xffe6
-	.short 0x6e00
-	.short 0x0248
-	.short 0x0c6e
-	.short 0x0006
-	.short 0xffe6
-	.short 0x661a
-	.short 0x206e
-	.short 0x0008
-	.short 0x0c68
-	.short 0x00ff
-	.short 0x0002
-	.short 0x6604
-	.short 0x4240
-	.short 0x6002
-	.short 0x7001
-	.short 0xd07c
-	.short 0x0080
-	.short 0x3d40
-	.short 0xffec
-	.short 0x2079
-/* 0x009900: */
-	.short 0x0000
-	.short 0x5622
-	.short 0x322e
-	.short 0xffec
-	.short 0xc27c
-	.short 0x007f
-	.short 0x1030
-	.short 0x1030
-	.short 0x4880
-	.short 0x3d40
-	.short 0xffea
-	.short 0x4a6e
-	.short 0xffea
-	.short 0x6f00
-	.short 0x01ea
-	.short 0x302e
-	.short 0xffe6
-	.short 0x6000
-	.short 0x01cc
-	.short 0x206e
-	.short 0x0008
-	.short 0x0c68
-	.short 0x00ff
-	.short 0x0002
-	.short 0x6658
-	.short 0x486e
-	.short 0xfff2
-	.short 0x2f3c
-	.short 0x0000
-	.short 0x0001
-	.short 0x3f2e
-	.short 0xffea
-/* 0x009940: */
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x7ab8
-	.short 0xdefc
-	.short 0x000a
-	.short 0xb0bc
-	.short 0x0000
-	.short 0x0001
-	.short 0x660e
-	.short 0x102e
-	.short 0xfff2
-	.short 0x4880
-	.short 0x48c0
-	.short 0x6000
-	.short 0x054e
-	.short 0x6006
-	.short 0x4280
-	.short 0x6000
-	.short 0x0546
-	.short 0x486e
-	.short 0xfff2
-	.short 0x2f3c
-	.short 0x0000
-	.short 0x0001
-	.short 0x3f2e
-	.short 0xffea
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x7ab8
-	.short 0xdefc
-	.short 0x000a
-	.short 0x102e
-/* 0x009980: */
-	.short 0xfff2
-	.short 0x4880
-	.short 0x48c0
-	.short 0x6000
-	.short 0x0522
+
+addr_9894:
+	movew %fp@(-26),%d0
+	mulsw #6,%d0
+	.short 0xd0bc															/* addl addr_2856a,%d0 */
+	.long addr_2856a
+	movel %d0,%fp@(-42)
+	moveal %fp@(-42),%a0
+	movew %a0@(4),%fp@(-20)
+	tstw %fp@(-20)
+	beqw addr_9b22
+	tstw %fp@(-26)
+	beqw addr_9b22
+	cmpiw #12,%fp@(-26)
+	blts addr_98dc
+	cmpiw #16,%fp@(-26)
+	bltw addr_9b22
+	cmpiw #19,%fp@(-26)
+	bgtw addr_9b22
+addr_98dc:	
+	cmpiw #6,%fp@(-26)
+	bnes addr_98fe
+	moveal %fp@(8),%a0
+	cmpiw #255,%a0@(2)
+	bnes addr_98f4
+	clrw %d0
+	bras addr_98f6
+addr_98f4:	
+	moveq #1,%d0
+addr_98f6:	
+	.short 0xd07c,128													/* addw #128,%d0 */
+	movew %d0,%fp@(-20)
+addr_98fe:
+	moveal ram_unknown6,%a0
+	movew %fp@(-20),%d1
+	.short 0xc27c,127													/* andw #127,%d1 */
+	moveb %a0@(0x30,%d1:w),%d0
+	extw %d0
+	movew %d0,%fp@(-22)
+	tstw %fp@(-22)
+	blew addr_9b06
+	movew %fp@(-26),%d0
+	braw addr_9af0
+	moveal %fp@(8),%a0
+	cmpiw #255,%a0@(2)
+	bnes addr_998a
+	pea %fp@(-14)
+	movel #1,%sp@-
+	movew %fp@(-22),%sp@-
+	.short 0x4eb9															/* jsr addr_7ab8 */
+	.long addr_7ab8
+	addaw #10,%sp
+	.short 0xb0bc															/* cmpl #1,%d0 */
+	.long 1
+	bnes addr_9960
+	moveb %fp@(-14),%d0
+	extw %d0
+	extl %d0
+	braw addr_9eaa
+	bras addr_9966
+addr_9960:
+	clrl %d0
+	braw addr_9eaa
+addr_9966:	
+	pea %fp@(-14)
+	movel #1,%sp@-
+	movew %fp@(-22),%sp@-
+	.short 0x4eb9															/* jsr addr_7ab8 */
+	.long addr_7ab8
+	addaw #10,%sp
+	moveb %fp@(-14),%d0
+	extw %d0
+	extl %d0
+	braw addr_9eaa
+
+addr_998a:	
 	.short 0x2eae
 	.short 0x0008
 	.short 0x5697
@@ -19506,6 +19451,8 @@ addr_9894:
 	.short 0x6000
 	.short 0x03be
 	.short 0x6016
+	
+addr_9af0:	
 	.short 0x5340
 	.short 0xb07c
 	.short 0x0012
@@ -19518,11 +19465,14 @@ addr_9894:
 	.short 0x8780
 	.short 0x2050
 	.short 0x4ed0
+	
+addr_9b06:	
 	.short 0x0c6e
 	.short 0x000a
 	.short 0xffe6
 	.short 0x6708
 	.short 0x0c6e
+
 	.short 0x0009
 	.short 0xffe6
 	.short 0x6608
@@ -19531,7 +19481,10 @@ addr_9894:
 	.short 0xffec
 	.short 0x6004
 	.short 0x426e
+
 	.short 0xffec
+
+addr_9b22:
 	.short 0x082e
 	.short 0x0007
 	.short 0xffed
@@ -19999,11 +19952,12 @@ addr_9894:
 	.short 0x679a
 	.short 0x202e
 	.short 0xffde
+
 addr_9eaa:	
     .short 0x4e5e
 	rts
-	.short 0x4e56
 
+	.short 0x4e56
 	.short 0x0000
 	.short 0x48e7
 	.short 0x0300
@@ -82069,7 +82023,8 @@ lineftab:
     /* Everything in here is JMPed, not JSRed */
 
 	.long 0x00fe1b0a                        /* 0 */
-    .long 0x00fd49e8
+
+	.long 0x00fd49e8
 	.long 0x00fd4a64
 	.long 0x00fd4382
 	.long 0x00fd4aca
@@ -83120,6 +83075,7 @@ gem_magic:
 	.short 0x4b00
 	.short 0x0000
 	.short 0x1810
+
 	.short 0x0000
 	.short 0x001f
 	.short 0x001c
@@ -83128,11 +83084,14 @@ gem_magic:
 	.short 0x001f
 	.short 0x001e
 	.short 0x001f
+
 	.short 0x001f
 	.short 0x001e
 	.short 0x001f
 	.short 0x001e
 	.short 0x001f
+	
+addr_2856a:
 	.short 0x00fc
 	.short 0x8128
 	.short 0x0000
