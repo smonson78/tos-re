@@ -391,7 +391,7 @@ trap14_vectors:
 	.long keytbl
 	.long random                            /* 17 - int32_t Random(); */
     /* 18 - void Protobt(void *buf, int32_t serialno, int16_t disktype, int16_t execflag); */
-	.long 0x00fc1d42
+	.long protobt
     /* 19 - int16_t Flopver(void *buf, int32_t filler, int16_t devno, int16_ sectno, int16_t trackno, int16_t sideno, int16_t count); */
 	.long 0x00fc1286                        
 	.long 0x00fc0cfa                        /* 20 - void Scrdmp(); */
@@ -3003,127 +3003,100 @@ addr_1cc6:
 	.short 0x4e5e
 /* 0x001d40: */
 	rts
-	.short 0x4e56
-	.short 0xfffa
-	.short 0x48e7
-	.short 0x0704
-	.short 0x4a6e
-	.short 0x0012
-	.short 0x6c1e
-	.short 0x3ebc
-	.short 0x0100
-	.short 0x2f2e
-	.short 0x0008
-	.short 0x6100
-	.short 0x00d4
-	.short 0x588f
-	.short 0xb07c
-	.short 0x1234
-	.short 0x6704
-	.short 0x4240
-	.short 0x6002
-	.short 0x7001
-	.short 0x3d40
-	.short 0x0012
-	.short 0x4aae
-	.short 0x000c
-	.short 0x6d3e
-	.short 0x202e
-	.short 0x000c
-	.short 0xb0bc
-	.short 0x00ff
-	.short 0xffff
-	.short 0x6f08
-/* 0x001d80: */
-	.short 0x6100
-	.short 0xfef4
-	.short 0x2d40
-	.short 0x000c
-	.short 0x4247
-	.short 0x6020
-	.short 0x202e
-	.short 0x000c
-	.short 0xc0bc
-	.short 0x0000
-	.short 0x00ff
-	.short 0x3247
-	.short 0xd3ee
-	.short 0x0008
-	.short 0x1340
-	.short 0x0008
-	.short 0x202e
-	.short 0x000c
-	.short 0xe080
-	.short 0x2d40
-	.short 0x000c
-	.short 0x5247
-	.short 0xbe7c
-	.short 0x0003
-	.short 0x6dda
-	.short 0x4a6e
-	.short 0x0010
-	.short 0x6d28
-	.short 0x3c2e
-	.short 0x0010
-	.short 0xcdfc
-	.short 0x0013
-/* 0x001dc0: */
-	.short 0x4247
-	.short 0x6016
-	.short 0x3047
-	.short 0xd1ee
-	.short 0x0008
-	.short 0x3246
-	.short 0xd3fc
-	.short 0x00fe
-	.short 0x820a
-	.short 0x1151
-	.short 0x000b
-	.short 0x5246
-	.short 0x5247
-	.short 0xbe7c
-	.short 0x0013
-	.short 0x6de4
-	.short 0x426e
-	.short 0xfffa
-	.short 0x2d6e
-	.short 0x0008
-	.short 0xfffc
-	.short 0x600e
-	.short 0x206e
-	.short 0xfffc
-	.short 0x3010
-	.short 0xd16e
-	.short 0xfffa
-	.short 0x54ae
-	.short 0xfffc
-	.short 0x202e
-	.short 0x0008
-	.short 0xd0bc
-/* 0x001e00: */
-	.short 0x0000
-	.short 0x01fe
-	.short 0xb0ae
-	.short 0xfffc
-	.short 0x62e2
-	.short 0x303c
-	.short 0x1234
-	.short 0x906e
-	.short 0xfffa
-	.short 0x226e
-	.short 0xfffc
-	.short 0x3280
-	.short 0x4a6e
-	.short 0x0012
-	.short 0x6606
-	.short 0x206e
-	.short 0xfffc
-	.short 0x5250
-	.short 0x4a9f
-	.short 0x4cdf
-	.short 0x20c0
-	.short 0x4e5e
+
+/* Generate a standard floppy disk boot sector into a pointed-to buffer */
+addr_1d42:
+protobt:
+    linkw %fp,#-6
+    moveml %d5-%d7/%a5,%sp@-
+    tstw %fp@(18)
+    bges addr_1d6e
+    movew #256,%sp@
+    movel %fp@(8),%sp@-
+    bsrw addr_1e2e
+    addql #4,%sp
+    .short 0xb07c, 0x1234                   /* cmpw #0x1234,%d0 */
+    beqs addr_1d68
+    clrw %d0
+    bras addr_1d6a
+addr_1d68:
+    moveq #1,%d0
+addr_1d6a:
+    movew %d0,%fp@(18)
+addr_1d6e:
+    tstl %fp@(12)
+    blts addr_1db2
+    movel %fp@(12),%d0
+    .short 0xb0bc                           /* cmpl #0xffffff,%d0 */
+    .long 0xffffff
+    bles addr_1d88
+    bsrw random
+    movel %d0,%fp@(12)
+addr_1d88:
+    clrw %d7
+    bras addr_1dac
+addr_1d8c:
+    movel %fp@(12),%d0
+    .short 0xc0bc                           /* andl #255,%d0 */
+    .long 255
+    moveaw %d7,%a1
+    addal %fp@(8),%a1
+    moveb %d0,%a1@(8)
+    movel %fp@(12),%d0
+    asrl #8,%d0
+    movel %d0,%fp@(12)
+    addqw #1,%d7
+addr_1dac:
+    .short 0xbe7c,3                         /* cmpw #3,%d7 */
+    blts addr_1d8c
+addr_1db2:
+    tstw %fp@(16)
+    blts addr_1de0
+    movew %fp@(16),%d6
+    mulsw #19,%d6
+    clrw %d7
+    bras addr_1dda
+addr_1dc4:    
+    moveaw %d7,%a0
+    addal %fp@(8),%a0
+    moveaw %d6,%a1
+    .short 0xd3fc                           /* addal addr_2820a,%a1 */
+    .long addr_2820a
+    moveb %a1@,%a0@(11)
+    addqw #1,%d6
+    addqw #1,%d7
+addr_1dda:
+    .short 0xbe7c,19                        /* cmpw #19,%d7 */
+    blts addr_1dc4
+addr_1de0:
+    clrw %fp@(-6)
+    movel %fp@(8),%fp@(-4)
+    bras addr_1dfa
+addr_1dec:
+    moveal %fp@(-4),%a0
+    movew %a0@,%d0
+    addw %d0,%fp@(-6)
+    addql #2,%fp@(-4)
+addr_1dfa:    
+    movel %fp@(8),%d0
+    .short 0xd0bc                           /* addl #0x1fe,%d0 */
+    .long 0x1fe
+    cmpl %fp@(-4),%d0
+    bhis addr_1dec
+    movew #0x1234,%d0
+    subw %fp@(-6),%d0
+    moveal %fp@(-4),%a1
+    movew %d0,%a1@
+    tstw %fp@(18)
+    bnes addr_1e24
+    moveal %fp@(-4),%a0
+    addqw #1,%a0@
+addr_1e24:
+    tstl %sp@+
+    moveml %sp@+,%d6-%d7/%a5
+    unlk %fp
 	rts
+addr_1e2e:
 	.short 0x4e56
 	.short 0x0000
 	.short 0x48e7
@@ -82631,10 +82604,13 @@ gem_magic:
     .long 0x87654321                        /* gm_magic - Magic number */
 	.long 0x0000a84e                        /* gm_end - end of RAM used by GEM */
 	.long gem_entry                         /* gm_init - address of GEM's entry point */
-	.short 0x0002
+
+addr_2820a:	
+    .short 0x0002
 	.short 0x0101
 	.short 0x0002
-	.short 0x4000
+	
+    .short 0x4000
 	.short 0x6801
 	.short 0xfc02
 	.short 0x0009
@@ -82642,7 +82618,8 @@ gem_magic:
 	.short 0x0000
 	.short 0x0000
 	.short 0x0202
-	.short 0x0100
+	
+    .short 0x0100
 	.short 0x0270
 	.short 0x00d0
 	.short 0x02fd
@@ -82650,6 +82627,7 @@ gem_magic:
 	.short 0x0900
 	.short 0x0200
 	.short 0x0000
+
 	.short 0x0002
 	.short 0x0201
 	.short 0x0002
