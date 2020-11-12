@@ -229,6 +229,19 @@ etv_term:
 .set ram_unknown93,0xe7d
 .global ram_unknown93
 
+/* KEYTAB strucutre is at least 3 pointers long (7 pointers in TOS 4, but probably 3 here) */
+/* 
+  0xe7e - unshift 
+  0xe82 - shift
+  0xe86 - capslock
+*/
+.set keytab,0xe7e
+.global keytab
+
+/* 32 bits */
+.set rseed,0xeb0
+.global rseed
+
 /* Saved copy of SR register */
 .set saved_sr_register,0xffa
 .global saved_sr_register

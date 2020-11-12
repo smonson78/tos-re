@@ -362,6 +362,7 @@ trap13_vectors:
 	.long Drvmap
 	.long Kbshift
 
+/* XBIOS functions */
 addr_84a:
 trap14_vectors:
 	.short 65                               /* 65 vectors */
@@ -385,10 +386,10 @@ trap14_vectors:
 	.long mfpint                            /* 13 - void Mfpint(int16_t number, int16_t (*vector)()); */
 	.long iorec                             /* 14 - IOREC *Iorec(int16_t dev); */
     /* 15 - int32_t Rsconf(int16_t baud, int16_t ctr, int16_t ucr, int16_t rsr, int16_t tsr, int16_t scr); */
-    .long rsconf    
+    .long rsconf
     /* 16 - KEYTAB *Keytbl(void *unshift, void *shift, void *capslock); */
-	.long addr_41ac
-	.long 0x00fc1c76                        /* 17 - int32_t Random(); */
+	.long keytbl
+	.long random                            /* 17 - int32_t Random(); */
     /* 18 - void Protobt(void *buf, int32_t serialno, int16_t disktype, int16_t execflag); */
 	.long 0x00fc1d42
     /* 19 - int16_t Flopver(void *buf, int32_t filler, int16_t devno, int16_ sectno, int16_t trackno, int16_t sideno, int16_t count); */
@@ -2910,47 +2911,30 @@ addr_1a24:
 	.short 0x20f8
 	.short 0x4e5e
 	rts
-	.short 0x4e56
-	.short 0xfffc
-	.short 0x4ab9
-	.short 0x0000
-	.short 0x0eb0
-/* 0x001c80: */
-	.short 0x6616
-	.short 0x2039
-	.short 0x0000
-	.short 0x04ba
-	.short 0x7210
-	.short 0xe3a0
-	.short 0x80b9
-	.short 0x0000
-	.short 0x04ba
-	.short 0x23c0
-	.short 0x0000
-	.short 0x0eb0
-	.short 0x2f3c
-	.short 0xbb40
-	.short 0xe62d
-	.short 0x2f39
-	.short 0x0000
-	.short 0x0eb0
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x9438
-	.short 0x508f
-	.short 0x5280
-	.short 0x23c0
-	.short 0x0000
-	.short 0x0eb0
-	.short 0x2039
-	.short 0x0000
-	.short 0x0eb0
-	.short 0xe080
-	.short 0xc0bc
-	.short 0x00ff
-/* 0x001cc0: */
-	.short 0xffff
-	.short 0x4e5e
+
+random:    
+addr_1c76:
+    linkw %fp,#-4
+    tstl rseed
+    bnes addr_1c98
+    movel _hz_200,%d0
+    moveq #16,%d1
+    asll %d1,%d0
+    orl _hz_200,%d0
+    movel %d0,rseed
+addr_1c98:    
+    movel #0xbb40e62d,%sp@-                 /* This is 3141592621, a magic number based on Pi */
+    movel rseed,%sp@-
+    .short 0x4eb9                           /* jsr addr_9438 */ /* Must be a long multiply? */
+    .long addr_9438
+    addql #8,%sp
+    addql #1,%d0
+    movel %d0,rseed
+    movel rseed,%d0
+    asrl #8,%d0
+    .short 0xc0bc                           /* andl #0x00ffffff,%d0 */
+    .long 0x00ffffff
+    unlk %fp
 	rts
 
 addr_1cc6:
@@ -7797,43 +7781,44 @@ addr_41a6:
 	.short 0x0d08
 	.short 0x0504
 	
-addr_41ac:    
-    .short 0x4aaf
-	.short 0x0004
-	.short 0x6b06
-	.short 0x2b6f
-	.short 0x0004
-	.short 0x0e7e
-	.short 0x4aaf
-	.short 0x0008
-	.short 0x6b06
-	.short 0x2b6f
-/* 0x0041c0: */
-	.short 0x0008
-	.short 0x0e82
-	.short 0x4aaf
-	.short 0x000c
-	.short 0x6b06
-	.short 0x2b6f
-	.short 0x000c
-	.short 0x0e86
-	.short 0x203c
-	.short 0x0000
-	.short 0x0e7e
+addr_41ac:
+keytbl:
+    tstl %sp@(4)
+    bmis addr_41b8                          /* Check if parameter is negative, skip if so */
+    /* Store the parameter as the new unshifted keyboard scancode to character mapping pointer */
+    .short 0x2b6f                           /* movel %sp@(4),%a5@(keytab) */
+    .short 4
+    .short keytab
+    
+addr_41b8:
+    /* Same with shifted keycodes */
+    tstl %sp@(8)
+    bmis addr_41c4
+    movel %sp@(8),%a5@(keytab + 4)
+addr_41c4:
+    /* Same with caps lock keycodes */
+    tstl %sp@(12)
+    bmis addr_41d0
+    movel %sp@(12),%a5@(keytab + 8)
+addr_41d0:
+    /* Return a pointer to the KEYTAB struct */
+    .short 0x203c                           /* movel keytab,%d0 */
+    .long keytab
+    rts
+
+    .short 0x2b7c                           /* movel addr_2829c,%a5@(keytab) */
+    .long addr_2829c
+    .short keytab
+
+    .short 0x2b7c                           /* movel addr_2831c,%a5@(keytab + 4) */
+    .long addr_2831c
+    .short keytab + 4
+    
+    .short 0x2b7c                           /* movel addr_2839c,%a5@(keytab + 8) */
+    .long addr_2839c
+    .short keytab + 8
 	rts
-	.short 0x2b7c
-	.short 0x00fe
-	.short 0x829c
-	.short 0x0e7e
-	.short 0x2b7c
-	.short 0x00fe
-	.short 0x831c
-	.short 0x0e82
-	.short 0x2b7c
-	.short 0x00fe
-	.short 0x839c
-	.short 0x0e86
-	rts
+
 	.short 0x202d
 	.short 0x0ea6
 	.short 0x222f
@@ -18698,6 +18683,8 @@ addr_93a4:
 	.short 0x4e4e
 	.short 0x5c4f
 	rts
+
+addr_9438:
 	.short 0x4e56
 	.short 0xfffc
 	.short 0x4242
@@ -18742,6 +18729,7 @@ addr_93a4:
 	.short 0x4480
 	.short 0x4e5e
 	rts
+
 	.short 0x4e56
 	.short 0xfffe
 	.short 0x48e7
@@ -82712,13 +82700,16 @@ gem_magic:
 	.short 0x31ff
 	.short 0x001b
 	.short 0x3301
+
 	.short 0xff00
 	.short 0x1b32
 	.short 0xff00
 	.short 0x1b58
 	.short 0x00ff
 	.short 0x0000
-	.short 0x001b
+
+addr_2829c:	
+    .short 0x001b
 	.short 0x3132
 	.short 0x3334
 	.short 0x3536
@@ -82784,7 +82775,9 @@ gem_magic:
 	.short 0x0000
 	.short 0x0000
 	.short 0x0000
-	.short 0x001b
+
+addr_2831c:
+    .short 0x001b
 	.short 0x2122
 	.short 0x9c24
 	.short 0x255e
@@ -82850,6 +82843,8 @@ gem_magic:
 	.short 0x0000
 	.short 0x0000
 	.short 0x0000
+
+addr_2839c:    
 	.short 0x001b
 	.short 0x3132
 	.short 0x3334
