@@ -1,9 +1,9 @@
 /*
 
-NOTE: Some instructions are "optimised" by GNU as into other instructions 
+NOTE: Some instructions are "optimised" by GNU as into other instructions
 than the ones that appear in the original TOS binary. For this reason, you
 will see instructions occasionally written out in binary as .short and .long
-directives, with the intended opcode written in a comment. This makes it 
+directives, with the intended opcode written in a comment. This makes it
 easier to ensure that the binaries built from this source code exactly match
 the original TOS in ROM.
 
@@ -90,9 +90,9 @@ addr_5c8:
     .short 0xc07c,0x00ff                    /* andw #255,%d0 */
     beqs addr_05f2
     dbf %d5,addr_57a
-addr_5f0:    
+addr_5f0:
     moveq #-1,%d0
-addr_05f2:    
+addr_05f2:
     movew #128,%fp@
     tstb %d0
     sf %a4@(flock)                          /* Is this right? Seems like it wouldn't do anything */
@@ -103,10 +103,10 @@ addr_5fe:
     .long 0x0000008a
     .long 0x0001008a
 
-addr_60e:    
+addr_60e:
     movel %d0,%a5@                          /* Put the param in the DMA sector count register */
     moveq #10,%d1
-addr_612:    
+addr_612:
     addl %a4@(_hz_200),%d1                  /* add value of 200Hz counter - so 50ms in the future */
 addr_616:
     btst #5,%a4@(mfp_pp)                    /* Parallel port data register - "interrupt" pin */
@@ -202,13 +202,13 @@ autovec_lvl_4:
     .short 0xc03c,0x0003                    /* andb #3,%d0 */
     .short 0xb03c,0x0002                    /* cmpb #2,%d0 */
     bges addr_0702                          /* Are we in mono mode? */
-    
+
     /* In colour modes: */
     btst #7,%d1                             /* Check mono detect */
     bnes lvl4_vec_nochange                  /* No mono monitor --> skip */
 
     movew #2000,%d0                         /* Delay loop */
-lvl4_vec_delay:                          
+lvl4_vec_delay:
     dbf %d0,lvl4_vec_delay
 
     moveb #2,%d0                            /* Set resolution to mono */
@@ -223,7 +223,7 @@ addr_0702:
     blts lvl4_vec_chmode                    /* Default shifter mode compatible with colour monitor --> jump over */
     clrb %d0                                /* Set to fallback mode 0 (low) */
 
-lvl4_vec_chmode:    
+lvl4_vec_chmode:
     moveb %d0,%a5@(sshiftmod)               /* Set TOS copy of shifter resolution */
     moveb %d0,%a5@(video_res)               /* Set shifter resolution register */
     moveal %a5@(swv_vec),%a0
@@ -244,33 +244,33 @@ addr_073c:
 
     clrl %a5@(colorptr)                     /* Clear the new-palette pointer */
 
-addr_0746:    
+addr_0746:
     tstl %a5@(screenpt)                     /* Check for a new video address waiting to be loaded into the shifter */
     beqs addr_075e                          /* No --> skip */
     movel %a5@(screenpt),%a5@(_v_bas_ad)    /* Copy it to TOS variable */
     moveb %a5@(_v_bas_ad + 2),%a5@(video_basem + 1)  /* Copy bits 15-8 to hardware register */
     moveb %a5@(_v_bas_ad + 1),%a5@(video_baseh + 1)  /* Copy bits 23-16 to hardware register */
-addr_075e:    
+addr_075e:
     bsrw addr_1360
     movew nvbls,%d7
     beqs addr_078a
     subql #1,%d7
     moveal _vblqueue,%a0
-addr_0772:    
+addr_0772:
     moveal %a0@+,%a1
     cmpal #0,%a1
     beqs addr_0786
     moveml %d7-%a0,%sp@-
     jsr %a1@
     moveml %sp@+,%d7-%a0
-addr_0786:    
+addr_0786:
     dbf %d7,addr_0772
-addr_078a:    
+addr_078a:
     subal %a5,%a5
     tstw %a5@(_dumpflg)                     /* Check for screen dump flag */
     bnes addr_0796
     bsrw addr_cfa
-addr_0796:    
+addr_0796:
     moveml %sp@+,%d0-%fp                    /* Restore registers */
 addr_079a:
     addqw #1,vblsem
@@ -305,7 +305,7 @@ gem_critical_evt_handler:
 	rts
 
 addr_7c4:
-trap14_handler:	
+trap14_handler:
 .global trap14_handler
     lea %pc@(trap14_vectors),%a0
     bras addr_7ce
@@ -325,7 +325,7 @@ addr_7ce:                                   /* Lookup and jump from table - tabl
     btst #13,%d0                            /* Was bit 13 set in sr? 0x2000 */
     bnes addr_7ec
     movel %usp,%sp                          /* Switch to the user stack pointer */
-addr_7ec:    
+addr_7ec:
     movew %sp@+,%d0                         /* Take the routine number off the stack */
     cmpw %a0@+,%d0                          /* Get the number of vectors in the table */
     bges addr_802                           /* Is the routine number valid? No - then skip calling */
@@ -393,10 +393,10 @@ trap14_vectors:
     /* 18 - void Protobt(void *buf, int32_t serialno, int16_t disktype, int16_t execflag); */
 	.long protobt
     /* 19 - int16_t Flopver(void *buf, int32_t filler, int16_t devno, int16_ sectno, int16_t trackno, int16_t sideno, int16_t count); */
-	.long flopver                        
+	.long flopver
 	.long scrdmp                            /* 20 - void Scrdmp(); */
 	.long cursconf                          /* 21 - int16_t Cursconf(int16_t func, int16_t rate); */
-	.long 0x00fc0e4c                        /* 22 - void Settime(uint32_t time); */
+	.long settime                           /* 22 - void Settime(uint32_t time); */
 	.long 0x00fc0e3e                        /* 23 - uint32_t Gettime(); */
 	.long 0x00fc41d8                        /* 24 - void Bioskeys(); */
 	.long 0x00fc3480                        /* 25 - void Ikbdws(int16_t count, const int8_t *ptr); */
@@ -456,7 +456,7 @@ Bconin:
 .global Bconin
     lea %a5@(xconin),%a0
     bras addr_96c
-	
+
 addr_962:
 Bcostat:
 .global Bcostat
@@ -587,8 +587,8 @@ logbase:
     movel %a5@(_v_bas_ad),%d0
 	rts
 
-/* 
-    int16_t Getrez() 
+/*
+    int16_t Getrez()
     0 - low res
     1 - med res
     2 - high res
@@ -605,14 +605,14 @@ getrez:
 addr_a7e:
 setscreen:
     tstl %sp@(4)                            /* Check longword on stack */
-    bmis addr_a8a                               
+    bmis addr_a8a
     movel %sp@(4),%a5@(_v_bas_ad)           /* If positive, copy it to logical screen address */
-addr_a8a:    
+addr_a8a:
     tstl %sp@(8)                            /* Check next longword on stack */
     bmis addr_a9c
     moveb %sp@(9),%a5@(video_baseh + 1)     /* If positive, copy it to the video base address */
     moveb %sp@(10),%a5@(video_basem + 1)
-addr_a9c:    
+addr_a9c:
     tstw %sp@(12)                           /* Check next word on stack */
     bmis addr_ac2
     moveb %sp@(13),%a5@(sshiftmod)          /* If positive, update screen resolution */
@@ -621,7 +621,7 @@ addr_a9c:
     clrw %a5@(vblsem)
     jsr esc_init
     movew #1,%a5@(vblsem)
-addr_ac2:    
+addr_ac2:
     rts
 
 addr_ac4:
@@ -699,7 +699,7 @@ drawbombs:
     moveal %d0,%a0
     addaw %pc@(addr_b9e,%d7:w),%a0
     .short 0x43f9                           /* lea bomb_image,%a1 */
-    .long bomb_image    
+    .long bomb_image
     movew #15,%d6
 addr_b7e:
     movew %d1,%d2
@@ -911,7 +911,7 @@ scrdmp:
     rts
 
 addr_d0c:
-.global addr_d0c    
+.global addr_d0c
 	.short 0x9bcd
 	.short 0x2b6d
 	.short 0x044e
@@ -980,7 +980,7 @@ addr_d0c:
 	.short 0x584f
 	rts
 
-hardcopy_parameter_table: 
+hardcopy_parameter_table:
 	.short 320, 640, 640
     .short 200, 200, 400
 
@@ -1081,7 +1081,10 @@ run_reset_resident:
 	.short 0x00fc
 	.short 0x31a8
 	.short 0x600c
-	.short 0x47f9
+
+addr_e4c:
+settime:
+    .short 0x47f9
 	.short 0x00fc
 	.short 0x2080
 	.short 0x49f9
@@ -1092,6 +1095,7 @@ run_reset_resident:
 	.short 0x6402
 	.short 0x264c
 	.short 0x4ed3
+
 addr_e62:
 .global addr_e62
 	.short 0x41fa
@@ -1215,7 +1219,7 @@ floprd:
     bsrw fdchange
     moveq #E_READF,%d0                      /* set default error# E_READF */
     bsrw floplock
-addr_f42:    
+addr_f42:
     bsrw select
     bsrw go2track
     bnew addr_fd0
@@ -1230,7 +1234,7 @@ addr_f4e:
     bsrw wrfdcd7
     movel #0x40000,%d7
 /* --- Wait for read completion: */
-addr_f7c:    
+addr_f7c:
     btst #5,%a5@(mfp_pp)                    /* 1770 done yet? */
     beqs addr_f94                           /* (yes) */
     subql #1,%d7
@@ -1256,9 +1260,9 @@ addr_f94:
     beqw flopok                             /* (done) */
     bsrw addr_15c4
     bras addr_f4e
-addr_fce:    
+addr_fce:
 	bsrs fdcerr                             /* set error# from 1770 bits */
-addr_fd0:    
+addr_fd0:
     cmpiw #1,%a5@(fd_retry)                 /* are we on the "middlemost" retry? */
     bnes addr_fdc
     bsrw addr_14ce                          /* yes, home and reseek the head */
@@ -1290,7 +1294,7 @@ addr_1004:
 
 addr_100a:
 flopwr:
-.global flopwr    
+.global flopwr
 	.short 0x6100
 	.short 0x0634
 	.short 0x70f6
@@ -1418,7 +1422,7 @@ flopfmt:
     beqw flopok
     movew #-16,%a5@(fd_curerr)
     braw flopfail
-    
+
 addr_113c:
 fmtrack:
     movew #-10,%a5@(ram_unknown88)          /* default error E_WRITF */
@@ -1495,10 +1499,10 @@ addr_1238:
     subql #1,%d7
     bnes addr_1238
     bsrw fdcreset
-addr_1248:    
+addr_1248:
     moveq #1,%d7                            /* return error */
     rts
-addr_124c:    
+addr_124c:
     cmpw %a5@(fd_spt),%d3                   /* Last sector reached? */
     beqs addr_11f4                          /* Yes, end of track */
     movew %d3,%d6
@@ -1636,7 +1640,7 @@ verify1:
 	.short 0x0a0c
 	.short 0x60ce
 
-addr_1360:    
+addr_1360:
 	.short 0x9bcd
 	.short 0x4ded
 	.short 0x8606
@@ -1771,8 +1775,8 @@ floplock:
 	.short 0xff00
 	.short 0x0000
 	rts
-	
-addr_145c:    
+
+addr_145c:
 flopfail:
     .short 0x7001
 	.short 0x6100
@@ -1838,8 +1842,8 @@ hardseek:
 	.short 0x0010
 	.short 0x6000
 	.short 0x0072
-	
-addr_14ce:    
+
+addr_14ce:
     .short 0x33fc
 	.short 0xfffa
 	.short 0x0000
@@ -1980,7 +1984,7 @@ select:
 	.short 0x422d
 	.short 0x0a20
 
-addr_15c4:    
+addr_15c4:
 	.short 0x3cbc
 	.short 0x0084
 	.short 0x3e2d
@@ -2432,7 +2436,7 @@ addr_173c:
 	rts
 
 addr_18ec:
-.global addr_18ec    
+.global addr_18ec
 	.short 0x4e56
 	.short 0x0000
 	.short 0x48e7
@@ -2904,7 +2908,7 @@ addr_1a24:
 	.short 0x4e5e
 	rts
 
-random:    
+random:
 addr_1c76:
     linkw %fp,#-4
     tstl rseed
@@ -2914,7 +2918,7 @@ addr_1c76:
     asll %d1,%d0
     orl _hz_200,%d0
     movel %d0,rseed
-addr_1c98:    
+addr_1c98:
     movel #0xbb40e62d,%sp@-                 /* This is 3141592621, a magic number based on Pi */
     movel rseed,%sp@-
     .short 0x4eb9                           /* jsr addr_9438 */ /* Must be a long multiply? */
@@ -2930,7 +2934,7 @@ addr_1c98:
 	rts
 
 addr_1cc6:
-.global addr_1cc6    
+.global addr_1cc6
 	.short 0x4e56
 	.short 0x0000
 	.short 0x48e7
@@ -3048,7 +3052,7 @@ addr_1db2:
     mulsw #19,%d6
     clrw %d7
     bras addr_1dda
-addr_1dc4:    
+addr_1dc4:
     moveaw %d7,%a0
     addal %fp@(8),%a0
     moveaw %d6,%a1
@@ -3069,7 +3073,7 @@ addr_1dec:
     movew %a0@,%d0
     addw %d0,%fp@(-6)
     addql #2,%fp@(-4)
-addr_1dfa:    
+addr_1dfa:
     movel %fp@(8),%d0
     .short 0xd0bc                           /* addl #0x1fe,%d0 */
     .long 0x1fe
@@ -5924,7 +5928,7 @@ addr_32f6:
 	.short 0x0c9c
 
 addr_3392:
-.global addr_3392    
+.global addr_3392
 	.short 0x41f9
 	.short 0xffff
 	.short 0xfa01
@@ -5988,7 +5992,7 @@ addr_3392:
 	rts
 
 addr_3408:
-.global addr_3408    
+.global addr_3408
 	.short 0x41f9
 	.short 0x0000
 	.short 0x0c7e
@@ -6063,7 +6067,7 @@ addr_3480:
 	.short 0x0004
 	.short 0x246f
 	.short 0x0006
-addr_348a:    
+addr_348a:
     .short 0x121a
 	.short 0x61d2
 	.short 0x51cb
@@ -6438,7 +6442,7 @@ addr_36ac:
 	.short 0x2224
 
 addr_3754:
-mfpint:    
+mfpint:
 	.short 0x302f
 	.short 0x0004
 	.short 0x246f
@@ -6801,7 +6805,7 @@ iorec:
 	.short 0x203b
 	.short 0x1004
 	rts
-    
+
 	.short 0x0000
 	.short 0x0c70
 	.short 0x0000
@@ -6868,7 +6872,7 @@ addr_3abc:
     tstw %sp@(14)
     bmis addr_3ac8
     moveb %sp@(15),%a1@(38)
-addr_3ac8:    
+addr_3ac8:
     movel %d7,%d0
 	rts
 
@@ -7669,7 +7673,7 @@ initmouse_relative:
     lea %a5@(0xe8a),%a2
     bsrw addr_348a
     bras addr_4154                          /* return -1 and exit */
-initmouse_absolute:    
+initmouse_absolute:
     lea %a5@(0xe8a),%a2
     moveb #9,%a2@+
     moveb %a3@(4),%a2@+
@@ -7695,7 +7699,7 @@ initmouse_keycode:
     moveq #5,%d3
     lea %a5@(0xe8a),%a2
     bsrw addr_348a
-addr_4154:    
+addr_4154:
     moveq #-1,%d0                           /* return -1 and exit */
     rts
 
@@ -7741,7 +7745,7 @@ addr_41a6:
 
 	.short 0x0d08
 	.short 0x0504
-	
+
 addr_41ac:
 keytbl:
     tstl %sp@(4)
@@ -7750,7 +7754,7 @@ keytbl:
     .short 0x2b6f                           /* movel %sp@(4),%a5@(keytab) */
     .short 4
     .short keytab
-    
+
 addr_41b8:
     /* Same with shifted keycodes */
     tstl %sp@(8)
@@ -7774,7 +7778,7 @@ addr_41d0:
     .short 0x2b7c                           /* movel addr_2831c,%a5@(keytab + 4) */
     .long addr_2831c
     .short keytab + 4
-    
+
     .short 0x2b7c                           /* movel addr_2839c,%a5@(keytab + 8) */
     .long addr_2839c
     .short keytab + 8
@@ -18323,7 +18327,7 @@ addr_91b0:
 
     movew %sr,saved_sr_register             /* Save status register */
     oriw #0x700,%sr                         /* Disable interrupts */
-    
+
     movel #user_ex_vec_1,%sp@-
     movew #0x100,%sp@-
     movew #5,%sp@-
@@ -18357,14 +18361,14 @@ addr_91b0:
 	rts
 
 /* Trap 2 handler ? */
-/* 
-    d0 (low half)   - contains function number 
+/*
+    d0 (low half)   - contains function number
                       -1 = vq_gdos
                       -2 = get address of VDI dispatcher
                       115 = VDI dispatcher
                       200 = AES
                       201 = appl_yield
-    d1              - contains address of parameter block AESPB 
+    d1              - contains address of parameter block AESPB
 */
 addr_921e:
 trap2_handler:
@@ -18373,7 +18377,7 @@ trap2_handler:
     .short 0xb07c,0x0073            /* cmpw #115,%d0 - opcode == 115? */
     bnes addr_9230                  /* No */
     .short 0x4eb9                   /* jsr vdi_dispatcher */ /* Yes - go to VDI dispatcher */
-    .long vdi_dispatcher                 
+    .long vdi_dispatcher
     rte
 addr_9230:
     .short 0xb07c,0xffff            /* cmpw #-1,%d0 - opcode == -1? */
@@ -18407,7 +18411,7 @@ addr_9246:
 	.short 0x0005
 	rts
 
-user_ex_vec_1:    
+user_ex_vec_1:
 	.short 0x3f2f
 	.short 0x0004
 	.short 0x4eb9
@@ -18491,7 +18495,7 @@ trap1_handler:
 addr_92ea:
     cmpiw #32,%sp@(6)                       /* No idea */
     beqw addr_93a4                          /* But if so, branch */
-addr_92f4:    
+addr_92f4:
     movel %fp,%sp@-                         /* Push a6 */
     moveal ram_unknown6,%fp                 /* Save copy of regs in special location 0x5622 */
     moveml %d0/%a3-%a5,%fp@(104)            /* Push d0,a3,a4,a5 on frame */
@@ -18512,7 +18516,7 @@ addr_92f4:
     moveal #ram_unknown16,%sp
     lea %a5@(50),%a0
     bras addr_9348
-    
+
 addr_932e:
     /* This section if bit 13 is NOT set - put stuff on the user stack */
     moveml %d1-%a2,%sp@-
@@ -18524,7 +18528,7 @@ addr_932e:
     lea %sp@(50),%a0
     moveal #ram_unknown16,%sp
 
-addr_9348:    
+addr_9348:
     movel %a0,%sp@-
     .short 0x4eb9                           /* jsr addr_97c8 */
     .long addr_97c8
@@ -18544,13 +18548,13 @@ addr_9348:
     movew %d0,%sp@-
     moveml %a5@(104),%d0/%a3-%fp
     rte
- 
+
 addr_9380:
 	.short 0x2e4e
 	.short 0x4e64
 	.short 0x60ee
 
-addr_9386:    
+addr_9386:
 	.short 0x2228
 	.short 0x0002
 	.short 0x6708
@@ -18567,7 +18571,7 @@ addr_9386:
 	.short 0x2e48
 	.short 0x4e73
 
-addr_93a4:    
+addr_93a4:
 	.short 0x222f
 	.short 0x0008
 	.short 0x671e
@@ -18840,7 +18844,7 @@ addr_956e:
 
     unlk %fp
     rts
-    
+
 addr_95f8:
     linkw %fp,#-4
     moveq #-32,%d0
@@ -18856,10 +18860,10 @@ addr_9602:
 addr_9610:
     linkw %fp,#0
     moveml %d6-%d7/%a4-%a5,%sp@-
-    
+
     .short 0x4eb9                   /* jsr addr_8cf8 */
-    .long addr_8cf8 
-    
+    .long addr_8cf8
+
     .short 0x4eb9                   /* jsr addr_8918 */
     .long addr_8918
 
@@ -18877,12 +18881,12 @@ addr_963c:
     bnes addr_9638
     clrw %d7
     bras addr_9658
-addr_9644:   
+addr_9644:
     moveal %a5,%a0
     moveaw %d7,%a1
     addal %a1,%a0
     moveaw %d7,%a1
-    addal #addr_2877a,%a1             
+    addal #addr_2877a,%a1
     moveb %a1@,%a0@(48)
     addqw #1,%d7
 addr_9658:
@@ -18901,7 +18905,7 @@ addr_9658:
     movel #0x3a5c,%d0
     movel %d0,ram_unknown10 + 8
     movel %d0,ram_unknown11 + 8
-    
+
     .short 0x4239                   /* clrb ram_unknown12 */
     .long ram_unknown12
 
@@ -19159,7 +19163,7 @@ addr_9894:
 	bltw addr_9b22
 	cmpiw #19,%fp@(-26)
 	bgtw addr_9b22
-addr_98dc:	
+addr_98dc:
 	cmpiw #6,%fp@(-26)
 	bnes addr_98fe
 	moveal %fp@(8),%a0
@@ -19167,9 +19171,9 @@ addr_98dc:
 	bnes addr_98f4
 	clrw %d0
 	bras addr_98f6
-addr_98f4:	
+addr_98f4:
 	moveq #1,%d0
-addr_98f6:	
+addr_98f6:
 	.short 0xd07c,128													/* addw #128,%d0 */
 	movew %d0,%fp@(-20)
 addr_98fe:
@@ -19203,7 +19207,7 @@ addr_98fe:
 addr_9960:
 	clrl %d0
 	braw addr_9eaa
-addr_9966:	
+addr_9966:
 	pea %fp@(-14)
 	movel #1,%sp@-
 	movew %fp@(-22),%sp@-
@@ -19215,7 +19219,7 @@ addr_9966:
 	extl %d0
 	braw addr_9eaa
 
-addr_998a:	
+addr_998a:
 	.short 0x2eae
 	.short 0x0008
 	.short 0x5697
@@ -19400,8 +19404,8 @@ addr_998a:
 	.short 0x6000
 	.short 0x03be
 	.short 0x6016
-	
-addr_9af0:	
+
+addr_9af0:
 	.short 0x5340
 	.short 0xb07c
 	.short 0x0012
@@ -19414,8 +19418,8 @@ addr_9af0:
 	.short 0x8780
 	.short 0x2050
 	.short 0x4ed0
-	
-addr_9b06:	
+
+addr_9b06:
 	.short 0x0c6e
 	.short 0x000a
 	.short 0xffe6
@@ -19895,14 +19899,14 @@ addr_9b22:
 	.short 0x0002
 	.short 0x6700
 	.short 0xff60
-	
+
     .short 0xb07c
 	.short 0x0003
 	.short 0x679a
 	.short 0x202e
 	.short 0xffde
 
-addr_9eaa:	
+addr_9eaa:
     .short 0x4e5e
 	rts
 
@@ -20495,7 +20499,7 @@ addr_9eaa:
 	.short 0x04a8
 	.short 0x4ed0
 
-addr_a320:    
+addr_a320:
 normal_ascii:
 	.short 0xb27c
 	.short 0x0020
@@ -20980,7 +20984,7 @@ addr_a694:
 /* 0x00a6c0: */
 	.short 0x0001
 	.short 0x67f2
-addr_a6c4:    
+addr_a6c4:
 	rts
 
 addr_a6c6:
@@ -20992,7 +20996,7 @@ cursconf:
     addw %d0,%d0
     movew %pc@(addr_a6e0,%d0:w),%d0
     jmp %pc@(addr_a6e0,%d0:w)
-addr_a6e0:    
+addr_a6e0:
     .short 0xff26
     .short 0xff0c
     orib #22,%a0@
@@ -21513,7 +21517,7 @@ vdi_dispatcher:
 _gsx_entry:
     moveml %d1-%fp,%sp@-            /* Save all regs except d0 and sp */
     moveal %d1,%a0                  /* Source address in d1 */
-    
+
     lea contrl,%a1
     lea ptsin_array,%a3
 
@@ -21532,7 +21536,7 @@ _gsx_entry:
     bles addr_aafc                  /* yes, skip ahead */
     movew %d1,%d0                   /* No - just use 512 */
     movew %d1,%a2@(2)               /* Store 512 in the word we picked out of the source string earlier */
-addr_aafc:    
+addr_aafc:
     movew %d0,%d1                   /* Put the final number in d1 */
     asrw #3,%d0                     /* Divide by 8 */
     andiw #7,%d1                    /* Get mod 8 */
@@ -21554,7 +21558,7 @@ addr_ab20:
 
     .short 0x4eb9                   /* jsr _screen */
     .long _screen
-    
+
     moveal contrl,%a0
     movew %sp@+,%a0@(2)             /* pop off stack into 0x2ae0+2 */
     moveml %sp@+,%d1-%fp            /* restore saved registers */
@@ -22571,7 +22575,7 @@ _FindDevice:
     movew %a0@,%d0                          /* get something from a variable and put it in d0, this must be the requested res */
     .short 0xb07c,0x0001                    /* cmpw #1,%d0 */
     bnes addr_b2da                          /* 1 not requested, go here */
-    tstb %d2                                
+    tstb %d2
     beqs addr_b2f6                          /* Originally low, mode "1" now selected - go here */
     bras addr_b320                          /* Originally medium, mode "1" now selected - go here */
 
@@ -22600,9 +22604,9 @@ addr_b2f6:
 	rts
 
 /* Mode "3" requested */
-addr_b308:    
+addr_b308:
     moveq #1,%d0
-    cmpb %d0,%d2                            
+    cmpb %d0,%d2
     beqs addr_b320                          /* mode "1" originally -> */
     movew %d0,%sp@-
     moveq #-1,%d0
@@ -22855,7 +22859,7 @@ esc_init:
     cmpw %d1,%d0
     bnes addr_b4d8                          /* Ensure it's within range 0-2, invalid value 3 converts to 2 */
     moveq #2,%d0
-addr_b4d8:    
+addr_b4d8:
     movew %d0,%sp@-                         /* Save it during call */
     bsrw rezinit
     lea f8x8,%a0                            /* Address of 8x8 font */
@@ -22863,7 +22867,7 @@ addr_b4d8:
     .short 0xb07c,0x0002                    /* cmpw #2,%d0 - is it mono? */
     bnes addr_b4f2                          /* Nope -> skip */
     lea f8x16,%a0                           /* Use 8x16 font instead */
-addr_b4f2:    
+addr_b4f2:
     bsrw gl_f_init                          /* Probably inits fonts from the name */
     clrw %d0
     movew %d0,v_col_bg                      /* Background colour is all zeroes */
@@ -22892,7 +22896,7 @@ linea_init:
     .long rout_init
 
 addr_b56c:
-rezinit:    
+rezinit:
     lslw #3,%d0                             /* Lookup value from table */
     lea %pc@(reztab,%d0:w),%a0
     movew %a0@+,v_planes
@@ -22907,7 +22911,7 @@ reztab:
 	.short 2,160,200,640
 	.short 1,80,400,640
 
-/*  Set the BLASTER primitive vector list then call initialize routine. 
+/*  Set the BLASTER primitive vector list then call initialize routine.
     in:           d0      blit mode word
                   bit0    0:soft                  1:hard
                   bit1    0:no hardware assist    1:hardware assist
@@ -22932,7 +22936,7 @@ rout_init_copy_loop:
 	.short blt_mode
 	rts
 
-addr_b5da:	
+addr_b5da:
     .short 0x00fc
 	.short 0xa7ec
 	.short 0x00fc
@@ -22955,7 +22959,7 @@ addr_b5da:
 /* 0x00b600: */
 	.short 0xf9e6
 
-addr_b602:    
+addr_b602:
 	.short 0x00fd
 	.short 0x2562
 	.short 0x00fd
@@ -22990,7 +22994,7 @@ _screen:
     clrw %a5@(4)                            /* contrl[2] = 0 */
     clrw %a5@(8)                            /* contrl[4] = 0 */
 
-    clrw _flip_y 
+    clrw _flip_y
 
     .short 0xbe7c,0x0001                    /* cmpw #1,%d7 - if opcode == 1 */
     beqw addr_b74c
@@ -22999,14 +23003,14 @@ _screen:
 
     /* Search the chain of handles to find the correct attribute area */
     moveal #virt_work,%a4                   /* work_ptr = &virt_work */
-addr_b662:    
+addr_b662:
     cmpw %a4@(40),%d6                       /* if r == work_ptr->handle */
     beqs addr_b674
     moveal %a4@(64),%a4
     movel %a4,%d0
     bnes addr_b662
     braw addr_b790                          /* return; */
-addr_b674:    
+addr_b674:
     movel %a4,cur_work
     movew %a4@(2),%d0
     movew %d0,ram_unknown21 + 18
@@ -23022,9 +23026,9 @@ addr_b674:
     bnes addr_b6d4
     movew %a4@(10),ram_unknown21 + 16
     bras addr_b6da
-addr_b6d4:    
+addr_b6d4:
     clrw ram_unknown21 + 16
-addr_b6da:    
+addr_b6da:
     movel %a4@(52),ram_unknown20
     movew %a4@(68),dev_tab + 20
     movew %a4@(8),ram_unknown21 + 30
@@ -23073,10 +23077,10 @@ addr_b76e:
 
     moveal #jmptb2,%a1
     moveal %a0@(0000000000000000,%a1:l),%a0 /* Add 0xfeae50 */
-    
+
     jsr %a0@                                /* Call something */
 
-addr_b790:    
+addr_b790:
     tstl %sp@+
     moveml %sp@+,%d6-%d7/%a4-%a5
     unlk %fp
@@ -24550,7 +24554,7 @@ addr_c2b2:
     .short 0xbe7c,45                        /* cmpw #45,%d7 */
     blts addr_c2ae
 
-    movew max_vert,inq_tab + 28                 
+    movew max_vert,inq_tab + 28
 
     moveal #rom_siz_tab,%a5                 /* Copy 12 words from rom_siz_tab to siz_tab */
     moveal #siz_tab,%a4
@@ -24574,7 +24578,7 @@ addr_c2ea:
     moveal #f8x16,%a1
     moveal #ram8x16,%a0
     moveq #44,%d0                           /* Copy 45 words from f8x16 to ram8x16 (font headers?) */
-addr_c2fe:    
+addr_c2fe:
     movew %a1@+,%a0@+
     dbf %d0,addr_c2fe
 
@@ -24795,7 +24799,7 @@ v_clswk:
 addr_c58e:
     moveal cur_work,%a0
     movel %a0@(64),%fp@(-4)                 /* next_work = cur_work->next_work; */
-    
+
     movel cur_work,%sp@
     movew #73,%sp@-
     .short 0x4eb9                           /* jsr mfree - Mfree(cur_work) */
@@ -28258,7 +28262,7 @@ init_wk:
 addr_dfe2:
     clrw %d0
     bras addr_dfea
-addr_dfe6:    
+addr_dfe6:
     movew %d7,%d0
     subqw #1,%d0
 addr_dfea:
@@ -28336,7 +28340,7 @@ addr_e082:
     bges addr_e0a0
 addr_e09c:
     moveq #1,%d0
-	
+
 	.short 0x6002
 addr_e0a0:
 	.short 0x3007
@@ -40313,7 +40317,7 @@ vq_color:
 /* The entry point of the GEM desktop startup */
 /* I have copied in some comments from the TOS306 codebase */
 gem_entry:
-addr_13b34:    
+addr_13b34:
     moveal %sp,%a5                          /* Save stack */
     moveal #ustak+128,%sp                   /* Switch stacks - DOS needs a user stack */
     moveal %a5@(4),%a5                      /* Basepage address */
@@ -40391,7 +40395,7 @@ begin:
     jsr addr_27846                          /* returns sizeof(THEGLO) in words */
     moveal #_D,%a0                          /* zero out static unitialized data (_D) */
     clrl %d1
-addr_13c1e:    
+addr_13c1e:
     movew %d1,%a0@+
     dbmi %d0,addr_13c1e                     /* THIS MUST BE CHANGED TO DBRA!!! */
     movel #addr_2642e,_drwaddr              /* initialize some bss pointers */
@@ -40449,7 +40453,7 @@ gem_main:
     movew #26,no_aes                        /* no_aes = ALRTNOFUNC */
     lea %a5@(8196),%a0
     movel %a0,ram_unknown77                 /* probably ad_shcmd = &DGLO->s_cmd[0] */
-    lea %a5@(12516),%a0                     
+    lea %a5@(12516),%a0
     movel %a0,ram_unknown78                 /* probably ad_shtail = &DGLO->s_tail[0] */
     lea %a5@(7910),%a0
     movel %a0,ram_unknown89                 /* probably ad_path = &DGLO->g_dir[0] */
@@ -40459,10 +40463,10 @@ gem_main:
 
     movel #0x400,%sp@
     .short 0xf3c0                           /* dos_alloc */
-    
+
     movel %d0,drawstk                       /* drawstk = dos_alloc(0x400); */
     .short 0x06b9                           /* addil #0x400,drawstk - drawstk += 0x400 */
-    .long 0x400                    
+    .long 0x400
     .long drawstk
 
     .short 0xf7e8                           /* hcli() */
@@ -41070,7 +41074,7 @@ addr_1424c:
     addql #4,%sp
     bras addr_1428c
 
-addr_14270:	
+addr_14270:
     andiw #0xf,%fp@(-2)
     addqw #1,%fp@(-2)
     clrw _gl_rschange                       /* This code is part of pred_dinf() in aes/geminit.c which is called in gem_main(). */
@@ -41625,7 +41629,7 @@ addr_1428c:
 	.short 0x5c8f
 	.short 0xf028
 	rts
-	
+
 addr_146a6:
 gsx_attr:
     lea %sp@(4),%a0                         /* a0 <-- parameters */
@@ -41636,11 +41640,11 @@ gsx_attr:
     movew %a0@+,%d3                         /* d3 <-- text */
     movew %a0@+,%d0                         /* d0 <-- mode */
     movew %a0@+,%d4                         /* d4 <-- color */
-    
+
     clrw %a4@(2)                            /* contrl[1] <-- 0 */
     movew #1,%a4@(6)                        /* contrl[3] <-- 1 */
     movew _gl_handle,%a4@(12)               /* contrl[6] <-- gl_handle */
-    
+
     lea _gl_mode,%a0                        /* Skip this call if the requested mode is the same as the currently selected mode */
     cmpw %a0@,%d0
     beqs addr_146e8
@@ -43286,7 +43290,7 @@ addr_1470e:
 /* 0x015340: */
 	.short 0x00cc
 	.short 0xffe8
-	
+
     pea %fp@(-22)
     clrw %sp@-
     movew #3,%sp@-
@@ -43555,11 +43559,11 @@ app_reschange:
     bnes addr_15550
     clrw %d0                                /* Then just return 0 */
     bras addr_15562
-addr_15550:    
+addr_15550:
     movew %fp@(8),_gl_restype               /* Otherwise, _gl_restype = res */
     movew #1,_gl_rschange                   /* Set the flag to change res */
     moveq #1,%d0                            /* Return 1 */
-addr_15562:    
+addr_15562:
 	.short 0xf001
 
 
@@ -46381,7 +46385,7 @@ addr_15562:
 	.short 0x7001
 	.short 0xf001
 
-addr_16abc:    
+addr_16abc:
 desk_pref:                                  /* This is a guess. */
 
     linkw %fp,#-14
@@ -46403,10 +46407,10 @@ desk_pref:                                  /* This is a guess. */
     clrw %d0
     swap %d0
     movel %d0,%a5@(0x32ae)                  /* Put that one somewhere */
-    movew %fp@(8),%d0                       
+    movew %fp@(8),%d0
     braw addr_16b74                         /* Go to the switch statement */
 
-addr_16b00:                                 /* case 0: */   
+addr_16b00:                                 /* case 0: */
     clrl %a5@(0x32aa)                       /* Set all three things to 0 */
     clrl %a5@(0x32ae)
     clrl %a5@(0x32b2)
@@ -46417,16 +46421,16 @@ addr_16b10:                                 /* case 3: */
     bnes addr_16b22
     tstw %a5@(0x35a2)
     beqs addr_16b28
-addr_16b22:    
+addr_16b22:
     movew #1,%a5@(0x5e42)                   /* Something in the structure */
-addr_16b28:    
+addr_16b28:
     bras addr_16b3c
 addr_16b2a:                                 /* case 2: */
     movew #4,%fp@(-6)                       /* Set a local to 4 */
     tstw %a5@(0x35a0)
     beqs addr_16b3c
     movew #1,%a5@(0x5e42)
-addr_16b3c:    
+addr_16b3c:
     .short 0xf3b8
     movel %d0,%a5@(0x311a)
     tstl %a5@(0x311a)
@@ -46435,7 +46439,7 @@ addr_16b3c:
     .short 0xf3bc
     clrw %d0
     braw addr_16c72
-addr_16b54:    
+addr_16b54:
     movel %a5@(0x311a),%sp@
     .short 0xf3c0                           /* aligned_malloc */
     movel %d0,%a5@(0x3116)
@@ -46446,7 +46450,7 @@ addr_16b60:                                 /* case 1: */
     tstw %a5@(0x35a2)
     beqs addr_16b72
     movew #1,%a5@(0x5e42)
-addr_16b72:    
+addr_16b72:
     bras addr_16b8a
 
 addr_16b74:                                 /* switch() statement on d0, 0-3 */
@@ -46564,10 +46568,10 @@ addr_16b8a:
 	.short 0x6604
 	.short 0x4240
 	.short 0x6002
-addr_16c70:    
+addr_16c70:
 	.short 0x7001
-	
-addr_16c72:    
+
+addr_16c72:
     .short 0xf821
 	.short 0x4e56
 	.short 0x0000
@@ -48328,13 +48332,13 @@ addr_16c72:
 	.short 0x0002
 	.short 0xf07c
 	.short 0x4e5e
-	
-addr_179c6:    
+
+addr_179c6:
     movel %d0,%sp@-                         /* Save return value */
     .short 0xf084                           /* linef function 33 */
     movel %sp@+,%d0                         /* Restore return value */
     rts
-	
+
 	.short 0x2f2f
 	.short 0x0008
 	.short 0x206f
@@ -48679,7 +48683,7 @@ rsrc_gaddr:
     movel %sp@(8),%sp@-                     /* paddr */
     movel %sp@(8),%sp@-                     /* rstype, rsid */
     pea _pglobal                            /* &pglobal */
-    
+
     .short 0xf0b0                           /* in TOS306: jsr _rs_gaddr (linef function 44) */
 
     addaw #12,%sp
@@ -49636,7 +49640,7 @@ rsrc_gaddr:
 	.short 0x4a40
 	.short 0x6700
 	.short 0x015e
-	
+
     pea %fp@(-32)
     movew %fp@(-36),%sp@-
     movew #5,%sp@-
@@ -49991,7 +49995,7 @@ rsrc_gaddr:
 	.short 0x3086
 	.short 0x4a46
 
-	
+
 
 
     beqs addr_1865c
@@ -50035,7 +50039,7 @@ addr_18684:
     beqs addr_186a6
     moveal %d7,%a0
     addal #394,%a0
-    
+
 /* object array plus 394 */
 /* object 16 is the high res button */
 /* obj[16].ob_state = 8 (DISABLED) */
@@ -55507,8 +55511,8 @@ addr_1b000:
 	.short 0xf2c4
 	.short 0x548f
 	.short 0xf001
-	
-addr_1b01a:    
+
+addr_1b01a:
     .short 0x4e56
 	.short 0xff7a
 	.short 0x48e7
@@ -56577,7 +56581,7 @@ addr_1b120:
 	.short 0x5c8f
 	.short 0x3005
 	.short 0xf83d
-	
+
 addr_1b828:
     .short 0x4e56
 	.short 0xfff8
@@ -57129,7 +57133,7 @@ addr_1b828:
 	.short 0x0004
 	.short 0x6d00
 
-    
+
 	.short 0xff5e
 	.short 0xf618
 	.short 0xfe21
@@ -57157,7 +57161,7 @@ addr_1bc56:
     .short 0xf668
     movew #1,%sp@
     .short 0xf66c
-    
+
     pea %a5@(ram_unknown44 + 6)
     pea %a5@(ram_unknown44 + 4)
     pea %a5@(ram_unknown44 + 2)
@@ -57183,7 +57187,7 @@ addr_1bc56:
     movel %a0,%a5@(ram_unknown45)
     movew #1,%sp@
     .short 0xf094
-    
+
     movel #_pglobal,%sp@
     movew #1,%sp@-
     .short 0xf348
@@ -59445,7 +59449,7 @@ dispatch:
 
 addr_1ce24:
 interrupts_off:
-.global interrupts_off 
+.global interrupts_off
 	movew %sr,saved_sr
     oriw #1792,%sr
 	rts
@@ -59826,7 +59830,7 @@ aligned_malloc:
     btst #0,%d0                             /* Bit 0 set? */
     beqs addr_1d0f6                         /* If yes, add 1 (rounding up to nearest word) */
     addql #1,%d0
-addr_1d0f6:    
+addr_1d0f6:
     movel %d0,%sp@-                         /* Put the new value on the stack */
     movew #72,%sp@-
     trap #1                                 /* Call GEMDOS Malloc() */
@@ -59837,9 +59841,9 @@ addr_1d0f6:
     rts
 addr_1d10e:
     btst #0,%d0                             /* Round returned pointer up to next word */
-    beqs addr_1d116                         
+    beqs addr_1d116
     addql #1,%d0
-addr_1d116:    
+addr_1d116:
     rts
 
 	.short 0x70ff
@@ -60223,7 +60227,7 @@ addr_1d1bc:
 	.short 0x00f8
 	.short 0x4e5e
 	rts
-	
+
 /* A TRAP #2 (GEM) handler */
 addr_1d40a:
 trap2_dispatcher:
@@ -60247,9 +60251,9 @@ _gosuper:
 aes_dispatcher:
 	.short 0x4eb9                           /* jsr interrupts_off */
     .long interrupts_off
-    
+
     movel %usp,%a0                          /* Save regs on user stack */
-    moveml %d1-%fp,%a0@-                    
+    moveml %d1-%fp,%a0@-
     movel %a0,%usp
 
     moveal rlr,%fp                          /* rlr is a pointer to pd structure. */
@@ -60263,7 +60267,7 @@ aes_dispatcher:
 
     .short 0x4eb9                           /* jsr interrupts_on */
     .long interrupts_on
- 
+
 
     .short 0xb07c,0x00c8                    /* cmpw #200,%d0 - 200 is CRYSTAL1 */
     bnes addr_1d468                         /* if CRYSTAL2, fall into dsptch (same as appl_yield() for PC-GEM) */
@@ -60273,7 +60277,7 @@ aes_dispatcher:
     .long crystal_interface
     addql #4,%sp
 
-addr_1d468:    
+addr_1d468:
     .short 0x4eb9                           /* jsr dispatch */
     .long dispatch
 
@@ -64047,7 +64051,7 @@ addr_1f0da:
     moveq #1,%d0
     bras addr_1f136
     moveq #2,%d0
-addr_1f136:    
+addr_1f136:
     moveal %fp@(22),%a0
     movel %a0@,%sp@
     moveal %fp@(14),%a0
@@ -64971,8 +64975,8 @@ addr_1f136:
 	.short 0x504f
 	.short 0x7cff
 	.short 0x6028
-	
-addr_1f836:    
+
+addr_1f836:
     .short 0x907c
 	.short 0x000a
 	.short 0xb07c
@@ -64995,8 +64999,8 @@ addr_1f836:
 	.short 0x4a5f
 	.short 0x4a5f
 	.short 0x4a5f
-	
-addr_1f85e:    
+
+addr_1f85e:
     .short 0x3006
     .short 0xf031
 
@@ -65004,7 +65008,7 @@ addr_1f85e:
 
 /*
         ./aes/gembind.c:
-        vi 
+        vi
         uint16_t control[C_SIZE]; // #define C_SIZE 4
         uint16_t int_in[I_SIZE];  // #define I_SIZE 16
         int16_t int_out[O_SIZE];  // #define O_SIZE 7
@@ -65056,7 +65060,7 @@ crystal_interface:
     .short 0xf1ac                           /* linef function 107 - lwcopy */
 
     addql #8,%sp
-addr_1f898:    
+addr_1f898:
     tstw %fp@(-2)
     beqs addr_1f8be
     .short 0x4240                           /* clrw %d0 */
@@ -65073,7 +65077,7 @@ addr_1f898:
     .short 0xf1ac                           /* linef function 107 - lwcopy */
 
     addql #8,%sp
-addr_1f8be:    
+addr_1f8be:
     pea %fp@(-62)
     pea %fp@(-54)
     pea %fp@(-40)
@@ -69583,7 +69587,7 @@ addr_1f926:
 	.short 0x0000
 	.short 0x6e1c
 	rts
-	
+
 addr_21aec:
 gsx_acode:
     lea %sp@(4),%a0
@@ -69631,7 +69635,7 @@ gsx_init:
 	.short 0x7002
 	.short 0x612c
 
-addr_21b58:  
+addr_21b58:
 setmb:
 	.short 0x4879
 	.short 0x0000
@@ -69647,7 +69651,7 @@ setmb:
 	.short 0x4fef
 	.short 0x000c
 	rts
-    
+
 addr_21b74:
     moveq #3,%d0
     bsrs addr_21b84
@@ -69672,10 +69676,10 @@ addr_21b9a:
     dbf %d0,addr_21b9a                      /* intin[0] to intin[9] are all set to 1 */
 
     movew #2,%a1@                           /* intin[10] <- 2 */
-    movew _gl_restype,%a2@                  /* intin[0] <- _gl_restype */                            
+    movew _gl_restype,%a2@                  /* intin[0] <- _gl_restype */
 
-    pea _gl_ws     
-    pea _gl_handle                       
+    pea _gl_ws
+    pea _gl_handle
     pea %a2@
     bsrw av_opnwk                           /* av_opnwk(intin[0], &_gl_handle, &_gl_ws); */
     lea %sp@(12),%sp
@@ -69942,7 +69946,7 @@ addr_21d12:
 
 /* WORD av_opnwk(WORD *pwork_in, WORD *phandle, WORD *pwork_out) */
 addr_21dc8:
-av_opnwk:   
+av_opnwk:
     movel %sp@(4),iioff                     /* _intin array is pwork_in */
     moveal %sp@(12),%a1                     /* a1 -> pwork_out */
     movel %a1,iooff                         /* _intout array is pwork_out */
@@ -70028,7 +70032,7 @@ av_opnwk:
 	.short 0x612e
 	.short 0x6120
 	.short 0x24d8
-	
+
     .short 0x7012
 	.short 0x6032
 	.short 0x41ef
@@ -74099,12 +74103,12 @@ vdi_list:
 	.short 0x0000
 	.short 0x742a
 	.short 0x6704
-    
+
 	.short 0x4240
 	.short 0x6002
 	.short 0x7001
 	.short 0xf001
-	
+
 addr_23d78:
 rs_gaddr:
     linkw %fp,#0
@@ -74126,7 +74130,7 @@ rs_gaddr:
     bras addr_23da2
 addr_23da0:
     moveq #1,%d0
-addr_23da2:    
+addr_23da2:
 
     .short 0xf801
 
@@ -78156,7 +78160,7 @@ addr_25c0a:
 	.short 0x5200
 	.short 0x60f6
 	rts
-	
+
 addr_25c2c:
 linef_lwcopy:
     /* void lwcopy(uint16_t *dst, uint16_t *src, uint16_t length) */
@@ -78169,7 +78173,7 @@ addr_25c3a:
     movew %a1@+,%a0@+                       /* *dest++ = *src++ */
     subqw #1,%d0                            /* length-- */
     bnes addr_25c3a                         /* continue while (length) */
-addr_25c40:    
+addr_25c40:
 	rts
 
 	.short 0x4cef
@@ -79228,7 +79232,7 @@ addr_26156:
 	.short 0x0000
 	.short 0x6b02
 	rts
-    
+
 addr_2642e:
 	rts
 
@@ -81932,9 +81936,9 @@ linef_handler:
     movew %a0@+,%d1                         /* fetch opcode */
     btst #0,%d1
     bnes linefh1
-    
+
     /* Bit 0 was set: */
-    movew %d2,%sr                           
+    movew %d2,%sr
     movel %a0,%sp@-
     andiw #0x0fff,%d1                       /* Strip off the initial f */
     moveal #lineftab,%a0
@@ -82587,11 +82591,11 @@ gem_magic:
 	.long 0x0000a84e                        /* gm_end - end of RAM used by GEM */
 	.long gem_entry                         /* gm_init - address of GEM's entry point */
 
-addr_2820a:	
+addr_2820a:
     .short 0x0002
 	.short 0x0101
 	.short 0x0002
-	
+
     .short 0x4000
 	.short 0x6801
 	.short 0xfc02
@@ -82600,7 +82604,7 @@ addr_2820a:
 	.short 0x0000
 	.short 0x0000
 	.short 0x0202
-	
+
     .short 0x0100
 	.short 0x0270
 	.short 0x00d0
@@ -82668,7 +82672,7 @@ addr_2820a:
 	.short 0x00ff
 	.short 0x0000
 
-addr_2829c:	
+addr_2829c:
     .short 0x001b
 	.short 0x3132
 	.short 0x3334
@@ -82804,7 +82808,7 @@ addr_2831c:
 	.short 0x0000
 	.short 0x0000
 
-addr_2839c:    
+addr_2839c:
 	.short 0x001b
 	.short 0x3132
 	.short 0x3334
@@ -83045,7 +83049,7 @@ addr_2839c:
 	.short 0x001f
 	.short 0x001e
 	.short 0x001f
-	
+
 addr_2856a:
 	.short 0x00fc
 	.short 0x8128
@@ -84284,7 +84288,7 @@ addr_2877a:
 	.short 0x0000
 	.short 0x0800
 	.short 0x0000
-	
+
 addr_28ec6:
 f8x8:
     .short 0x0001
@@ -88188,7 +88192,7 @@ rom_dev_tab:
 	.short 12                               /* Crosshatch patterns */
     .short 16                               /* Colours */
     .short 10                               /* Number of GDPs */
-    .short 1, 2, 3, 4, 5, 6, 7, 8, 9, 10    /* GDP bar, arc, pic, circle, ellipse, elliptical arc, elliptical pie, 
+    .short 1, 2, 3, 4, 5, 6, 7, 8, 9, 10    /* GDP bar, arc, pic, circle, ellipse, elliptical arc, elliptical pie,
                                                rounded rectangle, filled rounded rectangle, justified text */
     .short 3, 0, 3, 3, 3, 0, 3, 0, 3, 2     /* GDP #1, #2, #3, #4, #5, #6, #7, #8, #9, #10 */
     .short 1                                /* Colour capability */
@@ -92557,7 +92561,7 @@ desk_rsc:
 	.short 0x0000
 	.short 0x2bb0
 	.short 0x00b1
-/* 0x02cde0: */    
+/* 0x02cde0: */
 	.short 0x000e
 	.short 0x001e
 	.short 0x0005
@@ -93516,7 +93520,7 @@ set_preferences_string:
     .byte 0
     .ascii "Confirmation required for:"
     .byte 0
-	
+
 
 	.byte 0x46
 	.short 0x696c
