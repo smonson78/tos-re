@@ -1084,70 +1084,49 @@ run_reset_resident:
 
 addr_e4c:
 settime:
-    .short 0x47f9
-	.short 0x00fc
-	.short 0x2080
-	.short 0x49f9
-	.short 0x00fc
-	.short 0x31d2
-	.short 0x6100
-	.short 0x1116
-	.short 0x6402
-	.short 0x264c
-	.short 0x4ed3
-
+    .short 0x47f9                           /* lea addr_2080,%a3 */
+    .long addr_2080
+    .short 0x49f9                           /* lea addr_31d2,%a4 */
+    .long addr_31d2
+    bsrw addr_1f70
+    bccs addr_e60
+    moveal %a4,%a3
+addr_e60:    
+    jmp %a3@
 addr_e62:
 .global addr_e62
-	.short 0x41fa
-	.short 0xf19c
-	.short 0x43f9
-	.short 0x0000
-	.short 0x0940
-	.short 0x702f
-	.short 0x13b0
-	.short 0x0000
-	.short 0x0000
-	.short 0x51c8
-	.short 0xfff8
-	.short 0x337a
-	.short 0x001c
-	.short 0xfffa
-	.short 0x2369
-/* 0x000e80: */
-	.short 0x0004
-	.short 0xfffc
-	.short 0x32ba
-	.short 0x0016
-	.short 0x3369
-	.short 0x001e
-	.short 0x001c
-	.short 0x23c9
-	.short 0x0000
-	.short 0x04f2
+    lea %pc@(os_entry),%a0
+    lea ram_unknown15,%a1
+    moveq #47,%d0
+addr_e6e:
+    moveb %a0@(0,%d0:w),%a1@(0,%d0:w)
+    dbf %d0,addr_e6e
+    movew %pc@(addr_e96),%a1@(-6)
+    movel %a1@(4),%a1@(-4)
+    movew %pc@(addr_e9c),%a1@
+    movew %a1@(30),%a1@(28)
+    movel %a1,_sysbase
 	rts
-	.short 0x4ef9
-	.short 0x0000
-	.short 0x0000
-	.short 0x60f8
-	.short 0x6126
-	.short 0x3800
-	.short 0x3a00
-	.short 0xe24d
-	.short 0x8a7c
-	.short 0xfffe
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0xb5d2
-	.short 0x3600
-	.short 0x302f
-	.short 0x0004
-	.short 0x6b0a
-	.short 0xc045
-	.short 0x8044
-	.short 0x4eb9
 
-	.long rout_init
-	.short 0x3003
+addr_e96:
+    jmp ram_start
+
+addr_e9c:
+    bras addr_e96
+    bsrs blittest
+    movew %d0,%d4
+    movew %d0,%d5
+    lsrw #1,%d5
+    .short 0x8a7c,-2                        /* orw #-2,%d5 */
+    jsr addr_b5d2
+    movew %d0,%d3
+    movew %sp@(4),%d0
+    bmis addr_ec2
+    andw %d5,%d0
+    orw %d4,%d0
+    jsr rout_init
+addr_ec2:
+    movew %d3,%d0
 	rts
 
 addr_ec6:
@@ -3257,6 +3236,8 @@ addr_1f4c:
 	rts
 	.short 0x70ff
 	rts
+
+addr_1f70:    
 	.short 0x93c9
 	.short 0x307c
 	.short 0xfc20
@@ -3397,7 +3378,8 @@ addr_1f4c:
 	rts
 	.short 0x70ff
 	rts
-/* 0x002080: */
+
+addr_2080:
 	.short 0x6100
 	.short 0xfeee
 	.short 0x6500
@@ -5686,6 +5668,8 @@ addr_31a8:
 	.short 0x202d
 	.short 0x0e6c
 	rts
+
+addr_31d2:    
 	.short 0x2b6f
 	.short 0x0004
 	.short 0x0e70
@@ -22931,9 +22915,8 @@ rout_init_copy_loop:
     dbf %d0,rout_init_copy_loop
 	rts
 
-	.short 0x3039
-	.short 0x0000
-	.short blt_mode
+addr_b5d2:
+    movew blt_mode,%d0
 	rts
 
 addr_b5da:

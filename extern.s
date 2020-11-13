@@ -180,6 +180,9 @@ etv_term:
 .set tos_register_buffer,0x93a
 .global tos_register_buffer
 
+.set ram_unknown15,0x940
+.global ram_unknown15
+
 .set fd_retry,0x9f6
 .global fd_retry
 
