@@ -269,7 +269,7 @@ addr_078a:
     subal %a5,%a5
     tstw %a5@(_dumpflg)                     /* Check for screen dump flag */
     bnes addr_0796
-    bsrw addr_0cfa
+    bsrw addr_cfa
 addr_0796:    
     moveml %sp@+,%d0-%fp                    /* Restore registers */
 addr_079a:
@@ -393,9 +393,9 @@ trap14_vectors:
     /* 18 - void Protobt(void *buf, int32_t serialno, int16_t disktype, int16_t execflag); */
 	.long protobt
     /* 19 - int16_t Flopver(void *buf, int32_t filler, int16_t devno, int16_ sectno, int16_t trackno, int16_t sideno, int16_t count); */
-	.long 0x00fc1286                        
-	.long 0x00fc0cfa                        /* 20 - void Scrdmp(); */
-	.long 0x00fca6c6                        /* 21 - int16_t Cursconf(int16_t func, int16_t rate); */
+	.long flopver                        
+	.long scrdmp                            /* 20 - void Scrdmp(); */
+	.long cursconf                          /* 21 - int16_t Cursconf(int16_t func, int16_t rate); */
 	.long 0x00fc0e4c                        /* 22 - void Settime(uint32_t time); */
 	.long 0x00fc0e3e                        /* 23 - uint32_t Gettime(); */
 	.long 0x00fc41d8                        /* 24 - void Bioskeys(); */
@@ -902,17 +902,13 @@ addr_bf4:
 	.short 0x0980
 	rts
 
-addr_0cfa:
-	.short 0x2079
-    .short 0x0000
-	.short 0x0502
-/* 0x000d00: */
-	.short 0x4e90
-	.short 0x33fc
-	.short 0xffff
-	.short 0x0000
-	.short 0x04ee
-	rts
+/* Screen dump */
+addr_cfa:
+scrdmp:
+    moveal dump_vec,%a0
+    jsr %a0@
+    movew #-1,_dumpflg
+    rts
 
 addr_d0c:
 .global addr_d0c    
@@ -1527,20 +1523,16 @@ wmult:
     dbf %d1,wmult                           /* (do it again) */
 	rts
 
-	.short 0x6100
-	.short 0x03b8
-	.short 0x70f5
-	.short 0x6100
-	.short 0x014e
-	.short 0x6100
-	.short 0x030a
-	.short 0x6100
-	.short 0x026c
-	.short 0x6600
-	.short 0x01c2
-	.short 0x6104
-	.short 0x6000
-	.short 0x01ca
+addr_1286:
+flopver:
+    bsrw fdchange
+    moveq #-11,%d0
+    bsrw floplock
+    bsrw select
+    bsrw go2track
+    bnew flopfail
+    bsrs verify1
+    braw flopok
 
 addr_12a2:
 verify1:
@@ -3095,33 +3087,29 @@ addr_1e24:
     tstl %sp@+
     moveml %sp@+,%d6-%d7/%a5
     unlk %fp
-	rts
+    rts
 addr_1e2e:
-	.short 0x4e56
-	.short 0x0000
-	.short 0x48e7
-	.short 0x0300
-	.short 0x4247
-	.short 0x600c
-	.short 0x206e
-	.short 0x0008
-	.short 0x3010
-/* 0x001e40: */
-	.short 0xde40
-	.short 0x54ae
-	.short 0x0008
-	.short 0x302e
-	.short 0x000c
-	.short 0x536e
-	.short 0x000c
-	.short 0x4a40
-	.short 0x66e8
-	.short 0x3007
-	.short 0x4a9f
-	.short 0x4cdf
-	.short 0x0080
-	.short 0x4e5e
-	rts
+    linkw %fp,#0
+    moveml %d6-%d7,%sp@-
+    clrw %d7
+    bras addr_1e46
+addr_1e3a:
+    moveal %fp@(8),%a0
+    movew %a0@,%d0
+    addw %d0,%d7
+    addql #2,%fp@(8)
+addr_1e46:
+    movew %fp@(12),%d0
+    subqw #1,%fp@(12)
+    tstw %d0
+    bnes addr_1e3a
+    movew %d7,%d0
+    tstl %sp@+
+    moveml %sp@+,%d7
+    unlk %fp
+    rts
+
+addr_1e5e:
 	.short 0x4e56
 	.short 0xfffc
 	.short 0x206e
@@ -20992,34 +20980,28 @@ addr_a694:
 /* 0x00a6c0: */
 	.short 0x0001
 	.short 0x67f2
+addr_a6c4:    
 	rts
-	.short 0x49f9
-	.short 0x0000
-	.short 0x2ad6
-	.short 0x302f
-	.short 0x0004
-	.short 0xb07c
-	.short 0x0007
-	.short 0x62ee
-	.short 0xd040
-	.short 0x303b
-	.short 0x0006
-	.short 0x4efb
-	.short 0x0002
-	.short 0xff26
-	.short 0xff0c
-	.short 0x0010
-	.short 0x0016
-	.short 0x001c
-	.short 0x0024
-	.short 0x002c
-	.short 0x0036
-	.short 0x08d4
-	.short 0x0000
+
+addr_a6c6:
+cursconf:
+    lea ram_unknown13,%a4
+    movew %sp@(4),%d0
+    .short 0xb07c,7                         /* cmpw #7,%d0 */
+    bhis addr_a6c4                          /* dodgy hack */
+    addw %d0,%d0
+    movew %pc@(addr_a6e0,%d0:w),%d0
+    jmp %pc@(addr_a6e0,%d0:w)
+addr_a6e0:    
+    .short 0xff26
+    .short 0xff0c
+    orib #22,%a0@
+    orib #36,%a4@+
+    orib #54,%a4@(ram_unknown14)
+    .short 0x0000,0x4e75                    /* orib #117,%d0 */
+    bclr #0,%a4@
 	rts
-	.short 0x0894
-	.short 0x0000
-	rts
+
 	.short 0x196f
 	.short 0x0007
 /* 0x00a700: */

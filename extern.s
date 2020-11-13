@@ -174,6 +174,9 @@ etv_term:
 .set environment,0x840
 .global environment
 
+.set ram_unknown14,0x8d4
+.global ram_unknown14
+
 .set tos_register_buffer,0x93a
 .global tos_register_buffer
 
@@ -356,6 +359,8 @@ etv_term:
 /* Video memory config parameters: */
 .set v_hz_rez,0x2ad0
 .global v_hz_rez
+.set ram_unknown13,0x2ad6
+.global ram_unknown13
 .set v_vt_rez,0x2ad8
 .global v_vt_rez
 .set bytes_lin,0x2ada
