@@ -266,20 +266,20 @@ etv_term:
 .set ram_unknown51,0xeb4
 .global ram_unknown51
 
-.set ram_unknown95,0xeb8
-.global ram_unknown95
+.set prtbbval,0xeb8
+.global prtbbval
 
 .set ram_unknown80,0xebc
 .global ram_unknown80
 
-.set ram_unknown96,0xee6
-.global ram_unknown96
+.set prtbgval,0xee6
+.global prtbgval
 
 .set ram_unknown87,0xef0
 .global ram_unknown87
 
-.set ram_unknown97,0xef6
-.global ram_unknown97
+.set prtbrval,0xef6
+.global prtbrval
 
 /*
 struct _pbdef
@@ -309,7 +309,7 @@ struct _pbdef
 .set ram_unknown58,0xefc
 .global ram_unknown58
 
-/* maybe pbpar.pb_width */
+/* pbpar.pb_width */
 .set ram_unknown52,0xefe
 .global ram_unknown52
 
@@ -325,6 +325,7 @@ struct _pbdef
 .set ram_unknown56,0xf08
 .global ram_unknown56
 
+/* pbpar.pb_colptr */
 .set ram_unknown86,0xf0a
 .global ram_unknown86
 
@@ -337,8 +338,8 @@ struct _pbdef
 .set ram_unknown79,0xf12
 .global ram_unknown79
 
-.set ram_unknown94,0xf7c
-.global ram_unknown94
+.set prtbtcol,0xf7c
+.global prtbtcol
 
 .set ram_unknown67,0xf7e
 .global ram_unknown67

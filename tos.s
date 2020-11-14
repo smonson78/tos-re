@@ -3688,22 +3688,21 @@ addr_23bc:
     moveal ram_unknown86,%a0
     movew %a0@,%d0
     .short 0xc07c,0x777                     /* andw #0x777,%d0 */
-    movew %d0,ram_unknown94
+    movew %d0,prtbtcol
     addql #2,ram_unknown86
-    cmpiw #0x777,ram_unknown94
-
+    cmpiw #0x777,prtbtcol
     beqw addr_2614
-    movew ram_unknown94,%d0
+    movew prtbtcol,%d0
     .short 0xc07c,7                         /* andw #7,%d0 */
-    movew %d0,ram_unknown95
-    movew ram_unknown94,%d0
+    movew %d0,prtbbval
+    movew prtbtcol,%d0
     asrw #4,%d0
     .short 0xc07c,7                         /* andw #7,%d0 */
-    movew %d0,ram_unknown96
-    movew ram_unknown94,%d0
+    movew %d0,prtbgval
+    movew prtbtcol,%d0
     asrw #8,%d0
     .short 0xc07c,7                         /* andw #7,%d0 */
-    movew %d0,ram_unknown97
+    movew %d0,prtbrval
     tstb ram_unknown67
     beqw addr_25c2
     moveaw %d7,%a0
