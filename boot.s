@@ -325,7 +325,7 @@ addr_396:
     bsrw addr_34fc
     movel #addr_52e,%sp@-                       /* Push 2 params */
     movew #1,%sp@-                              
-    jsr addr_3480
+    jsr ikbdws
     addql #6,%sp                                /* Restore stack */
     movel #32767,%d0
 addr_3b8:

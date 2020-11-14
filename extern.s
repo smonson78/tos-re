@@ -228,6 +228,9 @@ etv_term:
 .set rs232iorec,0xc70
 .global rs232iorec
 
+.set ram_unknown30,0xe2e
+.global ram_unknown30
+
 /* A mouse vector */
 .set mouseint,0xe3e
 .global mouseint
@@ -244,9 +247,119 @@ etv_term:
 .set keytab,0xe7e
 .global keytab
 
+.set ram_unknown31,0xe9e
+.global ram_unknown31
+
+.set ram_unknown19,0xea6
+.global ram_unknown19
+
+.set ram_unknown22,0xeaa
+.global ram_unknown22
+
+.set ram_unknown24,0xeac
+.global ram_unknown24
+
 /* 32 bits */
 .set rseed,0xeb0
 .global rseed
+
+.set ram_unknown51,0xeb4
+.global ram_unknown51
+
+.set ram_unknown95,0xeb8
+.global ram_unknown95
+
+.set ram_unknown80,0xebc
+.global ram_unknown80
+
+.set ram_unknown96,0xee6
+.global ram_unknown96
+
+.set ram_unknown87,0xef0
+.global ram_unknown87
+
+.set ram_unknown97,0xef6
+.global ram_unknown97
+
+/*
+struct _pbdef
+{ 
+   /  0 / char *   pb_scrptr;  / Pointer to start of screen memory /
+   /  4 / uint16_t pb_offset;  / Offset to be added to this        /
+   /  6 / uint16_t pb_width;   / Screen width in dots              /
+   /  8 / uint16_t pb_height;  / Screen height in dots             /
+   / 10 / uint16_t pb_left;    / Left margin in dots               /
+   / 12 / uint16_t pb_right;   / Right margin in dots              /
+   / 14 / uint16_t pb_screz;   / Resolution                        /
+   / 16 / uint16_t pb_prrez;   / Printer type (Atari/Epson)        /
+   / 18 / const int16_t *pb_colptr;  / Pointer to color palette    /
+   / 22 / uint16_t pb_prtype;  / 0: Atari matrix monochrome
+                           1: Atari matrix color
+                           2: Atari daisywheel monochrome
+                           3: Epson matrix monochrome        /
+   / 24 / uint16_t pb_prport;  / Centronics/RS-232 port            /
+   / 26 / const char *pb_mask; / Pointer to halftone mask          /
+   / 30 /
+};
+*/
+
+.set ram_unknown36,0xef8
+.global ram_unknown36
+
+.set ram_unknown58,0xefc
+.global ram_unknown58
+
+/* maybe pbpar.pb_width */
+.set ram_unknown52,0xefe
+.global ram_unknown52
+
+.set ram_unknown50,0xf00
+.global ram_unknown50
+
+.set ram_unknown74,0xf04
+.global ram_unknown74
+
+.set ram_unknown57,0xf06
+.global ram_unknown57
+
+.set ram_unknown56,0xf08
+.global ram_unknown56
+
+.set ram_unknown86,0xf0a
+.global ram_unknown86
+
+.set ram_unknown55,0xf0e
+.global ram_unknown55
+
+.set ram_unknown49,0xf10
+.global ram_unknown49
+
+.set ram_unknown79,0xf12
+.global ram_unknown79
+
+.set ram_unknown94,0xf7c
+.global ram_unknown94
+
+.set ram_unknown67,0xf7e
+.global ram_unknown67
+
+.set ram_unknown73,0xfa0
+.global ram_unknown73
+
+.set ram_unknown63,0xfb8
+.global ram_unknown63
+
+.set ram_unknown61,0xfba
+.global ram_unknown61
+
+.set ram_unknown66,0xfe8
+.global ram_unknown66
+
+.set ram_unknown68,0xfea
+.global ram_unknown68
+
+.set ram_unknown59,0xfec
+.global ram_unknown59
 
 /* Saved copy of SR register */
 .set saved_sr_register,0xffa
