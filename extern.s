@@ -344,6 +344,9 @@ struct _pbdef
 .set ram_unknown67,0xf7e
 .global ram_unknown67
 
+.set ram_unknown94,0xf80
+.global ram_unknown94
+
 .set ram_unknown73,0xfa0
 .global ram_unknown73
 
@@ -352,6 +355,9 @@ struct _pbdef
 
 .set ram_unknown61,0xfba
 .global ram_unknown61
+
+.set ram_unknown95,0xfc8
+.global ram_unknown95
 
 .set ram_unknown66,0xfe8
 .global ram_unknown66
