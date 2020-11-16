@@ -266,17 +266,68 @@ etv_term:
 .set ram_unknown51,0xeb4
 .global ram_unknown51
 
+.set ram_unknown127,0xeb6
+.global ram_unknown127
+
 .set prtbbval,0xeb8
 .global prtbbval
+
+.set ram_unknown109,0xeba
+.global ram_unknown109
 
 .set ram_unknown80,0xebc
 .global ram_unknown80
 
+.set ram_unknown123,0xebe
+.global ram_unknown123
+
+.set ram_unknown114,0xed0
+.global ram_unknown114
+
+.set ram_unknown118,0xed2
+.global ram_unknown118
+
+.set ram_unknown103,0xed6
+.global ram_unknown103
+
+.set ram_unknown106,0xed8
+.global ram_unknown106
+
+.set ram_unknown117,0xedc
+.global ram_unknown117
+
+.set ram_unknown101,0xeca
+.global ram_unknown101
+
+.set ram_unknown104,0xece
+.global ram_unknown104
+
+.set ram_unknown120,0xee0
+.global ram_unknown120
+
+.set ram_unknown116,0xee2
+.global ram_unknown116
+
 .set prtbgval,0xee6
 .global prtbgval
 
+.set ram_unknown112,0xee8
+.global ram_unknown112
+
+.set ram_unknown119,0xeec
+.global ram_unknown119
+
+.set ram_unknown110,0xeee
+.global ram_unknown110
+
 .set ram_unknown87,0xef0
 .global ram_unknown87
+
+.set ram_unknown126,0xef2
+.global ram_unknown126
+
+.set ram_unknown113,0xef4
+.global ram_unknown113
 
 .set prtbrval,0xef6
 .global prtbrval
@@ -316,6 +367,9 @@ struct _pbdef
 .set ram_unknown50,0xf00
 .global ram_unknown50
 
+.set ram_unknown100,0xf02
+.global ram_unknown100
+
 .set ram_unknown74,0xf04
 .global ram_unknown74
 
@@ -338,6 +392,18 @@ struct _pbdef
 .set ram_unknown79,0xf12
 .global ram_unknown79
 
+.set ram_unknown105,0xf56
+.global ram_unknown105
+
+.set ram_unknown96,0xf58
+.global ram_unknown96
+
+.set ram_unknown99,0xf78
+.global ram_unknown99
+
+.set ram_unknown107,0xf7a
+.global ram_unknown107
+
 .set prtbtcol,0xf7c
 .global prtbtcol
 
@@ -350,11 +416,38 @@ struct _pbdef
 .set ram_unknown73,0xfa0
 .global ram_unknown73
 
+.set ram_unknown122,0xfa2
+.global ram_unknown122
+
+.set ram_unknown111,0xfae
+.global ram_unknown111
+
+.set ram_unknown124,0xfb0
+.global ram_unknown124
+
 .set ram_unknown63,0xfb8
 .global ram_unknown63
 
 .set ram_unknown61,0xfba
 .global ram_unknown61
+
+.set ram_unknown125,0xfbc
+.global ram_unknown125
+
+.set ram_unknown98,0xfbe
+.global ram_unknown98
+
+.set ram_unknown102,0xfc0
+.global ram_unknown102
+
+.set ram_unknown121,0xfc2
+.global ram_unknown121
+
+.set ram_unknown97,0xfc4
+.global ram_unknown97
+
+.set ram_unknown115,0xfc6
+.global ram_unknown115
 
 .set ram_unknown95,0xfc8
 .global ram_unknown95
@@ -367,6 +460,9 @@ struct _pbdef
 
 .set ram_unknown59,0xfec
 .global ram_unknown59
+
+.set ram_unknown108,0xfee
+.global ram_unknown108
 
 /* Saved copy of SR register */
 .set saved_sr_register,0xffa
