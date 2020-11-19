@@ -438,7 +438,7 @@ trap14_vectors:
 	.long dummy_subroutine
 	.long dummy_subroutine
 	.long dummy_subroutine
-	.long 0x00fc0e9e                        /* int16_t Blitmode(int16_t mode);  */
+	.long blitmode                          /* int16_t Blitmode(int16_t mode);  */
 /* end of vectors */
 
 addr_950:
@@ -483,7 +483,7 @@ bios_vectors:
 .global bios_vectors
     /* xconstat */
 	.long dummy_subroutine
-	.long 0x00fc33a6
+	.long addr_33a6
 	.long 0x00fc3494
 	.long 0x00fc32a6
 	.long dummy_subroutine
@@ -1115,6 +1115,9 @@ addr_e96:
 
 addr_e9c:
     bras addr_e96
+
+addr_e9e:
+blitmode:
     bsrs blittest
     movew %d0,%d4
     movew %d0,%d5
@@ -2024,19 +2027,17 @@ wrfdcd7:
 addr_1626:
 rdfdcd0:
 .global rdfdcd0
-	.short 0x6106
-	.short 0x3039
-	.short 0xffff
-	.short 0x8604
-	.short 0x40e7
-	.short 0x3f07
-	.short 0x3e3c
-	.short 0x0020
-	.short 0x51cf
-	.short 0xfffe
-	.short 0x3e1f
-	.short 0x46df
-	rts
+    bsrb addr_162e
+    movew dma_data_register,%d0
+addr_162e:
+    movew %sr,%sp@-
+    movew %d7,%sp@-
+    movew #32,%d7
+addr_1636:
+    dbf %d7,addr_1636
+    movew %sp@+,%d7
+    movew %sp@+,%sr
+    rts
 
 /* test for disk change */
 addr_1640:
@@ -5062,18 +5063,18 @@ addr_3392:
 	.short 0x6702
 	.short 0x7000
 	rts
-	.short 0x41f9
-	.short 0x0000
-	.short 0x0c70
-	.short 0x70ff
-	.short 0x43e8
-	.short 0x0006
-	.short 0x41e8
-	.short 0x0008
-	.short 0xb348
-	.short 0x6602
-	.short 0x7000
-	rts
+
+addr_33a6:
+    lea rs232iorec,%a0
+    moveq #-1,%d0
+    lea %a0@(6),%a1
+    lea %a0@(8),%a0
+    cmpmw %a0@+,%a1@+
+    bnes addr_33bc
+    moveq #0,%d0
+addr_33bc:
+    rts
+
 	.short 0x41f9
 /* 0x0033c0: */
 	.short 0x0000
