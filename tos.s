@@ -500,8 +500,8 @@ bios_vectors:
 	.long dummy_subroutine
 	.long dummy_subroutine
     /* xcostat */
-	.long 0x00fc3392
-	.long 0x00fc3408
+	.long addr_3392
+	.long addr_3408
 	.long 0x00fc34e0
 	.long 0x00fc344a
 	.long 0x00fc326a
@@ -5045,16 +5045,14 @@ addr_3384:
 
 addr_3392:
 .global addr_3392
-	.short 0x41f9
-	.short 0xffff
-	.short 0xfa01
-	.short 0x70ff
-	.short 0x0828
-	.short 0x0000
-	.short 0x0000
-	.short 0x6702
-	.short 0x7000
-	rts
+    lea mfp_pp,%a0
+    moveq #-1,%d0
+    .short 0x0828                           /* btst #0,%a0@(0) */
+    .long 0
+    beqs addr_33a4
+    moveq #0,%d0
+addr_33a4:
+    rts
 
 addr_33a6:
     lea rs232iorec,%a0
@@ -5096,29 +5094,21 @@ addr_3404:
 
 addr_3408:
 .global addr_3408
-	.short 0x41f9
-	.short 0x0000
-	.short 0x0c7e
-	.short 0x3228
-	.short 0x0008
-	.short 0x6100
-	.short 0x05de
-	.short 0x70ff
-	.short 0xb268
-	.short 0x0006
-	.short 0x6602
-	.short 0x7000
-	rts
+    lea ram_unknown134,%a0
+    movew %a0@(8),%d1
+    bsrw addr_39f2
+    moveq #-1,%d0
+    cmpw %a0@(6),%d1
+    bnes addr_3420
+    moveq #0,%d0
+addr_3420:
+    rts
 
 addr_3422:
 .global addr_3422
-	.short 0x302f
-	.short 0x0006
-	.short 0x41f9
-	.short 0x0000
-	.short 0x0c7e
-	.short 0x6100
-	.short 0x0546
+    movew %sp@(6),%d0
+    lea ram_unknown134,%a0
+    bsrw addr_3974
 
 addr_3430:    
 	.short 0x45f9
@@ -5822,23 +5812,18 @@ addr_37e2:
 	.short 0x002e
 	rts
 
-	.short 0x3228
-	.short 0x0008
-	.short 0x6178
-	.short 0xb268
-	.short 0x0006
-	.short 0x67fa
-/* 0x003980: */
-	.short 0x2268
-	.short 0x0000
-	.short 0xc2bc
-	.short 0x0000
-	.short 0xffff
-	.short 0x1380
-	.short 0x1800
-	.short 0x3141
-	.short 0x0008
-	rts
+addr_3974:
+    movew %a0@(8),%d1
+    bsrb addr_39f2
+addr_397a:
+    cmpw %a0@(6),%d1
+    beqs addr_397a
+    .short 0x2268,0                         /* moveal %a0@(0),%a1 */
+    .short 0xc2bc                           /* andl #65535,%d1 */
+    .long 0xffff
+    moveb %d0,%a1@(0,%d1:l)
+    movew %d1,%a0@(8)
+    rts
 
 addr_3994:
 	.short 0x3228
@@ -5891,12 +5876,14 @@ addr_39b6:
 	.short 0x0002
 	.short 0x46df
 	rts
-	.short 0x5241
-	.short 0xb268
-	.short 0x0004
-	.short 0x6502
-	.short 0x7200
-	rts
+
+addr_39f2:
+    addqw #1,%d1
+    cmpw %a0@(4),%d1
+    bcss addr_39fc
+    moveq #0,%d1
+addr_39fc:
+    rts
 
 /* Obtain address of the input/ output buffer of a serial device. */
 addr_39fe:
