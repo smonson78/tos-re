@@ -240,6 +240,9 @@ etv_term:
 .set ram_unknown132,0xc92
 .global ram_unknown132
 
+.set ram_unknown133,0xda0
+.global ram_unknown133
+
 .set ram_unknown30,0xe2e
 .global ram_unknown30
 
@@ -1040,6 +1043,9 @@ cart_boot:
 .set mfp_timerbc,0xfffffa1a
 .set mfp_timerb,0xfffffa20
 
+.set midi_acia_control,0xfffffc04           /* -1020 */
+.set midi_acia_data,0xfffffc06
+
 .global memctrl
 .global video_baseh
 .global video_basem
@@ -1057,6 +1063,8 @@ cart_boot:
 .global mfp_pp
 .global mfp_timerbc
 .global mfp_timerb
+.global midi_acia_control
+.global midi_acia_data
 
 .set STACK_SIZE,448
 .set uda_size,74+(4*STACK_SIZE)

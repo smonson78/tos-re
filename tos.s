@@ -485,16 +485,16 @@ bios_vectors:
 	.long dummy_subroutine
 	.long addr_33a6
 	.long addr_3494
-	.long 0x00fc32a6
+	.long addr_32a6
 	.long dummy_subroutine
 	.long dummy_subroutine
 	.long dummy_subroutine
 	.long dummy_subroutine
     /* xconin */
-	.long 0x00fc3372
-	.long 0x00fc33be
-	.long 0x00fc34aa
-	.long 0x00fc32c0
+	.long addr_3372
+	.long addr_33be
+	.long addr_34aa
+	.long addr_32c0
 	.long dummy_subroutine
 	.long dummy_subroutine
 	.long dummy_subroutine
@@ -4925,47 +4925,40 @@ midiws:
 	.short 0xfffa
 	rts
 
-	.short 0x41ed
-	.short 0x0da0
-	.short 0x43ed
-	.short 0xfc04
-	.short 0x70ff
-	.short 0x45e8
-	.short 0x0006
-	.short 0x47e8
-	.short 0x0008
-	.short 0xb54b
-	.short 0x6602
-	.short 0x7000
-	rts
-/* 0x0032c0: */
-	.short 0x61e4
-	.short 0x4a40
-	.short 0x67fa
-	.short 0x40e7
-	.short 0x007c
-	.short 0x0700
-	.short 0x3228
-	.short 0x0006
-	.short 0xb268
-	.short 0x0008
-	.short 0x671c
-	.short 0x5241
-	.short 0xb268
-	.short 0x0004
-	.short 0x6502
-	.short 0x7200
-	.short 0x2268
-	.short 0x0000
-	.short 0xc2bc
-	.short 0x0000
-	.short 0xffff
-	.short 0x1031
-	.short 0x1800
-	.short 0x3141
-	.short 0x0006
-	.short 0x46df
-	rts
+addr_32a6:
+    lea %a5@(ram_unknown133),%a0
+    lea %a5@(midi_acia_control),%a1
+    moveq #-1,%d0
+    lea %a0@(6),%a2
+    lea %a0@(8),%a3
+    cmpmw %a3@+,%a2@+
+    bnes addr_32be
+    moveq #0,%d0
+addr_32be:
+    rts
+
+addr_32c0:
+    bsrb addr_32a6
+    tstw %d0
+    beqs addr_32c0
+    movew %sr,%sp@-
+    oriw #1792,%sr
+    movew %a0@(6),%d1
+    cmpw %a0@(8),%d1
+    beqs addr_32f2
+    addqw #1,%d1
+    cmpw %a0@(4),%d1
+    bcss addr_32e0
+    moveq #0,%d1
+addr_32e0:
+    .short 0x2268,0                         /* moveal %a0@(0),%a1 */
+    .short 0xc2bc                           /* andl #0xffff,%d1 */
+    .long 0xffff
+    moveb %a1@(0,%d1:l),%d0
+    movew %d1,%a0@(6)
+addr_32f2:
+    movew %sp@+,%sr
+    rts
 
 addr_32f6:
 .global addr_32f6
@@ -5027,29 +5020,28 @@ addr_32f6:
 	.short 0x46df
 	.short 0x70ff
 	rts
-	.short 0x7420
-	.short 0x6000
-	.short 0x0cf8
-	.short 0x74df
-	.short 0x6000
-	.short 0x0d18
-	.short 0x7207
-	.short 0x6100
-	.short 0x0cb6
-	.short 0x0200
-	.short 0x007f
-	.short 0x7287
-	.short 0x6100
-/* 0x003380: */
-	.short 0x0cac
-	.short 0x61e2
-	.short 0x610c
-	.short 0x4a40
-	.short 0x66fa
-	.short 0x61e0
-	.short 0x720f
-	.short 0x6000
-	.short 0x0c9c
+
+addr_3366:
+    moveq #32,%d2
+    braw addr_4062
+addr_336c:	
+    moveq #-33,%d2
+    braw addr_4088
+
+addr_3372:
+    moveq #7,%d1
+    bsrw addr_402c
+    andib #127,%d0
+    moveq #-121,%d1
+    bsrw addr_402c
+    bsrb addr_3366
+addr_3384:
+    bsrb addr_3392
+    tstw %d0
+    bnes addr_3384
+    bsrb addr_336c
+    moveq #15,%d1
+    braw addr_402c
 
 addr_3392:
 .global addr_3392
@@ -5075,45 +5067,32 @@ addr_33a6:
 addr_33bc:
     rts
 
-	.short 0x41f9
-/* 0x0033c0: */
-	.short 0x0000
-	.short 0x0c70
-	.short 0x6100
-	.short 0x05ce
-	.short 0x3f00
-	.short 0x4a28
-	.short 0x0020
-	.short 0x6734
-	.short 0x3028
-	.short 0x0008
-	.short 0x9068
-	.short 0x0006
-	.short 0x6a04
-	.short 0xd068
-	.short 0x0004
-	.short 0xb068
-	.short 0x000a
-	.short 0x6e20
-	.short 0x4a28
-	.short 0x001e
-	.short 0x671a
-	.short 0x4228
-	.short 0x001e
-	.short 0x0828
-	.short 0x0000
-	.short 0x0020
-	.short 0x6606
-	.short 0x6100
-	.short 0x05be
-	.short 0x6008
-	.short 0x117c
-	.short 0x0011
-/* 0x003400: */
-	.short 0x0021
-	.short 0x612c
-	.short 0x301f
-	rts
+addr_33be:
+    lea rs232iorec,%a0
+    bsrw addr_3994
+    movew %d0,%sp@-
+    tstb %a0@(32)
+    beqs addr_3404
+    movew %a0@(8),%d0
+    subw %a0@(6),%d0
+    bpls addr_33de
+    addw %a0@(4),%d0
+addr_33de:
+    cmpw %a0@(10),%d0
+    bgts addr_3404
+    tstb %a0@(30)
+    beqs addr_3404
+    clrb %a0@(30)
+    btst #0,%a0@(32)
+    bnes addr_33fc
+    bsrw addr_39b6
+    bras addr_3404
+addr_33fc:
+    moveb #17,%a0@(33)
+    bsrb addr_3430
+addr_3404:
+    movew %sp@+,%d0
+    rts
 
 addr_3408:
 .global addr_3408
@@ -5140,6 +5119,8 @@ addr_3422:
 	.short 0x0c7e
 	.short 0x6100
 	.short 0x0546
+
+addr_3430:    
 	.short 0x45f9
 	.short 0xffff
 	.short 0xfa01
@@ -5858,6 +5839,8 @@ addr_37e2:
 	.short 0x3141
 	.short 0x0008
 	rts
+
+addr_3994:
 	.short 0x3228
 	.short 0x0006
 	.short 0xb268
@@ -5875,6 +5858,8 @@ addr_37e2:
 	.short 0x3141
 	.short 0x0006
 	rts
+
+addr_39b6:
 	.short 0x43f9
 	.short 0xffff
 	.short 0x8800
@@ -6724,6 +6709,7 @@ addr_405c:
 ongibit:
     moveq #0,%d2
     movew %sp@(4),%d2
+addr_4062:
     moveml %d0-%d2,%sp@-
     movew %sr,%sp@-
     oriw #0x700,%sr

@@ -23,3 +23,7 @@ e.g. jump/subroutine target 0xfcb5aa isn't disassembled.
 a patch made manually:
 fcb5aa:	33c0 0000 2b86 	movew %d0,0x2b86
 fcb5b0:	2079 0000 2b82 	moveal 0x2b82,%a0
+
+
+~/dev/decompiler2020/decompiler2/disassembler/dasm -s -e 3372 -f 3392  -b fc0000 -n extern.s ~/dev/tos-re/tos104uk.img \
+  | ~/dev/decompiler2020/decompiler2/assisted-disassembler/add_labels.py /dev/stdin | sed -e "s/0xfc\([0-9a-f]\{4\}\)/addr_\1/g"
