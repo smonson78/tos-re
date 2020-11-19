@@ -484,7 +484,7 @@ bios_vectors:
     /* xconstat */
 	.long dummy_subroutine
 	.long addr_33a6
-	.long 0x00fc3494
+	.long addr_3494
 	.long 0x00fc32a6
 	.long dummy_subroutine
 	.long dummy_subroutine
@@ -5198,45 +5198,41 @@ addr_348a:
 	.short 0x51cb
 	.short 0xfffa
 	rts
-	.short 0x41ed
-	.short 0x0c92
-	.short 0x70ff
-	.short 0x45e8
-	.short 0x0006
-	.short 0x47e8
-	.short 0x0008
-	.short 0xb54b
-	.short 0x6602
-	.short 0x7000
-	rts
-	.short 0x61e8
-	.short 0x4a40
-	.short 0x67fa
-	.short 0x40e7
-	.short 0x007c
-	.short 0x0700
-	.short 0x3228
-	.short 0x0006
-	.short 0xb268
-	.short 0x0008
-	.short 0x671c
-/* 0x0034c0: */
-	.short 0x5841
-	.short 0xb268
-	.short 0x0004
-	.short 0x6502
-	.short 0x7200
-	.short 0x2268
-	.short 0x0000
-	.short 0xc2bc
-	.short 0x0000
-	.short 0xffff
-	.short 0x2031
-	.short 0x1800
-	.short 0x3141
-	.short 0x0006
-	.short 0x46df
-	rts
+
+addr_3494:
+    lea %a5@(ram_unknown132),%a0
+    moveq #-1,%d0
+    lea %a0@(6),%a2
+    lea %a0@(8),%a3
+    cmpmw %a3@+,%a2@+
+    bnes addr_34a8
+    moveq #0,%d0
+addr_34a8:
+    rts
+
+addr_34aa:
+    bsrb addr_3494
+    tstw %d0
+    beqs addr_34aa
+    movew %sr,%sp@-
+    oriw #1792,%sr
+    movew %a0@(6),%d1
+    cmpw %a0@(8),%d1
+    beqs addr_34dc
+    addqw #4,%d1
+    cmpw %a0@(4),%d1
+    bcss addr_34ca
+    moveq #0,%d1
+addr_34ca:
+    .short 0x2268,0                         /* moveal %a0@(0),%a1 */
+    .short 0xc2bc                           /* andl #0xffff,%d1 */
+    .long 0xffff
+    movel %a1@(0,%d1:l),%d0
+    movew %d1,%a0@(6)
+addr_34dc:
+    movew %sp@+,%sr
+    rts
+
 	.short 0x70ff
 	rts
 	.short 0x082d

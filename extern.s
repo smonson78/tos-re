@@ -237,6 +237,9 @@ etv_term:
 .set rs232iorec,0xc70
 .global rs232iorec
 
+.set ram_unknown132,0xc92
+.global ram_unknown132
+
 .set ram_unknown30,0xe2e
 .global ram_unknown30
 
