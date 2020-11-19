@@ -88,6 +88,7 @@ etv_term:
 .set hdv_boot,0x47a                         /* Hard disk boot vector. 0 = no hard disk */
 .set hdv_mediach,0x47e                      /* Vector for Mediach() */
 .set _cmdload,0x482                         /* If non-zero, load COMMAND.PRG instead of desktop at boot */
+.set conterm,0x484                          /* Key repeat, click, etc */
 .set themd,0x48e                            /* This is the Memory Descriptor structure initialized by the BIOS */
 .set savptr,0x4a2                           /* Pointer to buffer used by TOS for saving registers */
 .set con_state,0x4a8                        /* Vector to internal console output routines */
@@ -136,6 +137,7 @@ etv_term:
 .global _vbclock
 .global _frlock
 .global _cmdload
+.global conterm
 .global themd
 .global savptr
 .global con_state
@@ -239,6 +241,9 @@ etv_term:
 
 .set ram_unknown134,0xc7e
 .global ram_unknown134
+
+.set ram_unknown135,0xc8d
+.global ram_unknown135
 
 .set ram_unknown132,0xc92
 .global ram_unknown132
@@ -1046,6 +1051,8 @@ cart_boot:
 .set mfp_timerbc,0xfffffa1a
 .set mfp_timerb,0xfffffa20
 
+.set kbd_acia_control,0xfffffc00
+.set kbd_acia_data,0xfffffc02
 .set midi_acia_control,0xfffffc04           /* -1020 */
 .set midi_acia_data,0xfffffc06
 
@@ -1066,6 +1073,8 @@ cart_boot:
 .global mfp_pp
 .global mfp_timerbc
 .global mfp_timerb
+.global kbd_acia_control
+.global kbd_acia_data
 .global midi_acia_control
 .global midi_acia_data
 

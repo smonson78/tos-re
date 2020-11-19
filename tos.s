@@ -502,8 +502,8 @@ bios_vectors:
     /* xcostat */
 	.long addr_3392
 	.long addr_3408
-	.long 0x00fc34e0
-	.long 0x00fc344a
+	.long addr_34e0
+	.long addr_344a
 	.long 0x00fc326a
 	.long dummy_subroutine
 	.long dummy_subroutine
@@ -5110,65 +5110,53 @@ addr_3422:
     lea ram_unknown134,%a0
     bsrw addr_3974
 
-addr_3430:    
-	.short 0x45f9
-	.short 0xffff
-	.short 0xfa01
-	.short 0x4a2a
-	.short 0x002c
-	.short 0x6a0c
-	.short 0x40e7
-	.short 0x007c
-/* 0x003440: */
-	.short 0x0700
-	.short 0x6100
-	.short 0x04ee
-	.short 0x46df
-	rts
-	.short 0x70ff
-	.short 0x1439
-	.short 0xffff
-	.short 0xfc00
-	.short 0x0802
-	.short 0x0001
-	.short 0x6602
-	.short 0x7000
-	rts
-	.short 0x322f
-	.short 0x0006
+addr_3430:
+    lea mfp_pp,%a2
+    tstb %a2@(44)
+    bpls addr_3448
+    movew %sr,%sp@-
+    oriw #1792,%sr
+    bsrw addr_3932
+    movew %sp@+,%sr
+addr_3448:
+    rts
 
+addr_344a:
+    moveq #-1,%d0
+    moveb kbd_acia_control,%d2
+    btst #1,%d2
+    bnes addr_345a
+    moveq #0,%d0
+addr_345a:
+    rts
+    
+addr_345c:
+    movew %sp@(6),%d1
 addr_3460:
-	.short 0x43f9
-	.short 0xffff
-	.short 0xfc00
-	.short 0x1429
-	.short 0x0000
-	.short 0x0802
-	.short 0x0001
-	.short 0x67f6
-	.short 0x343c
-	.short 0x03b6
-	.short 0x6108
-	.short 0x51ca
-	.short 0xfffc
-	.short 0x1341
-	.short 0x0002
-	rts
+    lea kbd_acia_control,%a1
+addr_3466:
+    .short 0x1429,0                         /* moveb %a1@(0),%d2 */
+    btst #1,%d2
+    beqs addr_3466
+    movew #950,%d2
+addr_3474:
+    bsrb addr_347e
+    dbf %d2,addr_3474
+    moveb %d1,%a1@(2)
+addr_347e:
+    rts
 
 addr_3480:
 ikbdws:
 .global ikbdws
-	.short 0x7600
-	.short 0x362f
-	.short 0x0004
-	.short 0x246f
-	.short 0x0006
+    moveq #0,%d3
+    movew %sp@(4),%d3
+    moveal %sp@(6),%a2
 addr_348a:
-    .short 0x121a
-	.short 0x61d2
-	.short 0x51cb
-	.short 0xfffa
-	rts
+    moveb %a2@+,%d1
+    bsrb addr_3460
+    dbf %d3,addr_348a
+    rts
 
 addr_3494:
     lea %a5@(ram_unknown132),%a0
@@ -5204,20 +5192,18 @@ addr_34dc:
     movew %sp@+,%sr
     rts
 
-	.short 0x70ff
+addr_34e0:
+	moveq #-1,%d0
 	rts
-	.short 0x082d
-	.short 0x0002
-	.short 0x0484
-	.short 0x670e
-	.short 0x2b7c
-	.short 0x00fe
-	.short 0x841c
-	.short 0x0ea6
-	.short 0x1b7c
-	.short 0x0000
-	.short 0x0eaa
-	rts
+
+addr_34e4:
+    btst #2,%a5@(conterm)
+    beqs addr_34fa
+    movel #addr_2841c,%a5@(ram_unknown19)
+    moveb #0,%a5@(ram_unknown22)
+addr_34fa:
+    rts
+
 addr_34fc:
 .global addr_34fc
 	.short 0x41f9
@@ -5761,6 +5747,7 @@ addr_37e2:
 	.short 0x002e
 	.short 0x08a8
 	.short 0x0003
+
 	.short 0x000e
 	.short 0x4cdf
 	.short 0x0101
@@ -5769,6 +5756,7 @@ addr_37e2:
 	.short 0x41f9
 	.short 0xffff
 	.short 0xfa01
+
 	.short 0x13e8
 	.short 0x002c
 	.short 0x0000
@@ -5777,40 +5765,30 @@ addr_37e2:
 	.short 0x0001
 	.short 0x000e
 	.short 0x205f
-	.short 0x4e73
-	.short 0x41f9
-	.short 0x0000
-	.short 0x0c70
-	.short 0x1028
-	.short 0x0020
-	.short 0xc028
-	.short 0x001f
-	.short 0x6630
-	.short 0x1028
-	.short 0x0021
-	.short 0x6706
-	.short 0x4228
-	.short 0x0021
-	.short 0x6012
-	.short 0x41f9
-	.short 0x0000
-	.short 0x0c7e
-	.short 0x3028
-	.short 0x0006
-	.short 0xb068
-	.short 0x0008
-	.short 0x6714
-	.short 0x6134
-	.short 0x4a2a
-	.short 0x002c
-	.short 0x6afa
-	.short 0x13ea
-	.short 0x002c
-	.short 0x0000
-	.short 0x0c8d
-	.short 0x1540
-	.short 0x002e
-	rts
+	rte
+
+addr_3932:
+    lea rs232iorec,%a0
+    moveb %a0@(32),%d0
+    andb %a0@(31),%d0
+    bnes addr_3972
+    moveb %a0@(33),%d0
+    beqs addr_394e
+    clrb %a0@(33)
+    bras addr_3960
+addr_394e:
+    lea ram_unknown134,%a0
+    movew %a0@(6),%d0
+    cmpw %a0@(8),%d0
+    beqs addr_3972
+    bsrb addr_3994
+addr_3960:
+    tstb %a2@(44)
+    bpls addr_3960
+    moveb %a2@(44),ram_unknown135
+    moveb %d0,%a2@(46)
+addr_3972:
+    rts
 
 addr_3974:
     movew %a0@(8),%d1
@@ -81968,13 +81946,16 @@ addr_2839c:
 	.short 0x3233
 	.short 0x302e
 	.short 0x0d00
+
 	.short 0x0000
 	.short 0x0000
 	.short 0x0000
 	.short 0x0000
 	.short 0x0000
 	.short 0x0000
-	.short 0x0034
+	
+addr_2841c:    
+    .short 0x0034
 	.short 0x0100
 	.short 0x0200
 	.short 0x0300
