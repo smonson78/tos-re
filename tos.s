@@ -411,11 +411,11 @@ trap14_vectors:
 	.long kbdvbase                          /* 34 - KBDVBASE *Kbdvbase(); */
 	.long kbrate                            /* 35 - int16_t Kbrate(int16_t initial, int16_t repeat); */
 	.long prtblk                            /* 36 - int16_t Prtblk(PBDEF *par); */
-	.long 0x00fc07a2                        /* 37 - void Vsync(); */
-	.long 0x00fc0950                        /* 38 - int32_t Supexec(int32_t (*func)()); */
-	.long 0x00fc0af0                        /* 39 - void Puntaes(); */
+	.long vsync                             /* 37 - void Vsync(); */
+	.long supexec                           /* 38 - int32_t Supexec(int32_t (*func)()); */
+	.long puntaes                           /* 39 - void Puntaes(); */
 	.long dummy_subroutine
-	.long 0x00fc1692                        /* 41 - int16_t Floprate(int16_t devno, int16_t newrate); */
+	.long floprate                          /* 41 - int16_t Floprate(int16_t devno, int16_t newrate); */
 	.long dummy_subroutine                  /* 42 - int16_t DMAread(int32_t sector, int16_t count, void *buffer, int16_t devno); */
 	.long dummy_subroutine                  /* 43 - int16_t DMAwrite(int32_t sector, int16_t count, void *buffer, int16_t devno); */
 	.long dummy_subroutine                  /* 44 - int32_t Bconmap(int16_t devno); */
@@ -441,9 +441,10 @@ trap14_vectors:
 	.long 0x00fc0e9e                        /* int16_t Blitmode(int16_t mode);  */
 /* end of vectors */
 
-	.short 0x206f
-	.short 0x0004
-	.short 0x4ed0
+addr_950:
+supexec:
+    moveal %sp@(4),%a0
+    jmp %a0@
 
 addr_956:
 Bconstat:
@@ -647,6 +648,7 @@ addr_aee:
 	rts
 
 addr_af0:
+puntaes:
     moveal %pc@(os_magic),%a0
     cmpil #0x87654321,%a0@
     bnes addr_b08
@@ -2077,35 +2079,27 @@ fdchange:
 
 addr_1682:
 setdchg:
-	.short 0x41ed
-	.short 0x0ecc
-	.short 0x1f00
-	.short 0x302d
-	.short 0x0a08
-	.short 0x119f
-	.short 0x0000
+    lea %a5@(ram_unknown131),%a0
+    moveb %d0,%sp@-
+    movew %a5@(ram_unknown130),%d0
+    moveb %sp@+,%a0@(0,%d0:w)
 	rts
 
-	.short 0x41f9
-	.short 0x0000
-	.short 0x0a4c
-	.short 0x4a6f
-	.short 0x0004
-	.short 0x6706
-	.short 0x41f9
-	.short 0x0000
-	.short 0x0a50
-	.short 0x3028
-	.short 0x0002
-	.short 0x322f
-	.short 0x0006
-	.short 0xb27c
-	.short 0xffff
-	.short 0x6704
-	.short 0x3141
-	.short 0x0002
-	.short 0x48c0
-	rts
+addr_1692:
+floprate:
+    lea ram_unknown128,%a0
+    tstw %sp@(4)
+    beqs addr_16a4
+    lea ram_unknown129,%a0
+addr_16a4:
+    movew %a0@(2),%d0
+    movew %sp@(6),%d1
+    .short 0xb27c,-1                        /* cmpw #-1,%d1 */
+    beqs addr_16b6
+    movew %d1,%a0@(2)
+addr_16b6:
+    extl %d0
+    rts
 
 addr_16ba:
 .global addr_16ba

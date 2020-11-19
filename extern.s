@@ -195,6 +195,9 @@ etv_term:
 .set fd_side,0xa0e
 .global fd_side
 
+.set ram_unknown130,0xa08
+.global ram_unknown130
+
 .set fd_scount,0xa10
 .global fd_scount
 
@@ -221,6 +224,12 @@ etv_term:
 
 .set fd_curerr,0xa26
 .global fd_curerr
+
+.set ram_unknown128,0xa4c
+.global ram_unknown128
+
+.set ram_unknown129,0xa50
+.global ram_unknown129
 
 .set baudrate,0xa6e
 .global baudrate
@@ -280,6 +289,9 @@ etv_term:
 
 .set ram_unknown123,0xebe
 .global ram_unknown123
+
+.set ram_unknown131,0xecc
+.global ram_unknown131
 
 .set ram_unknown114,0xed0
 .global ram_unknown114
