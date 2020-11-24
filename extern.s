@@ -273,6 +273,9 @@ etv_term:
 .set ram_unknown31,0xe9e
 .global ram_unknown31
 
+.set ram_unknown136,0xea0
+.global ram_unknown136
+
 .set ram_unknown19,0xea6
 .global ram_unknown19
 

@@ -292,7 +292,7 @@ addr_7ae:
     movew %sp@+,%sr                         /* Restore sr */
 	rts
 
-/* What are these? */
+/* What are these? "movel etv_critic,%sp@-" */
 addr_7ba:
 	.short 0x2f39
 	.short 0x0000
@@ -509,9 +509,9 @@ bios_vectors:
 	.long dummy_subroutine
 	.long dummy_subroutine
     /* xconout */
-	.long 0x00fc32f6
-	.long 0x00fc3422
-	.long 0x00fca30a
+	.long addr_32f6
+	.long addr_3422
+	.long addr_a30a
 	.long 0x00fc327a
 	.long 0x00fc345c
 	.long 0x00fca2fe
@@ -4962,64 +4962,45 @@ addr_32f2:
 
 addr_32f6:
 .global addr_32f6
-	.short 0x082d
-	.short 0x0004
-	.short 0x0eac
-	.short 0x6600
-	.short 0x0124
-/* 0x003300: */
-	.short 0x242d
-	.short 0x04ba
-	.short 0x94ad
-	.short 0x0ea0
-	.short 0x0c82
-	.short 0x0000
-	.short 0x03e8
-	.short 0x6518
-	.short 0x242d
-	.short 0x04ba
-	.short 0x617c
-	.short 0x4a40
-	.short 0x6618
-	.short 0x262d
-	.short 0x04ba
-	.short 0x9682
-	.short 0x0c83
-	.short 0x0000
-	.short 0x1770
-	.short 0x6dec
-	.short 0x7000
-	.short 0x2b6d
-	.short 0x04ba
-	.short 0x0ea0
-	rts
-	.short 0x40c3
-	.short 0x007c
-	.short 0x0700
-	.short 0x7207
-	.short 0x6100
-	.short 0x0cf0
-	.short 0x0000
-/* 0x003340: */
-	.short 0x0080
-	.short 0x7287
-	.short 0x6100
-	.short 0x0ce6
-	.short 0x46c3
-	.short 0x302f
-	.short 0x0006
-	.short 0x728f
-	.short 0x6100
-	.short 0x0cda
-	.short 0x40e7
-	.short 0x007c
-	.short 0x0700
-	.short 0x6110
-	.short 0x610e
-	.short 0x6106
-	.short 0x46df
-	.short 0x70ff
-	rts
+    btst #4,%a5@(ram_unknown24)
+    bnew addr_3422
+    movel %a5@(_hz_200),%d2
+    subl %a5@(ram_unknown136),%d2
+    cmpil #1000,%d2
+    bcss addr_3328
+    movel %a5@(_hz_200),%d2
+addr_3314:
+    bsrb addr_3392
+    tstw %d0
+    bnes addr_3332
+    movel %a5@(_hz_200),%d3
+    subl %d2,%d3
+    cmpil #6000,%d3
+    blts addr_3314
+addr_3328:
+    moveq #0,%d0
+    movel %a5@(_hz_200),%a5@(ram_unknown136)
+    rts
+addr_3332:
+    movew %sr,%d3
+    oriw #1792,%sr
+    moveq #7,%d1
+    bsrw addr_402c
+    orib #128,%d0
+    moveq #-121,%d1
+    bsrw addr_402c
+    movew %d3,%sr
+    movew %sp@(6),%d0
+    moveq #-113,%d1
+    bsrw addr_402c
+    movew %sr,%sp@-
+    oriw #1792,%sr
+    bsrb addr_336c
+    bsrb addr_336c
+    bsrb addr_3366
+    movew %sp@+,%sr
+    moveq #-1,%d0
+    rts
 
 addr_3366:
     moveq #32,%d2
@@ -19539,80 +19520,77 @@ addr_9eaa:
 	.short 0x00ff
 	.short 0x6000
 	.short 0x0416
-	.short 0x322f
-	.short 0x0006
-	.short 0x49f9
-
-	.short 0x0000
-	.short 0x2ad6
-	.short 0xc27c
-	.short 0x00ff
-	.short 0x2079
-	.short 0x0000
-	.short 0x04a8
-	.short 0x4ed0
+	
+addr_a30a:
+    movew %sp@(6),%d1
+    lea v_stat_0,%a4
+    .short 0xc27c,255                       /* andw #255,%d1 */
+    moveal con_state,%a0
+    jmp %a0@
 
 addr_a320:
 normal_ascii:
-	.short 0xb27c
-	.short 0x0020
-	.short 0x6c00
-	.short 0x03f8
-	.short 0xb23c
-	.short 0x001b
-	.short 0x6606
-	.short 0x41fa
-	.short 0x003c
-	.short 0x6056
-	.short 0x5f41
-	.short 0x6b58
-	.short 0xb27c
-	.short 0x0006
-	.short 0x6e52
-	.short 0xd241
-/* 0x00a340: */
-	.short 0x323b
-	.short 0x1006
-	.short 0x4efb
-	.short 0x1002
-	.short 0x000e
-	.short 0x0186
-	.short 0x0012
-	.short 0x0334
-	.short 0x0334
-	.short 0x0334
-	.short 0x032a
-	.short 0x6000
-	.short 0x918c
-	.short 0x302c
-	.short 0xffea
-	.short 0x0240
-	.short 0xfff8
-	.short 0x5040
-	.short 0x322c
-	.short 0xffec
-	.short 0x6000
-	.short 0x06ba
-	.short 0x41fa
-	.short 0xffb2
-	.short 0x6118
-	.short 0x927c
-	.short 0x0041
-	.short 0x6b18
-	.short 0xb27c
-	.short 0x000c
-	.short 0x6f00
-	.short 0x0084
-/* 0x00a380: */
-	.short 0xb27c
-	.short 0x0018
-	.short 0x666e
-	.short 0x41fa
-	.short 0x000a
-	.short 0x23c8
-	.short 0x0000
-	.short 0x04a8
-	rts
+    .short 0xb27c,32                        /* cmpw #32,%d1 */
+    bgew addr_a71e
+    .short 0xb23c,27                        /* cmpb #27,%d1 */
+    bnes handle_control
+    lea %pc@(addr_a36c),%a0
+    bras load_state
+addr_a334:
+handle_control:
+    subqw #7,%d1
+    bmis addr_a390
+    .short 0xb27c,6                         /* cmpw #6,%d1 */
+    bgts addr_a390
+    addw %d1,%d1
+    movew %pc@(addr_a348, %d1:w),%d1
+    jmp %pc@(addr_a348, %d1:w)
+
+/* These are each relative offsets from ctrl_tbl to a routine to handle a control code: ^G, ^H, ^I, ^J, ^K, ^L, ^M */
+addr_a348:
+ctrl_tbl:
+    .short do_bell - ctrl_tbl
+    .short 0x0186
+    .short do_tab - ctrl_tbl
+    .short 0x0334
+    .short 0x0334
+    .short 0x0334
+    .short 0x032a
+
+do_bell:
+/*
+	From TOS source:
+	#if TOSVERSION == 0x104
+	ringbell  equ $33C4+(BIOSTLEN-BTLEN_US)-(VDITBASE-BIOSTBASE)
+	#endif
+*/
+    .set ringbell,0x918c
+    .short 0x6000,ringbell
+
+do_tab:
+    movew %a4@(-22),%d0
+    andiw #0xfff8,%d0
+    addqw #8,%d0
+    movew %a4@(-20),%d1
+    braw move_cursor
+addr_a36c:
+    lea %pc@(addr_a320),%a0
+    bsrb load_state
+    .short 0x927c,65                        /* subw #65,%d1 */
+    bmis addr_a390
+    .short 0xb27c,12                        /* cmpw #12,%d1 */
+    blew addr_a402
+    .short 0xb27c,24                        /* cmpw #24,%d1 */
+    bnes addr_a3f4
+    lea %pc@(addr_a392),%a0
+addr_a38a:
+load_state:
+    movel %a0,con_state
+addr_a390:
+exit_conout:
+    rts
+
+addr_a392:
 	.short 0x927c
 	.short 0x0020
 	.short 0xb26c
@@ -19663,7 +19641,8 @@ normal_ascii:
 	.short 0x41fa
 	.short 0xff30
 	.short 0x6096
-	.short 0x927c
+addr_a3f4:	
+    .short 0x927c
 	.short 0x0021
 	.short 0x6b90
 	.short 0xb27c
@@ -19671,6 +19650,8 @@ normal_ascii:
 	.short 0x6f0c
 /* 0x00a400: */
 	rts
+
+addr_a402:    
 	.short 0xd241
 	.short 0x323b
 	.short 0x1010
@@ -20064,19 +20045,25 @@ addr_a6e0:
 /* 0x00a700: */
 	.short 0xffee
 	rts
+
 	.short 0x7000
 	.short 0x102c
 	.short 0xffee
 	rts
+
 	.short 0x102f
 	.short 0x0007
+
 	.short 0x1940
 	.short 0x0001
 	rts
+
 	.short 0x7000
 	.short 0x102c
 	.short 0x0001
 	rts
+
+addr_a71e:
 	.short 0x49f9
 	.short 0x0000
 	.short 0x2ad6
@@ -20476,6 +20463,9 @@ addr_a6e0:
 	.short 0xffe8
 	.short 0xd3c2
 	rts
+
+addr_aa24:
+move_cursor:
 	.short 0x526c
 	.short 0xfeac
 	.short 0x0894
@@ -86052,6 +86042,7 @@ f8x8:
 	.short 0x8242
 	.short 0x2842
 	.short 0x9292
+
 	.short 0xc0c6
 	.short 0x0018
 	.short 0x700e
@@ -86060,6 +86051,7 @@ f8x8:
 	.short 0x0000
 	.short 0x1850
 	.short 0x0000
+
 	.short 0x0000
 	.short 0x0024
 	.short 0x6638
