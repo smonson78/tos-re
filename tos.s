@@ -504,7 +504,7 @@ bios_vectors:
 	.long addr_3408
 	.long addr_34e0
 	.long addr_344a
-	.long 0x00fc326a
+	.long addr_326a
 	.long dummy_subroutine
 	.long dummy_subroutine
 	.long dummy_subroutine
@@ -512,9 +512,9 @@ bios_vectors:
 	.long addr_32f6
 	.long addr_3422
 	.long addr_a30a
-	.long 0x00fc327a
-	.long 0x00fc345c
-	.long 0x00fca2fe
+	.long addr_327a
+	.long addr_345c
+	.long addr_a2fe
 	.long dummy_subroutine
 	.long dummy_subroutine
 
@@ -766,60 +766,41 @@ addr_bae:
 	.short 0x5678
 	.short 0x9abc
 	.short 0xdef0
+
 addr_bf4:
 .global addr_bf4
-	.short 0x41fa
-	.short 0xffea
-	.short 0x43fa
-	.short 0xffec
-	.short 0x23df
-	.short 0x0000
-/* 0x000c00: */
-	.short 0x0980
-	.short 0x9bcd
-	.short 0x2b48
-	.short 0x0984
-	.short 0x2b49
-	.short 0x0988
-	.short 0x202d
-	.short 0x04c2
-	.short 0x3239
-	.short 0x0000
-	.short 0x0446
-	.short 0x0300
-	.short 0x6736
-	.short 0x41fa
-	.short 0xf90f
-	.short 0x2f08
-	.short 0x2f08
-	.short 0x2f08
-	.short 0x3f3c
-	.short 0x0005
-	.short 0x3f3c
-	.short 0x004b
-	.short 0x4e41
-	.short 0xdefc
-	.short 0x0010
-	.short 0x2040
-	.short 0x217c
-	.short 0x00fc
-	.short 0x0c58
-	.short 0x0008
-	.short 0x2f0b
-	.short 0x2f00
-/* 0x000c40: */
-	.short 0x2f0b
-	.short 0x3f3c
-	.short 0x0004
-	.short 0x3f3c
-	.short 0x004b
-	.short 0x4e41
-	.short 0xdefc
-	.short 0x0010
-	.short 0x2f39
-	.short 0x0000
-	.short 0x0980
-	rts
+    lea %pc@(addr_10be0),%a0
+    lea %pc@(addr_10be6),%a1
+    movel %sp@+,ram_unknown139
+    subal %a5,%a5
+    movel %a0,%a5@(ram_unknown140)
+    movel %a1,%a5@(ram_unknown141)
+    movel %a5@(_drvbits),%d0
+    movew _bootdev,%d1
+    btst %d1,%d0
+    beqs addr_c50
+    lea %pc@(addr_1052a + 1),%a0
+    movel %a0,%sp@-
+    movel %a0,%sp@-
+    movel %a0,%sp@-
+    movew #5,%sp@-
+    movew #75,%sp@-
+    trap #1
+    addaw #16,%sp
+    moveal %d0,%a0
+    movel #addr_c58,%a0@(8)
+    movel %a3,%sp@-
+    movel %d0,%sp@-
+    movel %a3,%sp@-
+    movew #4,%sp@-
+    movew #75,%sp@-
+    trap #1
+    addaw #16,%sp
+addr_c50:
+    movel ram_unknown139,%sp@-
+    rts
+
+addr_c58:
 	.short 0x42a7
 	.short 0x3f3c
 	.short 0x0020
@@ -4866,6 +4847,7 @@ addr_31d2:
 	.short 0x6100
 	.short 0x0224
 	rts
+
 /* 0x003240: */
 	.short 0x7200
 	.short 0x1200
@@ -4877,6 +4859,7 @@ addr_31d2:
 	.short 0xd041
 	.short 0x1100
 	rts
+
 	.short 0x1018
 	.short 0x1200
 	.short 0xc07c
@@ -4888,6 +4871,8 @@ addr_31d2:
 	.short 0x000a
 	.short 0xd041
 	rts
+
+addr_326a:
 	.short 0x70ff
 	.short 0x142d
 	.short 0xfc04
@@ -4896,6 +4881,8 @@ addr_31d2:
 	.short 0x6602
 	.short 0x7000
 	rts
+
+addr_327a:
 	.short 0x322f
 	.short 0x0006
 	.short 0x43ed
@@ -19513,6 +19500,8 @@ addr_9eaa:
 	.short 0xffe8
 	.short 0x6000
 	.short 0x02e0
+
+addr_a2fe:
 	.short 0x322f
 /* 0x00a300: */
 	.short 0x0006
@@ -19914,6 +19903,8 @@ esc_d:
 	.short 0x3940
 	.short 0xfeac
 	rts
+
+addr_a5ec:
 	.short 0x49f9
 	.short 0x0000
 	.short 0x2ad6
@@ -21712,29 +21703,18 @@ paltab16:
 
 addr_b384:
 dinit_g:
-	.short 0x2f39
-	.short 0x0000
-	.short 0x2a9e
-	.short 0x3f3c
-	.short 0x0100
-	.short 0x3f3c
-	.short 0x0005
-	.short 0x4e4d
-	.short 0x508f
-	.short 0x6100
-	.short 0x0118
-	.short 0x6100
-	.short 0xfe86
-	.short 0x6000
-	.short 0xf24c
-	.short 0x33fc
-	.short 0x0001
-	.short 0x0000
-	.short 0x2908
-	.short 0x7001
-	rts
-
-
+    movel ram_unknown138,%sp@-
+    movew #256,%sp@-
+    movew #5,%sp@-
+    trap #13
+    addql #8,%sp
+    bsrw addr_b4b0
+    bsrw v_clrwk
+    braw addr_a5ec
+    movew #1,ram_unknown137
+    moveq #1,%d0
+    rts
+	
 	.short 0x7203
 	.short 0x40c0
 	.short 0x007c
@@ -21868,6 +21848,8 @@ dinit_g:
 	.short 0x4fef
 	.short 0x000c
 	rts
+
+addr_b4b0:    
 	.short 0x2079
 	.short 0x0000
 	.short 0x0456
@@ -32188,6 +32170,7 @@ text_init:
 	.short 0xffe8
 	.short 0x4a5d
 	.short 0x6720
+
 	.short 0x3a1d
 	.short 0x3c1d
 	.short 0x3e1d
@@ -32196,12 +32179,15 @@ text_init:
 	.short 0x3801
 	.short 0xd843
 	.short 0xb855
+
 	.short 0x6cc0
-	.short 0xb045
+    .short 0xb045
 	.short 0x6dbc
 	.short 0x3802
 	.short 0xe74c
-	.short 0xd840
+	
+addr_1052a:
+    .short 0xd840
 	.short 0xb847
 	.short 0x6cb2
 	.short 0x4bf9
@@ -33083,6 +33069,7 @@ mfree:
 	.short 0x0000
 	.short 0x2ade
 	.short 0x2549
+
 	.short 0x0002
 	.short 0x3545
 	.short 0x0000
@@ -33091,10 +33078,13 @@ mfree:
 	.short 0x0006
 	.short 0x45ea
 	.short 0x0008
+
+addr_10be0:
 	.short 0x2e09
 	.short 0x3205
 	.short 0x6044
-	.short 0x00fd
+addr_10be6:
+    .short 0x00fd
 	.short 0x0c5e
 	.short 0x00fd
 	.short 0x0c68

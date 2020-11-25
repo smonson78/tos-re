@@ -185,6 +185,15 @@ etv_term:
 .set ram_unknown15,0x940
 .global ram_unknown15
 
+.set ram_unknown139,0x980
+.global ram_unknown139
+
+.set ram_unknown140,0x984
+.global ram_unknown140
+
+.set ram_unknown141,0x988
+.global ram_unknown141
+
 .set fd_retry,0x9f6
 .global fd_retry
 
@@ -541,6 +550,9 @@ struct _pbdef
 .set ram_unknown60,0x28fc
 .global ram_unknown60
 
+.set ram_unknown137,0x2908
+.global ram_unknown137
+
 .set chc_mode,0x290a
 .global chc_mode
 
@@ -568,6 +580,9 @@ struct _pbdef
 
 .set disab_cnt,0x2982
 .global disab_cnt
+
+.set ram_unknown138,0x2a9e
+.global ram_unknown138
 
 /* Background colour */
 .set v_col_bg,0x2ab6
