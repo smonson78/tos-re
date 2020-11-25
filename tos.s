@@ -19553,13 +19553,14 @@ handle_control:
 addr_a348:
 ctrl_tbl:
     .short do_bell - ctrl_tbl
-    .short 0x0186
+    .short esc_d - ctrl_tbl
     .short do_tab - ctrl_tbl
-    .short 0x0334
-    .short 0x0334
-    .short 0x0334
-    .short 0x032a
+    .short ascii_lf - ctrl_tbl
+    .short ascii_lf - ctrl_tbl
+    .short ascii_lf - ctrl_tbl
+    .short ascii_cr - ctrl_tbl
 
+addr_a356:
 do_bell:
 /*
     FIXME
@@ -19572,6 +19573,7 @@ do_bell:
     .set ringbell,0x918c
     .short 0x6000,ringbell
 
+addr_a35a:
 do_tab:
     movew %a4@(-22),%d0
     andiw #0xfff8,%d0
@@ -19761,7 +19763,10 @@ addr_a402:
 	.short 0x322c
 	.short 0xffec
 	.short 0x6000
-	.short 0x0558
+    .short 0x0558
+
+addr_a4ce:   
+esc_d: 
 	.short 0x302c
 	.short 0xffea
 	.short 0x67a8
@@ -19978,11 +19983,17 @@ addr_a402:
 	.short 0x0894
 	.short 0x0003
 	rts
+
+addr_a672:
+ascii_cr:
 	.short 0x4240
 	.short 0x322c
 	.short 0xffec
 	.short 0x6000
 	.short 0x03aa
+
+addr_a67c:
+ascii_lf:    
 	.short 0x322c
 	.short 0xffec
 /* 0x00a680: */
