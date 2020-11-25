@@ -194,6 +194,15 @@ etv_term:
 .set ram_unknown141,0x988
 .global ram_unknown141
 
+.set ram_unknown154,0x98c
+.global ram_unknown154
+
+.set ram_unknown156,0x9aa
+.global ram_unknown156
+
+.set ram_unknown155,0x9b8
+.global ram_unknown155
+
 .set ram_unknown143,0x9d8
 .global ram_unknown143
 
@@ -1102,6 +1111,7 @@ cart_boot:
 .set dma_pointer_low,0xffff860c             /* -31218 */
 
 .set psg,0xffff8800
+.set blitter_halftone_ram,0x8a00            /* -30208 */
 .set mfp_pp,0xfffffa01                      /* -1536 */
 .set mfp_timerbc,0xfffffa1a
 .set mfp_timerb,0xfffffa20
@@ -1126,6 +1136,7 @@ cart_boot:
 .global dma_pointer_mid
 .global dma_pointer_low
 .global psg
+.global blitter_halftone_ram
 .global mfp_pp
 .global mfp_timerbc
 .global mfp_timerb

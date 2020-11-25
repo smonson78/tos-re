@@ -739,25 +739,23 @@ addr_bae:
 	.short 0x0004
 	.short 0x226f
 	.short 0x0008
-	.short 0x303c
-    .short 0x003f
-	.short 0x12d8
-	.short 0x12d8
-	.short 0x12d8
-	.short 0x12d8
-	.short 0x12d8
-	.short 0x12d8
-	.short 0x12d8
-	.short 0x12d8
 
-	.short 0x51c8
-	.short 0xffee
-	rts
+addr_bd2:
+    movew #63,%d0
+addr_bc2:
+    moveb %a0@+,%a1@+
+    moveb %a0@+,%a1@+
+    moveb %a0@+,%a1@+
+    moveb %a0@+,%a1@+
+    moveb %a0@+,%a1@+
+    moveb %a0@+,%a1@+
+    moveb %a0@+,%a1@+
+    moveb %a0@+,%a1@+
+    dbf %d0,addr_bc2
+    rts
 
-	.short 0x2f39
-	.short 0x0000
-	.short 0x046a
-	rts
+    movel hdv_init,%sp@-
+    rts
 
 	.short 0x5c41
 	.short 0x5554
@@ -804,89 +802,59 @@ addr_c50:
     rts
 
 addr_c58:
-	.short 0x42a7
-	.short 0x3f3c
-	.short 0x0020
-	.short 0x4e41
-	.short 0x5c4f
-	.short 0x2840
-	.short 0x2a6f
-	.short 0x0004
-	.short 0x4fed
-	.short 0x0100
-	.short 0x2f3c
-	.short 0x0000
-	.short 0x0100
-	.short 0x2f0d
-	.short 0x4267
-	.short 0x3f3c
-	.short 0x004a
-	.short 0x4e41
-	.short 0x5c4f
-	.short 0x4a40
-/* 0x000c80: */
-	.short 0x666a
-	.short 0x3f3c
-	.short 0x0007
-	.short 0x2f39
-	.short 0x0000
-	.short 0x0984
-	.short 0x3f3c
-	.short 0x004e
-	.short 0x7e08
-	.short 0x4879
-	.short 0x0000
-	.short 0x098c
-	.short 0x3f3c
-	.short 0x001a
-	.short 0x4e41
-	.short 0x5c4f
-	.short 0x4e41
-	.short 0xdec7
-	.short 0x4a40
-	.short 0x6644
-	.short 0x2079
-	.short 0x0000
-	.short 0x0984
-	.short 0x2479
-	.short 0x0000
-	.short 0x0988
-	.short 0x43f9
-	.short 0x0000
-	.short 0x09b8
-	.short 0x12d8
-	.short 0xb5c8
-	.short 0x66fa
-/* 0x000cc0: */
-	.short 0x41f9
-	.short 0x0000
-	.short 0x09aa
-	.short 0x12d8
-	.short 0x66fc
-	.short 0x487a
-	.short 0xf85f
-	.short 0x487a
-	.short 0xf85b
-	.short 0x4879
-	.short 0x0000
-	.short 0x09b8
-	.short 0x4267
-	.short 0x3f3c
-	.short 0x004b
-	.short 0x4e41
-	.short 0xdefc
-	.short 0x0010
-	.short 0x7e02
-	.short 0x3f3c
-	.short 0x004f
-	.short 0x60a6
-	.short 0x4ff9
-	.short 0x0000
-	.short 0x378a
-	.short 0x2f39
-	.short 0x0000
-	.short 0x0980
-	rts
+    clrl %sp@-
+    movew #32,%sp@-
+    trap #1
+    addqw #6,%sp
+    moveal %d0,%a4
+    moveal %sp@(4),%a5
+    lea %a5@(256),%sp
+    movel #256,%sp@-
+    movel %a5,%sp@-
+    clrw %sp@-
+    movew #74,%sp@-
+    trap #1
+    addqw #6,%sp
+    tstw %d0
+    bnes addr_cec
+    movew #7,%sp@-
+    movel ram_unknown140,%sp@-
+    movew #78,%sp@-
+    moveq #8,%d7
+addr_c92:
+    pea ram_unknown154
+    movew #26,%sp@-
+    trap #1
+    addqw #6,%sp
+    trap #1
+    addaw %d7,%sp
+    tstw %d0
+    bnes addr_cec
+    moveal ram_unknown140,%a0
+    moveal ram_unknown141,%a2
+    lea ram_unknown155,%a1
+addr_cba:
+    moveb %a0@+,%a1@+
+    cmpal %a0,%a2
+    bnes addr_cba
+    lea ram_unknown156,%a0
+addr_cc6:
+    moveb %a0@+,%a1@+
+    bnes addr_cc6
+    pea %pc@(addr_1052a + 1)
+    pea %pc@(addr_1052a + 1)
+    pea ram_unknown155
+    clrw %sp@-
+    movew #75,%sp@-
+    trap #1
+    addaw #16,%sp
+    moveq #2,%d7
+    movew #79,%sp@-
+    bras addr_c92
+addr_cec:
+    lea stack_top,%sp
+    movel ram_unknown139,%sp@-
+    rts
 
 /* Screen dump */
 addr_cfa:
@@ -993,39 +961,29 @@ addr_df0:
 addr_dfe:
 run_reset_resident:
 .global addr_dfe
-	.short 0x2079
-/* 0x000e00: */
-	.short 0x0000
-	.short 0x042e
-	.short 0x90fc
-	.short 0x0200
-	.short 0xb1fc
-	.short 0x0000
-	.short 0x0400
-	.short 0x672c
-	.short 0x0c90
-	.short 0x1212
-	.short 0x3456
-	.short 0x66ec
-	.short 0xb1e8
-	.short 0x0004
-	.short 0x66e6
-	.short 0x4240
-	.short 0x2248
-	.short 0x323c
-	.short 0x00ff
-	.short 0xd059
-	.short 0x51c9
-	.short 0xfffc
-	.short 0xb07c
-	.short 0x5678
-	.short 0x66d2
-	.short 0x2f08
-	.short 0x4ea8
-	.short 0x0008
-	.short 0x205f
-	.short 0x60c8
-	rts
+    moveal phystop,%a0
+addr_e04:
+    subaw #512,%a0
+    cmpal #1024,%a0
+    beqs addr_e3c
+    cmpil #0x12123456,%a0@
+    bnes addr_e04
+    cmpal %a0@(4),%a0
+    bnes addr_e04
+    clrw %d0
+    moveal %a0,%a1
+    movew #255,%d1
+addr_e26:
+    addw %a1@+,%d0
+    dbf %d1,addr_e26
+    .short 0xb07c,0x5678                    /* cmpw #0x5678,%d0 */
+    bnes addr_e04
+    movel %a0,%sp@-
+    jsr %a0@(8)
+    moveal %sp@+,%a0
+    bras addr_e04
+addr_e3c:
+    rts
 
 addr_e3e:
 gettime:
@@ -1088,27 +1046,21 @@ addr_ec2:
 addr_ec6:
 blittest:
 .global blittest
-    .short 0x40c1
-	.short 0x303c
-	.short 0x0000
-	.short 0x91c8
-	.short 0x244f
-	.short 0x007c
-	.short 0x0700
-	.short 0x2268
-	.short 0x0008
-	.short 0x217c
-	.short 0x00fc
-	.short 0x0ee6
-	.short 0x0008
-	.short 0x4a68
-	.short 0x8a00
-	.short 0x7002
-	.short 0x2149
-	.short 0x0008
-	.short 0x46c1
-	.short 0x2e4a
-	rts
+    movew %sr,%d1
+    movew #0,%d0
+    subal %a0,%a0
+    moveal %sp,%a2
+    oriw #1792,%sr
+    moveal %a0@(8),%a1
+    movel #addr_ee6,%a0@(8)
+    tstw %a0@(blitter_halftone_ram)
+    moveq #2,%d0
+addr_ee6:
+    movel %a1,%a0@(8)
+    movew %d1,%sr
+    moveal %a2,%sp
+    rts
+
 	.short 0x43f9
 	.short 0x0000
 	.short 0x0a4c
@@ -1230,103 +1182,62 @@ addr_1004:
 addr_100a:
 flopwr:
 .global flopwr
-	.short 0x6100
-	.short 0x0634
-	.short 0x70f6
-	.short 0x6100
-	.short 0x03ca
-	.short 0x302d
-	.short 0x0a0c
-	.short 0x5340
-	.short 0x806d
-	.short 0x0a0a
-	.short 0x806d
-	.short 0x0a0e
-	.short 0x6606
-	.short 0x7002
-	.short 0x6100
-	.short 0x065a
-	.short 0x6100
-	.short 0x0570
-	.short 0x6100
-	.short 0x04d2
-	.short 0x6600
-	.short 0x0082
-	.short 0x3b7c
-	.short 0xffff
-	.short 0x0a26
-	.short 0x3cbc
-	.short 0x0190
-/* 0x001040: */
-	.short 0x3cbc
-	.short 0x0090
-	.short 0x3cbc
-	.short 0x0190
-	.short 0x3e3c
-	.short 0x0001
-	.short 0x6100
-	.short 0x05c4
-	.short 0x3cbc
-	.short 0x0180
-	.short 0x3e3c
-	.short 0x00a0
-	.short 0x6100
-	.short 0x05b8
-	.short 0x2e3c
-	.short 0x0004
-	.short 0x0000
-	.short 0x082d
-	.short 0x0005
-	.short 0xfa01
-	.short 0x670a
-	.short 0x5387
-	.short 0x66f4
-	.short 0x6100
-	.short 0x0512
-	.short 0x603a
-	.short 0x3cbc
-	.short 0x0180
-	.short 0x6100
-	.short 0x05ac
-	.short 0x6100
-	.short 0xff6a
-/* 0x001080: */
-	.short 0x0800
-	.short 0x0006
-	.short 0x6600
-	.short 0x03d6
-	.short 0xc03c
-	.short 0x005c
-	.short 0x6620
-	.short 0x3b7c
-	.short 0x0002
-	.short 0x09f6
-	.short 0x526d
-	.short 0x0a0c
-	.short 0x06ad
-	.short 0x0000
-	.short 0x0200
-	.short 0x0a12
-	.short 0x536d
-	.short 0x0a10
-	.short 0x6700
-	.short 0x03c4
-	.short 0x6100
-	.short 0x051a
-	.short 0x6088
-	.short 0x0c6d
-	.short 0x0001
-	.short 0x09f6
-	.short 0x6604
-	.short 0x6100
-	.short 0x0416
-	.short 0x536d
-	.short 0x09f6
-	.short 0x6a00
-/* 0x0010c0: */
-	.short 0xff6a
-	.short 0x6000
-	.short 0x0398
+    bsrw addr_1640
+    moveq #-10,%d0
+    bsrw addr_13dc
+    movew %a5@(fd_sect),%d0
+    subqw #1,%d0
+    orw %a5@(fd_curtrack),%d0
+    orw %a5@(fd_side),%d0
+    bnes addr_102a
+    moveq #2,%d0
+    bsrw addr_1682
+addr_102a:
+    bsrw addr_159c
+    bsrw addr_1502
+    bnew addr_10b6
+addr_1036:
+    movew #-1,%a5@(fd_curerr)
+    movew #400,%fp@
+    movew #144,%fp@
+    movew #400,%fp@
+    movew #1,%d7
+    bsrw addr_1612
+    movew #384,%fp@
+    movew #160,%d7
+    bsrw addr_1612
+    movel #262144,%d7
+addr_1062:
+    btst #5,%a5@(mfp_pp)
+    beqs addr_1074
+    subql #1,%d7
+    bnes addr_1062
+    bsrw addr_1582
+    bras addr_10ae
+addr_1074:
+    movew #384,%fp@
+    bsrw addr_1626
+    bsrw addr_fe8
+    btst #6,%d0
+    bnew flopfail
+    .short 0xc03c,92                        /* andb #92,%d0 */
+    bnes addr_10ae
+    movew #2,%a5@(fd_retry)
+    addqw #1,%a5@(fd_sect)
+    addil #512,%a5@(fd_buffer)
+    subqw #1,%a5@(fd_scount)
+    beqw addr_146a
+    bsrw addr_15c4
+    bras addr_1036
+addr_10ae:
+    cmpiw #1,%a5@(fd_retry)
+    bnes addr_10ba
+addr_10b6:
+    bsrw addr_14ce
+addr_10ba:
+    subqw #1,%a5@(fd_retry)
+    bplw addr_102a
+    braw flopfail
 
 addr_10c6:
 flopfmt:
@@ -1880,19 +1791,14 @@ go2track:
 addr_1582:
 fdcreset:
 .global fdcreset
-	.short 0x3cbc
-	.short 0x0080
-	.short 0x3e3c
-	.short 0x00d0
-	.short 0x6100
-	.short 0x0086
-	.short 0x3e3c
-	.short 0x000f
-	.short 0x51cf
-	.short 0xfffe
-	.short 0x6100
-	.short 0x0084
-	rts
+    movew #128,%fp@
+    movew #208,%d7
+    bsrw addr_1612
+    movew #15,%d7
+addr_1592:
+    dbf %d7,addr_1592
+    bsrw addr_161c
+    rts
 
 addr_159c:
 select:
@@ -1969,11 +1875,11 @@ wrfdcd7:
 	.short 0xffff
 	.short 0x8604
 	.short 0x6012
-	.short 0x6110
-	.short 0x3e39
-	.short 0xffff
-	.short 0x8604
-    .short 0x6008
+	
+addr_161c:
+    bsrb addr_162e
+    movew dma_sector_count,%d7
+    bras addr_162e
 
 addr_1626:
 rdfdcd0:
