@@ -19531,7 +19531,7 @@ addr_a30a:
 addr_a320:
 normal_ascii:
     .short 0xb27c,32                        /* cmpw #32,%d1 */
-    bgew addr_a71e
+    bgew ascii_out
     .short 0xb23c,27                        /* cmpb #27,%d1 */
     bnes handle_control
     lea %pc@(addr_a36c),%a0
@@ -19546,7 +19546,10 @@ handle_control:
     movew %pc@(addr_a348, %d1:w),%d1
     jmp %pc@(addr_a348, %d1:w)
 
-/* These are each relative offsets from ctrl_tbl to a routine to handle a control code: ^G, ^H, ^I, ^J, ^K, ^L, ^M */
+/* 
+    These are each relative offsets from ctrl_tbl to a routine to handle a control code: ^G, ^H, ^I, ^J, ^K, ^L, ^M 
+    FIXME finish these offsets
+*/
 addr_a348:
 ctrl_tbl:
     .short do_bell - ctrl_tbl
@@ -19559,7 +19562,9 @@ ctrl_tbl:
 
 do_bell:
 /*
+    FIXME
 	From TOS source:
+
 	#if TOSVERSION == 0x104
 	ringbell  equ $33C4+(BIOSTLEN-BTLEN_US)-(VDITBASE-BIOSTBASE)
 	#endif
@@ -20064,112 +20069,81 @@ addr_a6e0:
 	rts
 
 addr_a71e:
-	.short 0x49f9
-	.short 0x0000
-	.short 0x2ad6
-	.short 0xb26c
-	.short 0xfff6
-	.short 0x6500
-	.short 0x00c0
-	.short 0xb26c
-	.short 0xfff4
-	.short 0x6200
-	.short 0x00b8
-	.short 0x206c
-	.short 0xfffc
-	.short 0xd241
-	.short 0x3230
-	.short 0x1000
-	.short 0xe649
-/* 0x00a740: */
-	.short 0x206c
-	.short 0xfff0
-	.short 0xd0c1
-	.short 0x226c
-	.short 0xffe4
-	.short 0x3c2c
-	.short 0xffe2
-	.short 0x3e2c
-	.short 0xffe0
-	.short 0x0814
-	.short 0x0004
-	.short 0x6702
-	.short 0xcd47
-	.short 0x526c
-	.short 0xfeac
-	.short 0x0894
-	.short 0x0001
-	.short 0x2a6c
-	.short 0x0080
-	.short 0x4e95
-	.short 0x302c
-	.short 0xffea
-	.short 0x322c
-	.short 0xffec
-	.short 0xb06c
-	.short 0xffda
-	.short 0x6d32
-	.short 0x0814
-	.short 0x0003
-	.short 0x674c
-	.short 0x4240
-	.short 0x342c
-/* 0x00a780: */
-	.short 0xffde
-	.short 0x2279
-	.short 0x0000
-	.short 0x044e
-	.short 0xb26c
-	.short 0xffdc
-	.short 0x6d12
-	.short 0x3941
-	.short 0xffec
-	.short 0xc2c2
-	.short 0xd3c1
-	.short 0x4241
-	.short 0x487a
-	.short 0x0026
-	.short 0x6000
-	.short 0x00dc
-	.short 0x5241
-	.short 0xc4c1
-	.short 0xd3c2
-	.short 0x6014
-	.short 0x5249
-	.short 0x5240
-	.short 0x0800
-	.short 0x0000
-	.short 0x660a
-	.short 0x342c
-	.short 0x0006
-	.short 0xd442
-	.short 0x43f1
-	.short 0x20fe
-	.short 0x3941
-	.short 0xffec
-/* 0x00a7c0: */
-	.short 0x3940
-	.short 0xffea
-	.short 0x2949
-	.short 0xffe4
-	.short 0x1c2c
-	.short 0x0001
-	.short 0x6614
-	.short 0x3e2c
-	.short 0xfeac
-	.short 0x5347
-	.short 0x6610
-	.short 0x6100
-	.short 0x026e
-	.short 0x08d4
-	.short 0x0001
-	.short 0x1c2c
-	.short 0xffee
-	.short 0x1946
-	.short 0xffef
-	.short 0x536c
-	.short 0xfeac
-	rts
+ascii_out:
+    lea v_stat_0,%a4
+    cmpw %a4@(-10),%d1
+    bcsw addr_a7ea
+    cmpw %a4@(-12),%d1
+    bhiw addr_a7ea
+    moveal %a4@(-4),%a0
+    addw %d1,%d1
+    movew %a0@(0,%d1:w),%d1
+    lsrw #3,%d1
+    moveal %a4@(-16),%a0
+    addaw %d1,%a0
+    moveal %a4@(-28),%a1
+    movew %a4@(-30),%d6
+    movew %a4@(-32),%d7
+    btst #4,%a4@
+    beqs addr_a75a
+    exg %d6,%d7
+addr_a75a:
+    addqw #1,%a4@(-340)
+    bclr #1,%a4@
+    moveal %a4@(128),%a5
+    jsr %a5@
+    movew %a4@(-22),%d0
+    movew %a4@(-20),%d1
+    cmpw %a4@(-38),%d0
+    blts addr_a7a8
+    btst #3,%a4@
+    beqs addr_a7c8
+    clrw %d0
+    movew %a4@(-34),%d2
+    moveal _v_bas_ad,%a1
+    cmpw %a4@(-36),%d1
+    blts addr_a7a0
+    movew %d1,%a4@(-20)
+    muluw %d2,%d1
+    addal %d1,%a1
+    clrw %d1
+    pea %pc@(addr_a7c0)
+    braw addr_a87a
+addr_a7a0:
+    addqw #1,%d1
+    muluw %d1,%d2
+    addal %d2,%a1
+    bras addr_a7bc
+addr_a7a8:
+    addqw #1,%a1
+    addqw #1,%d0
+    btst #0,%d0
+    bnes addr_a7bc
+    movew %a4@(6),%d2
+    addw %d2,%d2
+    lea %a1@(-2,%d2:w),%a1
+addr_a7bc:
+    movew %d1,%a4@(-20)
+addr_a7c0:    
+    movew %d0,%a4@(-22)
+    movel %a1,%a4@(-28)
+addr_a7c8:
+    moveb %a4@(1),%d6
+    bnes addr_a7e2
+    movew %a4@(-340),%d7
+    subqw #1,%d7
+    bnes addr_a7e6
+    bsrw addr_aa46
+    bset #1,%a4@
+    moveb %a4@(-18),%d6
+addr_a7e2:
+    moveb %d6,%a4@(-17)
+addr_a7e6:
+    subqw #1,%a4@(-340)
+addr_a7ea:
+    rts
+
+addr_a7ec:
 	.short 0x4bf9
 	.short 0x00ff
 	.short 0x8a3c
@@ -20243,6 +20217,8 @@ addr_a71e:
 	.short 0x020c
 	.short 0x0203
 	.short 0x020f
+
+addr_a87a:    
 	.short 0x2a6c
 	.short 0x0084
 	.short 0x4ed5
@@ -20484,7 +20460,9 @@ move_cursor:
 	.short 0xffe4
 	.short 0x6000
 	.short 0xfd84
-	.short 0x382c
+	
+addr_aa46:
+    .short 0x382c
 	.short 0x0008
 	.short 0x3a2c
 	.short 0xffd8
