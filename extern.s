@@ -194,6 +194,42 @@ etv_term:
 .set ram_unknown141,0x988
 .global ram_unknown141
 
+.set ram_unknown143,0x9d8
+.global ram_unknown143
+
+.set ram_unknown144,0x9dc
+.global ram_unknown144
+
+.set ram_unknown146,0x9de
+.global ram_unknown146
+
+.set ram_unknown147,0x9e0
+.global ram_unknown147
+
+.set ram_unknown148,0x9e2
+.global ram_unknown148
+
+.set ram_unknown149,0x9e4
+.global ram_unknown149
+
+.set ram_unknown145,0x9e6
+.global ram_unknown145
+
+.set ram_unknown152,0x9e8
+.global ram_unknown152
+
+.set ram_unknown150,0x9ea
+.global ram_unknown150
+
+.set ram_unknown142,0x9ee
+.global ram_unknown142
+
+.set ram_unknown153,0x9f0
+.global ram_unknown153
+
+.set ram_unknown151,0x9f2
+.global ram_unknown151
+
 .set fd_retry,0x9f6
 .global fd_retry
 
@@ -1053,6 +1089,7 @@ cart_boot:
 .set video_basem,0xffff8202                 /* -32256 */
 .set shifter_sync_mode,0xffff820a           /* -32246 */
 .set palette,0xffff8240                     /* -32192 */
+.set palette_24_bit,0xff8240
 .set video_res,0xffff8260                   /* -32160 */
 
 /* Some of these are the same, but one's for read and one's for write */
@@ -1079,6 +1116,7 @@ cart_boot:
 .global video_basem
 .global shifter_sync_mode
 .global palette
+.global palette_24_bit
 .global video_res
 .global dma_data_register
 .global dma_sector_count

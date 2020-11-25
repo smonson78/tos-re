@@ -734,13 +734,13 @@ addr_bae:
 	.short 0x00a0
 	.short 0x0050
 	.short 0x0050
+
 	.short 0x206f
 	.short 0x0004
 	.short 0x226f
 	.short 0x0008
 	.short 0x303c
-/* 0x000bc0: */
-	.short 0x003f
+    .short 0x003f
 	.short 0x12d8
 	.short 0x12d8
 	.short 0x12d8
@@ -749,13 +749,16 @@ addr_bae:
 	.short 0x12d8
 	.short 0x12d8
 	.short 0x12d8
+
 	.short 0x51c8
 	.short 0xffee
 	rts
+
 	.short 0x2f39
 	.short 0x0000
 	.short 0x046a
 	rts
+
 	.short 0x5c41
 	.short 0x5554
 	.short 0x4f5c
@@ -895,78 +898,45 @@ scrdmp:
 
 addr_d0c:
 .global addr_d0c
-	.short 0x9bcd
-	.short 0x2b6d
-	.short 0x044e
-	.short 0x09d8
-	.short 0x426d
-	.short 0x09dc
-	.short 0x4240
-	.short 0x102d
-	.short 0x044c
-	.short 0x3b40
-	.short 0x09e6
-	.short 0xd040
-	.short 0x41fa
-	.short 0x0068
-	.short 0x3b70
-	.short 0x0000
-	.short 0x09de
-	.short 0x3b70
-	.short 0x0006
-	.short 0x09e0
-	.short 0x426d
-	.short 0x09e2
-	.short 0x426d
-	.short 0x09e4
-	.short 0x2b7c
-	.short 0x00ff
-/* 0x000d40: */
-	.short 0x8240
-	.short 0x09ea
-	.short 0x426d
-	.short 0x09f2
-	.short 0x322d
-	.short 0x0eac
-	.short 0xe649
-	.short 0xc27c
-	.short 0x0001
-	.short 0x3b41
-	.short 0x09e8
-	.short 0x322d
-	.short 0x0eac
-	.short 0x3001
-	.short 0xe848
-	.short 0xc07c
-	.short 0x0001
-	.short 0x3b40
-	.short 0x09f0
-	.short 0xc27c
-	.short 0x0007
-	.short 0x103b
-	.short 0x102e
-	.short 0x33c0
-	.short 0x0000
-	.short 0x09ee
-	.short 0x486d
-	.short 0x09d8
-	.short 0x3b7c
-	.short 0x0001
-	.short 0x04ee
-	.short 0x6100
-/* 0x000d80: */
-	.short 0x13dc
-	.short 0x33fc
-	.short 0xffff
-	.short 0x0000
-	.short 0x04ee
-	.short 0x584f
-	rts
+    subal %a5,%a5
+    movel %a5@(_v_bas_ad),%a5@(ram_unknown143)
+    clrw %a5@(ram_unknown144)
+    clrw %d0
+    moveb %a5@(sshiftmod),%d0
+    movew %d0,%a5@(ram_unknown145)
+    addw %d0,%d0
+    lea %pc@(hardcopy_parameter_table),%a0
+    movew %a0@(0,%d0:w),%a5@(ram_unknown146)
+    movew %a0@(6,%d0:w),%a5@(ram_unknown147)
+    clrw %a5@(ram_unknown148)
+    clrw %a5@(ram_unknown149)
+    movel #palette_24_bit,%a5@(ram_unknown150)
+    clrw %a5@(ram_unknown151)
+    movew %a5@(ram_unknown24),%d1
+    lsrw #3,%d1
+    .short 0xc27c,1                         /* andw #1,%d1 */
+    movew %d1,%a5@(ram_unknown152)
+    movew %a5@(ram_unknown24),%d1
+    movew %d1,%d0
+    lsrw #4,%d0
+    .short 0xc07c,1                         /* andw #1,%d0 */
+    movew %d0,%a5@(ram_unknown153)
+    .short 0xc27c,7                         /* andw #7,%d1 */
+    moveb %pc@(printer_types, %d1:w),%d0
+    movew %d0,ram_unknown142
+    pea %a5@(ram_unknown143)
+    movew #1,%a5@(_dumpflg)
+    bsrw addr_215c
+    movew #-1,_dumpflg
+    addqw #4,%sp
+    rts
 
+addr_d8e:
 hardcopy_parameter_table:
 	.short 320, 640, 640
     .short 200, 200, 400
 
+addr_d9a:
 printer_types:
 	.byte 0             /* ATARI B/W dot-matrix */
     .byte 2             /* ATARI B/W daisy-wheel */
