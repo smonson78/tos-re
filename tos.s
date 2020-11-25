@@ -734,7 +734,6 @@ addr_bae:
 	.short 0x00a0
 	.short 0x0050
 	.short 0x0050
-
 	.short 0x206f
 	.short 0x0004
 	.short 0x226f
@@ -763,10 +762,9 @@ addr_bc2:
 	.short 0x2a2e
 	.short 0x5052
 	.short 0x4700
-	.short 0x1234
-	.short 0x5678
-	.short 0x9abc
-	.short 0xdef0
+
+	.long 0x12345678
+	.long 0x9abcdef0
 
 addr_bf4:
 .global addr_bf4
@@ -1471,6 +1469,7 @@ verify1:
 	.short 0x0a12
 	.short 0x4252
 	rts
+
 	.short 0x0c6d
 	.short 0x0001
 	.short 0x09f6
@@ -1555,72 +1554,40 @@ addr_1360:
 addr_13dc:
 floplock:
 .global floplock
-	.short 0x48f9
-	.short 0x78f8
-	.short 0x0000
-	.short 0x0a28
-	.short 0x9bcd
-	.short 0x4ded
-	.short 0x8606
-	.short 0x50ed
-	.short 0x0a04
-	.short 0x3b40
-	.short 0x0a24
-	.short 0x3b40
-	.short 0x0a26
-	.short 0x3b7c
-	.short 0x0001
-	.short 0x043e
-	.short 0x2b6f
-	.short 0x0008
-/* 0x001400: */
-	.short 0x0a12
-	.short 0x3b6f
-	.short 0x0010
-	.short 0x0a08
-	.short 0x3b6f
-	.short 0x0012
-	.short 0x0a0c
-	.short 0x3b6f
-	.short 0x0014
-	.short 0x0a0a
-	.short 0x3b6f
-	.short 0x0016
-	.short 0x0a0e
-	.short 0x3b6f
-	.short 0x0018
-	.short 0x0a10
-	.short 0x3b7c
-	.short 0x0002
-	.short 0x09f6
-	.short 0x43ed
-	.short 0x0a4c
-	.short 0x4a6d
-	.short 0x0a08
-	.short 0x6704
-	.short 0x43ed
-	.short 0x0a50
-	.short 0x4a69
-	.short 0x0000
-	.short 0x6a20
-	.short 0x6100
-	.short 0x0160
-	.short 0x4269
-/* 0x001440: */
-	.short 0x0000
-	.short 0x6100
-	.short 0x00e4
-	.short 0x6712
-	.short 0x7e0a
-	.short 0x616a
-	.short 0x6606
-	.short 0x6100
-	.short 0x00d8
-	.short 0x6706
-	.short 0x337c
-	.short 0xff00
-	.short 0x0000
-	rts
+    moveml %d3-%d7/%a3-%fp,ram_unknown160
+    subal %a5,%a5
+    lea %a5@(dma_mode_control),%fp
+    st %a5@(ram_unknown161)
+    movew %d0,%a5@(ram_unknown88)
+    movew %d0,%a5@(fd_curerr)
+    movew #1,%a5@(flock)
+    movel %sp@(8),%a5@(fd_buffer)
+    movew %sp@(16),%a5@(ram_unknown130)
+    movew %sp@(18),%a5@(fd_sect)
+    movew %sp@(20),%a5@(fd_curtrack)
+    movew %sp@(22),%a5@(fd_side)
+    movew %sp@(24),%a5@(fd_scount)
+    movew #2,%a5@(fd_retry)
+    lea %a5@(ram_unknown128),%a1
+    tstw %a5@(ram_unknown130)
+    beqs addr_1434
+    lea %a5@(ram_unknown129),%a1
+addr_1434:
+    .short 0x4a69,0                         /* tstw %a1@(0) */
+    bpls addr_145a
+    bsrw select
+    .short 0x4269,0                         /* clrw %a1@(0) */
+    bsrw addr_1528
+    beqs addr_145a
+    moveq #10,%d7
+    bsrb addr_14b6
+    bnes addr_1454
+    bsrw addr_1528
+    beqs addr_145a
+addr_1454:
+    .short 0x337c,-256,0                    /* movew #-256,%a1@(0) */
+addr_145a:
+    rts
 
 addr_145c:
 flopfail:
@@ -1676,7 +1643,9 @@ hardseek:
 	.short 0x3e39
 	.short 0x0000
 	.short 0x0a0a
-	.short 0x33fc
+	
+addr_14b6:    
+    .short 0x33fc
 	.short 0xfffa
 	.short 0x0000
 	.short 0x0a26
@@ -1740,6 +1709,8 @@ go2track:
 	.short 0xce3c
 	.short 0x0018
 	rts
+
+addr_1528:
 	.short 0x4246
 	.short 0x6112
 	.short 0x660e
@@ -1900,40 +1871,24 @@ addr_1636:
 addr_1640:
 fdchange:
 .global fdchange
-	.short 0x0c79
-	.short 0x0001
-	.short 0x0000
-	.short 0x04a6
-	.short 0x6636
-	.short 0x302f
-	.short 0x0010
-	.short 0xb079
-	.short 0x0000
-	.short 0x0ed4
-	.short 0x6726
-	.short 0x3f00
-	.short 0x3f3c
-	.short 0xffef
-	.short 0x6100
-	.short 0xf15c
-	.short 0x584f
-	.short 0x33fc
-	.short 0xffff
-	.short 0x0000
-	.short 0x09fa
-	.short 0x41f9
-	.short 0x0000
-	.short 0x09fc
-	.short 0x4298
-	.short 0x4290
-	.short 0x33ef
-	.short 0x0010
-	.short 0x0000
-	.short 0x0ed4
-	.short 0x426f
-	.short 0x0010
-/* 0x001680: */
-	rts
+    cmpiw #1,_nflops
+    bnes addr_1680
+    movew %sp@(16),%d0
+    cmpw ram_unknown157,%d0
+    beqs addr_167c
+    movew %d0,%sp@-
+    movew #-17,%sp@-
+    bsrw addr_7ba
+    addqw #4,%sp
+    movew #-1,ram_unknown158
+    lea ram_unknown159,%a0
+    clrl %a0@+
+    clrl %a0@
+    movew %sp@(16),ram_unknown157
+addr_167c:
+    clrw %sp@(16)
+addr_1680:
+    rts
 
 addr_1682:
 setdchg:

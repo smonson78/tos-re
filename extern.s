@@ -91,6 +91,7 @@ etv_term:
 .set conterm,0x484                          /* Key repeat, click, etc */
 .set themd,0x48e                            /* This is the Memory Descriptor structure initialized by the BIOS */
 .set savptr,0x4a2                           /* Pointer to buffer used by TOS for saving registers */
+.set _nflops,0x4a6                          /* Number of connected floppy drives */
 .set con_state,0x4a8                        /* Vector to internal console output routines */
 .set _bufl,0x4b2                            /* 8 bytes: first longword is a pointer to a Buffer Control Block for data sectors.
                                                Second longword is a BCB for FAT/directory sectors */
@@ -140,6 +141,7 @@ etv_term:
 .global conterm
 .global themd
 .global savptr
+.global _nflops
 .global con_state
 .global _bufl
 .global _hz_200
@@ -242,6 +244,15 @@ etv_term:
 .set fd_retry,0x9f6
 .global fd_retry
 
+.set ram_unknown158,0x9fa
+.global ram_unknown158
+
+.set ram_unknown159,0x9fc
+.global ram_unknown159
+
+.set ram_unknown161,0xa04
+.global ram_unknown161
+
 .set fd_curtrack,0xa0a
 .global fd_curtrack
 
@@ -280,6 +291,9 @@ etv_term:
 
 .set fd_curerr,0xa26
 .global fd_curerr
+
+.set ram_unknown160,0xa28
+.global ram_unknown160
 
 .set ram_unknown128,0xa4c
 .global ram_unknown128
@@ -369,6 +383,9 @@ etv_term:
 
 .set ram_unknown118,0xed2
 .global ram_unknown118
+
+.set ram_unknown157,0xed4
+.global ram_unknown157
 
 .set ram_unknown103,0xed6
 .global ram_unknown103
