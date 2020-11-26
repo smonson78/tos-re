@@ -1384,92 +1384,54 @@ flopver:
 
 addr_12a2:
 verify1:
-	.short 0x3b7c
-	.short 0xfff5
-	.short 0x0a24
-	.short 0x246d
-	.short 0x0a12
-	.short 0x06ad
-	.short 0x0000
-	.short 0x0200
-	.short 0x0a12
-	.short 0x3b7c
-	.short 0x0002
-	.short 0x09f6
-	.short 0x3cbc
-	.short 0x0084
-	.short 0x3e2d
-/* 0x0012c0: */
-	.short 0x0a0c
-	.short 0x6100
-	.short 0x034e
-	.short 0x1b6d
-	.short 0x0a15
-	.short 0x860d
-	.short 0x1b6d
-	.short 0x0a14
-	.short 0x860b
-	.short 0x1b6d
-	.short 0x0a13
-	.short 0x8609
-	.short 0x3cbc
-	.short 0x0090
-	.short 0x3cbc
-	.short 0x0190
-	.short 0x3cbc
-	.short 0x0090
-	.short 0x3e3c
-	.short 0x0001
-	.short 0x6100
-	.short 0x0328
-	.short 0x3cbc
-	.short 0x0080
-	.short 0x3e3c
-	.short 0x0080
-	.short 0x6100
-	.short 0x031c
-	.short 0x2e3c
-	.short 0x0004
-	.short 0x0000
-	.short 0x082d
-/* 0x001300: */
-	.short 0x0005
-	.short 0xfa01
-	.short 0x670a
-	.short 0x5387
-	.short 0x66f4
-	.short 0x6100
-	.short 0x0276
-	.short 0x6036
-	.short 0x3cbc
-	.short 0x0090
-	.short 0x3016
-	.short 0x0800
-	.short 0x0000
-	.short 0x672a
-	.short 0x3cbc
-	.short 0x0080
-	.short 0x6100
-	.short 0x0304
-	.short 0x6100
-	.short 0xfcc2
-	.short 0xc03c
-	.short 0x001c
-	.short 0x6618
-	.short 0x526d
-	.short 0x0a0c
-	.short 0x536d
-	.short 0x0a10
-	.short 0x6600
-	.short 0xff7c
-	.short 0x04ad
-	.short 0x0000
-	.short 0x0200
-/* 0x001340: */
-	.short 0x0a12
-	.short 0x4252
-	rts
-
+    movew #-11,%a5@(ram_unknown88)
+    moveal %a5@(fd_buffer),%a2
+    addil #512,%a5@(fd_buffer)
+addr_12b4:
+    movew #2,%a5@(fd_retry)
+    movew #132,%fp@
+    movew %a5@(fd_sect),%d7
+    bsrw addr_1612
+addr_12c6:
+    moveb %a5@(fd_buffer + 3),%a5@(dma_pointer_low + 1)
+    moveb %a5@(fd_buffer + 2),%a5@(dma_pointer_mid + 1)
+    moveb %a5@(fd_buffer + 1),%a5@(dma_pointer_high + 1)
+    movew #144,%fp@
+    movew #400,%fp@
+    movew #144,%fp@
+    movew #1,%d7
+    bsrw addr_1612
+    movew #128,%fp@
+    movew #128,%d7
+    bsrw addr_1612
+    movel #262144,%d7
+addr_12fe:
+    btst #5,%a5@(mfp_pp)
+    beqs addr_1310
+    subql #1,%d7
+    bnes addr_12fe
+    bsrw addr_1582
+    bras addr_1346
+addr_1310:
+    movew #144,%fp@
+    movew %fp@,%d0
+    btst #0,%d0
+    beqs addr_1346
+    movew #128,%fp@
+    bsrw addr_1626
+    bsrw addr_fe8
+    .short 0xc03c,28                        /* andb #28,%d0 */
+    bnes addr_1346
+addr_132e:
+    addqw #1,%a5@(fd_sect)
+    subqw #1,%a5@(fd_scount)
+    bnew addr_12b4
+    subil #512,%a5@(fd_buffer)
+    clrw %a2@
+    rts
+    
+    
+addr_1346:
 	.short 0x0c6d
 	.short 0x0001
 	.short 0x09f6
