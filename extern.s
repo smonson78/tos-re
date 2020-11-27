@@ -244,6 +244,9 @@ etv_term:
 .set fd_retry,0x9f6
 .global fd_retry
 
+.set ram_unknown162,0x9f8
+.global ram_unknown162
+
 .set ram_unknown158,0x9fa
 .global ram_unknown158
 
@@ -252,6 +255,9 @@ etv_term:
 
 .set ram_unknown161,0xa04
 .global ram_unknown161
+
+.set ram_unknown164,0xa06
+.global ram_unknown164
 
 .set fd_curtrack,0xa0a
 .global fd_curtrack
@@ -294,6 +300,9 @@ etv_term:
 
 .set ram_unknown160,0xa28
 .global ram_unknown160
+
+.set ram_unknown163,0xa46
+.global ram_unknown163
 
 .set ram_unknown128,0xa4c
 .global ram_unknown128
@@ -1119,10 +1128,10 @@ cart_boot:
 .set video_res,0xffff8260                   /* -32160 */
 
 /* Some of these are the same, but one's for read and one's for write */
-.set dma_data_register,0xffff8604           /* R */
-.set dma_sector_count,0xffff8604            /* W */
-.set dma_status,0xffff8606                  /* R */
-.set dma_mode_control,0xffff8606            /* W */
+.set dma_data_register,0xffff8604           /* -31228 R */
+.set dma_sector_count,0xffff8604            /* -31228 W */
+.set dma_status,0xffff8606                  /* -31226 R */
+.set dma_mode_control,0xffff8606            /* -31226 W */
 .set dma_pointer_high,0xffff8608            /* -31222 */
 .set dma_pointer_mid,0xffff860a             /* -31220 */
 .set dma_pointer_low,0xffff860c             /* -31218 */

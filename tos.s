@@ -1429,89 +1429,58 @@ addr_132e:
     subil #512,%a5@(fd_buffer)
     clrw %a2@
     rts
-    
-    
 addr_1346:
-	.short 0x0c6d
-	.short 0x0001
-	.short 0x09f6
-	.short 0x6604
-	.short 0x6100
-
-	.short 0x017e
-	.short 0x536d
-	.short 0x09f6
-	.short 0x6a00
-	.short 0xff6e
-	.short 0x34ed
-	.short 0x0a0c
-	.short 0x60ce
-
+    cmpiw #1,%a5@(fd_retry)
+    bnes addr_1352
+    bsrw addr_14ce
+addr_1352:
+    subqw #1,%a5@(fd_retry)
+    bplw addr_12c6
+    movew %a5@(fd_sect),%a2@+
+    bras addr_132e
 addr_1360:
-	.short 0x9bcd
-	.short 0x4ded
-	.short 0x8606
-	.short 0x50ed
-	.short 0x0a04
-	.short 0x4a6d
-	.short 0x043e
-	.short 0x666a
-	.short 0x202d
-	.short 0x0466
-	.short 0x1200
-	.short 0xc23c
-	.short 0x0007
-	.short 0x6634
-	.short 0x3cbc
-	.short 0x0080
-/* 0x001380: */
-	.short 0xe608
-	.short 0xc07c
-	.short 0x0001
-	.short 0x41ed
-	.short 0x09f8
-	.short 0xd0c0
-	.short 0xb06d
-	.short 0x04a6
-	.short 0x6602
-	.short 0x4240
-	.short 0x5200
-	.short 0xe308
-	.short 0x0a00
-	.short 0x0007
-	.short 0x6100
-	.short 0x0244
-	.short 0x302d
-	.short 0x8604
-	.short 0x0800
-	.short 0x0006
-	.short 0x56d0
-	.short 0x1002
-	.short 0x6100
-	.short 0x0234
-	.short 0x302d
-	.short 0x09f8
-	.short 0x816d
-	.short 0x09fa
-	.short 0x4a6d
-	.short 0x0a06
-	.short 0x6618
-	.short 0x6100
-/* 0x0013c0: */
-	.short 0x0266
-	.short 0x0800
-	.short 0x0007
-	.short 0x6612
-	.short 0x103c
-	.short 0x0007
-	.short 0x6100
-	.short 0x0214
-	.short 0x3b7c
-	.short 0x0001
-	.short 0x0a06
-	.short 0x426d
-	.short 0x0a04
-	rts
+    subal %a5,%a5
+    lea %a5@(dma_mode_control),%fp
+    st %a5@(ram_unknown161)
+    tstw %a5@(flock)
+    bnes addr_13da
+    movel %a5@(_frlock),%d0
+    moveb %d0,%d1
+    .short 0xc23c,7                         /* andb #7,%d1 */
+    bnes addr_13b0
+    movew #128,%fp@
+    lsrb #3,%d0
+    .short 0xc07c,1                         /* andw #1,%d0 */
+    lea %a5@(ram_unknown162),%a0
+    addaw %d0,%a0
+    cmpw %a5@(_nflops),%d0
+    bnes addr_1394
+    clrw %d0
+addr_1394:
+    addqb #1,%d0
+    lslb #1,%d0
+    eorib #7,%d0
+    bsrw addr_15e2
+    movew %a5@(dma_data_register),%d0
+    btst #6,%d0
+    sne %a0@
+    moveb %d2,%d0
+    bsrw addr_15e2
+addr_13b0:
+    movew %a5@(ram_unknown162),%d0
+    orw %d0,%a5@(ram_unknown158)
+    tstw %a5@(ram_unknown164)
+    bnes addr_13d6
+    bsrw addr_1626
+    btst #7,%d0
+    bnes addr_13da
+    moveb #7,%d0
+    bsrw addr_15e2
+    movew #1,%a5@(ram_unknown164)
+addr_13d6:
+    clrw %a5@(ram_unknown161)
+addr_13da:
+    rts
 
 addr_13dc:
 floplock:
@@ -1774,6 +1743,8 @@ addr_15c4:
 	.short 0x0a13
 	.short 0x8609
 	rts
+
+addr_15e2:
 	.short 0x40e7
 	.short 0x007c
 	.short 0x0700
@@ -1794,6 +1765,7 @@ addr_15c4:
 	.short 0x8802
 	.short 0x46df
 	rts
+
 	.short 0x6124
 	.short 0x33c6
 	.short 0xffff
