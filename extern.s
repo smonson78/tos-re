@@ -292,6 +292,9 @@ etv_term:
 .set fd_secmap,0xa1c
 .global fd_secmap
 
+.set ram_unknown165,0xa20
+.global ram_unknown165
+
 .set ram_unknown88,0xa24
 .global ram_unknown88
 
@@ -300,9 +303,6 @@ etv_term:
 
 .set ram_unknown160,0xa28
 .global ram_unknown160
-
-.set ram_unknown163,0xa46
-.global ram_unknown163
 
 .set ram_unknown128,0xa4c
 .global ram_unknown128

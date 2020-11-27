@@ -1522,173 +1522,109 @@ addr_145a:
 
 addr_145c:
 flopfail:
-    .short 0x7001
-	.short 0x6100
-	.short 0x0222
-	.short 0x302d
-	.short 0x0a26
-	.short 0x48c0
-    .short 0x6002
-
+    moveq #1,%d0
+    bsrw addr_1682
+    movew %a5@(0xa26),%d0
+    extl %d0
+    bras addr_146c
 addr_146a:
 flopok:
-	.short 0x4280
-	.short 0x2f00
-	.short 0x3cbc
-	.short 0x0086
-	.short 0x3e29
-	.short 0x0000
-	.short 0x6100
-	.short 0x019a
-	.short 0x3c3c
-	.short 0x0010
-	.short 0x6100
-/* 0x001480: */
-	.short 0x00be
-	.short 0x302d
-	.short 0x0a08
-	.short 0xe548
-	.short 0x41ed
-	.short 0x09fc
-	.short 0x21ad
-	.short 0x0466
-	.short 0x0000
-	.short 0x0c6d
-	.short 0x0001
-	.short 0x04a6
-	.short 0x6606
-	.short 0x216d
-	.short 0x0466
-	.short 0x0004
-	.short 0x201f
-	.short 0x4ced
-	.short 0x78f8
-	.short 0x0a28
-	.short 0x4279
-	.short 0x0000
-	.short 0x043e
-	rts
+    clrl %d0
+addr_146c:
+    movel %d0,%sp@-
+    movew #134,%fp@
+    .short 0x3e29,0                         /* movew %a1@(0),%d7 */
+    bsrw addr_1612
+    movew #16,%d6
+    bsrw addr_153e
+    movew %a5@(ram_unknown130),%d0
+    lslw #2,%d0
+    lea %a5@(ram_unknown159),%a0
+    movel %a5@(_frlock),%a0@(0,%d0:w)
+    cmpiw #1,%a5@(_nflops)
+    bnes addr_14a0
+    movel %a5@(_frlock),%a0@(4)
+addr_14a0:
+    movel %sp@+,%d0
+    moveml %a5@(ram_unknown160),%d3-%d7/%a3-%fp
+    clrw flock
+    rts
 
 addr_14b0:
 hardseek:
-	.short 0x3e39
-	.short 0x0000
-	.short 0x0a0a
-	
-addr_14b6:    
-    .short 0x33fc
-	.short 0xfffa
-	.short 0x0000
-	.short 0x0a26
-	.short 0x3cbc
-	.short 0x0086
-	.short 0x6100
-	.short 0x014e
-	.short 0x3c3c
-	.short 0x0010
-	.short 0x6000
-	.short 0x0072
-
+    movew fd_curtrack,%d7
+addr_14b6:
+    movew #-6,fd_curerr
+    movew #134,%fp@
+    bsrw addr_1612
+    movew #16,%d6
+    braw addr_153e
 addr_14ce:
-    .short 0x33fc
-	.short 0xfffa
-	.short 0x0000
-	.short 0x0a26
-	.short 0x6150
-	.short 0x664c
-	.short 0x4269
-	.short 0x0000
-	.short 0x3cbc
-	.short 0x0082
-	.short 0x4247
-	.short 0x6100
-	.short 0x012c
-	.short 0x3cbc
-	.short 0x0086
-	.short 0x3e3c
-	.short 0x0005
-	.short 0x6100
-	.short 0x0120
-	.short 0x3c3c
-	.short 0x0010
-	.short 0x6144
-	.short 0x662a
-	.short 0x337c
-	.short 0x0005
-/* 0x001500: */
-	.short 0x0000
+    movew #-6,fd_curerr
+    bsrb addr_1528
+    bnes addr_1526
+    .short 0x4269,0                         /* clrw %a1@(0) */
+    movew #130,%fp@
+    clrw %d7
+    bsrw addr_1612
+    movew #134,%fp@
+    movew #5,%d7
+    bsrw addr_1612
+    movew #16,%d6
+    bsrb addr_153e
+    bnes addr_1526
+    .short 0x337c,5,0                       /* movew #5,%a1@(0) */
 
 addr_1502:
 go2track:
 .global go2track
-	.short 0x33fc
-	.short 0xfffa
-	.short 0x0000
-	.short 0x0a26
-	.short 0x3cbc
-	.short 0x0086
-	.short 0x3e2d
-	.short 0x0a0a
-	.short 0x6100
-	.short 0x00fe
-	.short 0x7c14
-	.short 0x6124
-	.short 0x660a
-	.short 0x336d
-	.short 0x0a0a
-	.short 0x0000
-	.short 0xce3c
-	.short 0x0018
-	rts
+    movew #-6,fd_curerr
+    movew #134,%fp@
+    movew %a5@(fd_curtrack),%d7
+    bsrw addr_1612
+    moveq #20,%d6
+    bsrb addr_153e
+    bnes addr_1526
+    .short 0x336d,fd_curtrack,0             /* movew %a5@(fd_curtrack),%a1@(0) */
+    .short 0xce3c,24                        /* andb #24,%d7 */
+addr_1526:
+    rts
 
 addr_1528:
-	.short 0x4246
-	.short 0x6112
-	.short 0x660e
-	.short 0x0807
-	.short 0x0002
-	.short 0x0a3c
-	.short 0x0004
-	.short 0x6604
-	.short 0x4269
-	.short 0x0000
-	rts
-	.short 0x3029
-/* 0x001540: */
-	.short 0x0002
-	.short 0xc03c
-	.short 0x0003
-	.short 0x8c00
-	.short 0x2e3c
-	.short 0x0004
-	.short 0x0000
-	.short 0x3cbc
-	.short 0x0080
-	.short 0x6100
-	.short 0x00d2
-	.short 0x0800
-	.short 0x0007
-	.short 0x6606
-	.short 0x2e3c
-	.short 0x0006
-	.short 0x0000
-	.short 0x6100
-	.short 0x00a4
-	.short 0x5387
-	.short 0x6712
-	.short 0x0839
-	.short 0x0005
-	.short 0xffff
-	.short 0xfa01
-	.short 0x66f2
-	.short 0x6100
-	.short 0x00a6
-	.short 0x4246
-	rts
-	.short 0x6104
-	.short 0x7c01
-/* 0x001580: */
-	rts
+    clrw %d6
+    bsrb addr_153e
+    bnes addr_153c
+    btst #2,%d7
+    eorib #4,%ccr
+    bnes addr_153c
+    .short 0x4269,0                         /* clrw %a1@(0) */
+addr_153c:
+    rts
+
+addr_153e:
+    movew %a1@(2),%d0
+    .short 0xc03c,3                         /* andb #3,%d0 */
+    orb %d0,%d6
+    movel #0x40000,%d7
+    movew #128,%fp@
+    bsrw addr_1626
+    btst #7,%d0
+    bnes addr_1562
+    movel #0x60000,%d7
+addr_1562:
+    bsrw addr_1608
+addr_1566:
+    subql #1,%d7
+    beqs addr_157c
+    btst #5,mfp_pp
+    bnes addr_1566
+    bsrw addr_161c
+    clrw %d6
+    rts
+addr_157c:
+    bsrb addr_1582
+    moveq #1,%d6
+    rts
 
 addr_1582:
 fdcreset:
@@ -1705,44 +1641,26 @@ addr_1592:
 addr_159c:
 select:
 .global select
-	.short 0x426d
-	.short 0x0a06
-	.short 0x302d
-	.short 0x0a08
-	.short 0x5200
-	.short 0xe308
-	.short 0x806d
-	.short 0x0a0e
-	.short 0x0a00
-	.short 0x0007
-	.short 0xc03c
-	.short 0x0007
-	.short 0x612c
-	.short 0x3cbc
-	.short 0x0082
-	.short 0x3e29
-	.short 0x0000
-	.short 0x6152
-/* 0x0015c0: */
-	.short 0x422d
-	.short 0x0a20
-
+    clrw %a5@(ram_unknown164)
+    movew %a5@(ram_unknown130),%d0
+    addqb #1,%d0
+    lslb #1,%d0
+    orw %a5@(fd_side),%d0
+    eorib #7,%d0
+    .short 0xc03c,7                         /* andb #7,%d0 */
+    bsrb addr_15e2
+    movew #130,%fp@
+    .short 0x3e29,0                         /* movew %a1@(0),%d7 */
+    bsrb addr_1612
+    clrb %a5@(ram_unknown165)
 addr_15c4:
-	.short 0x3cbc
-	.short 0x0084
-	.short 0x3e2d
-	.short 0x0a0c
-	.short 0x6144
-	.short 0x1b6d
-	.short 0x0a15
-	.short 0x860d
-	.short 0x1b6d
-	.short 0x0a14
-	.short 0x860b
-	.short 0x1b6d
-	.short 0x0a13
-	.short 0x8609
-	rts
+    movew #132,%fp@
+    movew %a5@(fd_sect),%d7
+    bsrb addr_1612
+    moveb %a5@(fd_buffer + 3),%a5@(dma_pointer_low + 1)
+    moveb %a5@(fd_buffer + 2),%a5@(dma_pointer_mid + 1)
+    moveb %a5@(fd_buffer + 1),%a5@(dma_pointer_high + 1)
+    rts
 
 addr_15e2:
 	.short 0x40e7
@@ -1766,6 +1684,7 @@ addr_15e2:
 	.short 0x46df
 	rts
 
+addr_1608:
 	.short 0x6124
 	.short 0x33c6
 	.short 0xffff
