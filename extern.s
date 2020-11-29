@@ -384,6 +384,9 @@ etv_term:
 .set ram_unknown123,0xebe
 .global ram_unknown123
 
+.set ram_unknown167,0xec6
+.global ram_unknown167
+
 .set ram_unknown131,0xecc
 .global ram_unknown131
 
@@ -501,6 +504,9 @@ struct _pbdef
 .set ram_unknown79,0xf12
 .global ram_unknown79
 
+.set ram_unknown177,0xf16
+.global ram_unknown177
+
 .set ram_unknown105,0xf56
 .global ram_unknown105
 
@@ -527,6 +533,9 @@ struct _pbdef
 
 .set ram_unknown122,0xfa2
 .global ram_unknown122
+
+.set ram_unknown168,0xfaa
+.global ram_unknown168
 
 .set ram_unknown111,0xfae
 .global ram_unknown111
@@ -584,9 +593,33 @@ struct _pbdef
 .set saved_vectors,0x1814
 .global saved_vectors
 
-/* This is a 1KB disk buffer from 0x181c to 0x221c (maybe it's just a pointer to the buffer) */
+/* This is a pointer to a 1KB disk buffer */
 .set disk_buffer,0x181c
 .global disk_buffer
+
+.set ram_unknown176,0x1827
+.global ram_unknown176
+
+.set ram_unknown175,0x1829
+.global ram_unknown175
+
+.set ram_unknown173,0x182d
+.global ram_unknown173
+
+.set ram_unknown169,0x182f
+.global ram_unknown169
+
+.set ram_unknown174,0x1832
+.global ram_unknown174
+
+.set ram_unknown171,0x1834
+.global ram_unknown171
+
+.set ram_unknown172,0x1836
+.global ram_unknown172
+
+.set ram_unknown170,0x1838
+.global ram_unknown170
 
 /* This is used by TOS but appears to be within the above buffer */
 .set _flip_y,0x1860
@@ -1137,6 +1170,7 @@ cart_boot:
 .set dma_pointer_low,0xffff860c             /* -31218 */
 
 .set psg,0xffff8800
+.set psg_write_data,0xffff8802
 .set blitter_halftone_ram,0x8a00            /* -30208 */
 .set mfp_pp,0xfffffa01                      /* -1536 */
 .set mfp_timerbc,0xfffffa1a
@@ -1162,6 +1196,7 @@ cart_boot:
 .global dma_pointer_mid
 .global dma_pointer_low
 .global psg
+.global psg_write_data
 .global blitter_halftone_ram
 .global mfp_pp
 .global mfp_timerbc
