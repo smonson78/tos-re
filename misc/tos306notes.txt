@@ -1,0 +1,333 @@
+desk_pref getting the address of the resource:
+obj = get_tree(ADSETPREF);
+
+
+#define ADSETPREF                          8 /* form/dialog */
+
+#define R_TREE     0
+
+OBJECT *get_tree(P(int16_t) item)
+PP(int16_t item;)
+{
+        OBJECT *obj;
+
+        rsrc_gaddr(R_TREE, item, (VOIDPTR *)&obj); // rsrc_gaddr(0, 8, (VOIDPTR *)&obj);
+	    
+        return obj;
+}
+
+int16_t pglobal[15];
+
+// This is AES (trap 2) opcode #112
+WORD rsrc_gaddr(WORD rstype, WORD rsid, VOIDPTR *paddr)
+{
+  WORD          ret;
+  ret = rs_gaddr( pglobal, rstype, rsid, paddr);
+  dsptch();
+  return(ret);
+}
+_rsrc_gaddr:
+        move.l  8(sp),-(sp)             ; paddr                         +4
+        move.l  4+4(sp),-(sp)           ; rstype, rsid                  +4
+        pea     _pglobal                ; &pglobal                      +4
+        jsr     _rs_gaddr
+        add.w   #12,sp
+        bra     disp1
+
+(somewhere else, shared)
+disp1:  move.l  d0,-(sp)                ; save return value
+        jsr     _dsptch                 ; dispatch
+        move.l  (sp)+,d0                ; restore return value
+        rts    
+
+
+_rs_gaddr       equ AESTBASE+$7144
+gemstart  equ AESTBASE
+
+/*
+ * AES #112 - rsrc_gaddr - Resource get address
+ *
+ *      Get a particular ADDRess out of a resource file that has been
+ *      loaded into memory.
+ */
+                             pglobal              0                  8
+int16_t rs_gaddr(P(intptr_t) pglobal, P(uint16_t) rtype, P(uint16_t) rindex, P(VOIDPTR *) rsaddr)
+PP(intptr_t pglobal;)
+PP(uint16_t rtype;)
+PP(uint16_t rindex;)
+PP(register VOIDPTR *rsaddr;)
+{
+        rs_sglobe(pglobal); // set up rs_global = pglobal and rs_hdr = pglobal[14]
+
+        *rsaddr = (VOIDPTR *)get_addr(rtype, rindex);
+	// *rsaddr = (*rs_global[10])[8]
+        return *rsaddr != (VOIDPTR *)-1L;
+}
+
+the gist of get_addr for RTREE is
+return LLGET(LLGET(APP_LOPNAME) + LW(rsindex * 4));
+
+#define APP_LOPNAME ((intptr_t)rs_global + 10)
+
+// cast x to a word then a longword (?)
+#define LW(x) ( (int32_t)((uint16_t)(x)) )
+
+/*
+ *      Set global addresses that are used by the resource library sub-
+ *      routines
+ */
+VOID rs_sglobe(P(intptr_t) pglobal)
+PP(intptr_t pglobal;)
+{
+        rs_global = pglobal;
+        rs_hdr = (RSHDR *)LLGET(APP_LO1RESV);
+	// this effectively means:
+	// rs_pglobal = pglobal
+	// rs_hdr = *(pglobal + 14)
+}
+
+
+/* Deference pointer to int32 */
+#define LLGET(x) ( *((int32_t *)(x)) )
+
+/* in global array      */
+#define APP_LO1RESV ((intptr_t)rs_global + 14) // 14 longwords?
+
+/*
+ * Should really be OBJECT *, as it was in the original DRI version.
+ * Someone messed it up and declared it as long in the Atari version.
+ * Even worse, LPTREE was not even used anymore, and all source
+ * files changes instead.
+ */
+typedef intptr_t LPTREE; // I think we can assume it's a pointer to long int
+
+PTR(_rs_global)
+
+
+
+crystal_interface calls: 0xf1ac
+
+the only thing that calls rsrc_gaddr(0, ...) is something at around:
+addr_1bd030 to addr_1bd040
+
+
+there's a variable, _gl_rschange, which is set to 1 when sshiftmod is changed.
+at the next AES tick, it changes the resolution.
+I already know where that is!
+
+
+
+
+
+	moveb #2,%a5@(shifter_sync_mode) /* Sync mode to 50Hz PAL */
+    
+
+this didn't work too well:
+
+_FindDevice2:
+    movew #4,%sp@-
+    trap #14                                /* Getrez() - get current video mode */
+    addql #2,%sp
+    moveb %d0,%d2                           /* Save the original resolution */
+    moveal ram_unknown51,%a0
+    movew %a0@,%d0                          /* Get the requested resolution */
+
+    cmpb #0,%d2                             /* Current resolution = low? */
+    beqs fd_origlow                         /* Yes, jump out */
+
+    cmpb #1,%d2                             /* Current resolution = medium? */
+    beqs fd_origmed                         /* Yes, jump out */
+
+    bras fd_orighigh                        /* Current resolution = high, jump out */
+
+fd_origlow:
+    cmpw #3,%d0
+    beqs fd_ch_med                          /* Switch to medium res */
+    cmpw #4,%d0
+    beqs fd_ch_hi                           /* Switch to high res */
+    bras fd_ch_low_pal
+
+fd_origmed:
+    cmpw #4,%d0
+    beqs fd_ch_hi                           /* Switch to high res */
+    cmpw #3,%d0
+    bne fd_ch_low                           /* Switch to low res */
+    bras fd_ch_med_pal
+
+fd_orighigh:
+    cmpw #3,%d0
+    beqs fd_ch_med                          /* Switch to medium res */
+    cmpw #4,%d0
+    bne fd_ch_low                           /* Switch to low res */
+    bras fd_ch_high_pal
+
+fd_ch_low:                                  /* Switch to low res */
+    clrw %sp@-
+    moveq #-1,%d0
+    movel %d0,%sp@-
+    movel %d0,%sp@-
+    movew #5,%sp@-
+    trap #14                                /* Setscreen(-1, -1, 0) - change to low res */
+    lea %sp@(12),%sp
+fd_ch_low_pal:
+    pea paltab16                            /* Set up 16-colour palette */
+    movew #6,%sp@-
+    trap #14                                /* Setpalette(void *pallptr) */
+    addql #6,%sp
+    moveq #1,%d0                            /* return 1 - low */
+	rts
+
+fd_ch_med:                                  /* Switch to medium res */
+    moveq #1,%d0
+    movew %d0,%sp@-
+    moveq #-1,%d0
+    movel %d0,%sp@-
+    movel %d0,%sp@-
+    movew #5,%sp@-
+    trap #14                                /* Setscreen(-1, -1, 1) */
+    lea %sp@(12),%sp
+fd_ch_med_pal:
+    pea paltab4                             /* Set up 4-colour palette */
+    movew #6,%sp@-
+    trap #14                                /* Setpalette(void *pallptr) */
+    addql #6,%sp
+    moveq #2,%d0                            /* return 2 - medium */
+	rts
+
+fd_ch_hi:
+    moveq #2,%d0
+    movew %d0,%sp@-
+    moveq #-1,%d0
+    movel %d0,%sp@-
+    movel %d0,%sp@-
+    movew #5,%sp@-
+    trap #14                                /* Setscreen(-1, -1, 2) */
+    lea %sp@(12),%sp
+fd_ch_high_pal:
+    pea paltab4                             /* Set up 4-colour palette */
+    movew #6,%sp@-
+    trap #14                               /* Setpalette(void *pallptr) */
+    addql #6,%sp
+    moveq #3,%d0                            /* return 3 - high */
+	rts
+
+
+
+1. Disable reboot on resolution change (not critical)
+2. Update desktop preferences dialog handler (FindDevice)
+3. Stop disabling the low/med/high buttons in the dialog at around addr_18684
+4. The crash at boot is happening during the call to esc_init.
+
+
+For reformatting jump tables:
+.short (0x00f.)\n\s.short 0x(....)
+.long $1$2
+
+
+/* 0x00c300: */
+	.short 0x51c8
+	.short 0xfffc
+	.short 0x23fc
+	.short 0x0000
+	.short 0x52ca
+	.short 0x0000
+	.short 0x2918
+
+    /* This is inside v_openwk() */
+
+	.short 0x4eb9
+	.long _FindDevice                        /* jsr FindDevice */
+
+    movew %d0,%fp@(-40)                     /* local variable: curRez */
+    cmpiw #2,%fp@(-40)                      /* is it 2? (medium) */
+    bnes addr_c342                          /* ...no -> skip */
+
+    movew #639,dev_tab                      /* X max */
+    movew #169,dev_tab + 6                  /* width of pixel in um */
+    movew #4,dev_tab + 26                   /* number of pens available (colours?) */
+    movew #2,inq_tab + 8                    /* number of planes */
+    bras addr_c3ae
+addr_c342:
+    cmpiw #3,%fp@(-40)                      /* Did we switch to high res? */
+    bnes addr_c3ae                          /* No --> skip */
+
+    movew #639,dev_tab                      /* X max */
+    movew #399,dev_tab + 2                  /* Y max */
+    movew #372,dev_tab + 6                  /* pixel width in um */
+    movew #2,dev_tab + 26                   /* number of pens
+    clrw dev_tab + 70                       /* colour capability flag */
+    movew #2,dev_tab + 78                   /* number of colours available */
+    movew #1,inq_tab + 2                    /* number of colour levels */
+    movew #1,inq_tab + 8                    /* number of planes */
+    clrw inq_tab + 10                       /* no CLUT */
+    movew #9,0x52cc                         /* ram8x8.point = 9 */
+    movew #10,0x5628                        /* ram8x16.point = 10 */
+    eoriw #1,0x530c                         /* ram8x8.flags ^= DEFAULT; */
+    oriw #1,0x5668                          /* ram8x16.flags |= DEFAULT; */
+    moveq #1,%d0
+    movew %d0,0x3bd2
+    moveal 0x2ae0,%a1
+    movew %d0,%a1@(12)
+    movel #15274,0x290c
+    clrl 0x3bea
+    movew #-1,0x2926
+
+
+	.short 0x33fc
+	.short 0x0001
+	.short 0x0000
+	.short 0x27d0
+
+
+
+When booting with (modded tos):
+    rgb, when desktop says low: res 0, _gl_resmod is 2, later 2
+    rgb, when desktop says medium: res 1, _gl_resmod is 3, later 3
+    rgb, when desktop says high: white screen, 71Hz
+
+    mono, when desktop says low: res 2, _gl_resmod is 2, later 4
+    mono, when desktop says medium: res 2, _gl_resmod is 3, later 3
+    mono, when desktop says high: res 2, _gl_resmod is 4, later 4
+
+hence, _gl_resmod is the saved desktop mode + 2
+it's set to the mode the desktop.inf wants at boot, then set based on the resolution in gsx_wsopen() after calling av_opnwk().
+
+If I change gsx_wsopen() so that it always sets _gl_resmod to 3, then the desktop still boots up in low res, but the desktop
+preferences dialog thinks that the machine's in medium res.
+
+
+gem_main()
+gsx_init()
+gsx_wsopen()
+    - Sets up _intin array and passes it to av_openwk() (using _gl_restype (2) for intin[0])
+    look int aes/gemgsxif.S _gsx_wsopen code for 306 to see how it was done later using a table.
+    - after calling av_opnwk, checks the value of _gl_ws and uses that to reset _gl_restype.
+    - _gl_ws isn't set anywhere that we've disassebled yet.
+
+av_opnwk()
+    - Copies _initin param to iioff
+    - calls vdi_call with d0=3
+vdi_call
+    - takes parameter in d0 (which is 3 for v_opnwk)
+    - passes params to gsx_acode(1, 0, 11)
+gsx_acode()
+    - Sets up parameter block starting at _contrl from stack parameter and _gl_handle
+    - passes control directly to gsx2() via linef 0xf050
+gsx2 
+    - Sets d1 to equal "pblock"
+    - Sets pblock.contrl = _contrl
+trap2_handler (with opcode 115)
+gsx_entry
+    - takes caller's parameter block in d1
+    - sets up local vars CONTRL, INTIN, INTOUT etc by copying from d1 (that sets up INTIN for FindDevice)
+_screen (with opcode #1)
+v_opnwk()
+FindDevice()
+    - Calls Setscreen() to change video mode
+Setscreen()
+    - Sets sshiftmod, and shifter mode
+    - Calls esc_init()
+esc_init()
+rezinit()
+    - Sets up font variables
+    - Clears video memory
