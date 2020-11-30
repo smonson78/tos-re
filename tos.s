@@ -755,6 +755,7 @@ addr_bc2:
     dbf %d0,addr_bc2
     rts
 
+addr_bd8:
     movel hdv_init,%sp@-
     rts
 
@@ -2317,70 +2318,56 @@ addr_1c98:
 
 addr_1cc6:
 .global addr_1cc6
-	.short 0x4e56
-	.short 0x0000
-	.short 0x48e7
-	.short 0x0300
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x0bd8
-	.short 0x4a79
-	.short 0x0000
-	.short 0x04a6
-	.short 0x6736
-	.short 0x7e02
-	.short 0x3ebc
-	.short 0x0001
-	.short 0x42a7
-	.short 0x3f3c
-	.short 0x0001
-	.short 0x4267
-	.short 0x42a7
-	.short 0x2f3c
-	.short 0x0000
-	.short 0x181c
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x0f38
-	.short 0xdefc
-	.short 0x0010
-	.short 0x4a80
-	.short 0x6604
-/* 0x001d00: */
-	.short 0x4247
-	.short 0x600c
-	.short 0x4a39
-	.short 0x0000
-	.short 0x09f8
-	.short 0x6604
-	.short 0x7003
-	.short 0x6028
-	.short 0x6002
-	.short 0x7e01
-	.short 0x4a47
-	.short 0x6704
-	.short 0x3007
-	.short 0x601c
-	.short 0x3ebc
-	.short 0x0100
-	.short 0x2f3c
-	.short 0x0000
-	.short 0x181c
-	.short 0x6100
-	.short 0x0106
-	.short 0x588f
-	.short 0xb07c
-	.short 0x1234
-	.short 0x6604
-	.short 0x4240
-	.short 0x6002
-	.short 0x7004
-	.short 0x4a9f
-	.short 0x4cdf
-	.short 0x0080
-	.short 0x4e5e
-/* 0x001d40: */
-	rts
+    linkw %fp,#0
+    moveml %d6-%d7,%sp@-
+    .short 0x4eb9                           /* jsr addr_bd8 */
+    .long addr_bd8
+    tstw _nflops
+    beqs addr_1d12
+    moveq #2,%d7
+    movew #0x1,%sp@
+    clrl %sp@-
+    movew #0x1,%sp@-
+    clrw %sp@-
+    clrl %sp@-
+    movel #disk_buffer,%sp@-
+    .short 0x4eb9                           /* jsr addr_f38 */
+    .long addr_f38
+    addaw #0x10,%sp
+    tstl %d0
+    bnes addr_1d04
+    clrw %d7
+    bras addr_1d10
+addr_1d04:
+    tstb ram_unknown162
+    bnes addr_1d10
+    moveq #3,%d0
+    bras addr_1d38
+addr_1d10:
+    bras addr_1d14
+addr_1d12:
+    moveq #1,%d7
+addr_1d14:
+    tstw %d7
+    beqs addr_1d1c
+    movew %d7,%d0
+    bras addr_1d38
+addr_1d1c:
+    movew #256,%sp@
+    movel #disk_buffer,%sp@-
+    bsrw addr_1e2e
+    addql #4,%sp
+    .short 0xb07c,0x1234                    /* cmpw #0x1234,%d0 */
+    bnes addr_1d36
+    clrw %d0
+    bras addr_1d38
+addr_1d36:
+    moveq #4,%d0
+addr_1d38:
+    tstl %sp@+
+    moveml %sp@+,%d7
+    unlk %fp
+    rts
 
 /* Generate a standard floppy disk boot sector into a pointed-to buffer */
 addr_1d42:
@@ -2496,129 +2483,105 @@ addr_1e46:
     rts
 
 addr_1e5e:
-	.short 0x4e56
-	.short 0xfffc
-	.short 0x206e
-	.short 0x0008
-	.short 0x1028
-	.short 0x0001
-	.short 0x4880
-	.short 0xc07c
-	.short 0x00ff
-	.short 0xe140
-	.short 0x226e
-	.short 0x0008
-	.short 0x1211
-	.short 0x4881
-	.short 0xc27c
-	.short 0x00ff
-	.short 0x8041
-/* 0x001e80: */
-	.short 0x4e5e
-	rts
-	.short 0x48e7
-	.short 0x1f1e
-	.short 0x9bcd
-	.short 0x206d
-	.short 0x0506
-	.short 0x4e90
-	.short 0x4cdf
-	.short 0x78f8
-	rts
-	.short 0x302f
-	.short 0x0006
-	.short 0x48e7
-	.short 0x1f1e
-	.short 0x3f00
-	.short 0x3f00
-	.short 0x9bcd
-	.short 0x206d
-	.short 0x050a
-	.short 0x4e90
-	.short 0x584f
-	.short 0x4cdf
-	.short 0x78f8
-	rts
-	.short 0x48e7
-	.short 0x1f1e
-	.short 0x9bcd
-	.short 0x206d
-	.short 0x050e
-	.short 0x4e90
-	.short 0x4cdf
-/* 0x001ec0: */
-	.short 0x78f8
-	rts
-	.short 0x302f
-	.short 0x0006
-	.short 0x48e7
-	.short 0x1f1e
-	.short 0x3f00
-	.short 0x3f00
-	.short 0x9bcd
-	.short 0x206d
-	.short 0x0512
-	.short 0x4e90
-	.short 0x584f
-	.short 0x4cdf
-	.short 0x78f8
-	rts
-	.short 0x206f
-	.short 0x0004
-	.short 0x226f
-	.short 0x0008
-	.short 0x48e7
-	.short 0x1f10
-	.short 0x7200
-	.short 0x7400
-	.short 0x7600
-	.short 0x7800
-	.short 0x7a00
-	.short 0x7c00
-	.short 0x7e00
-	.short 0x3647
-	.short 0x2008
-	.short 0x0800
-/* 0x001f00: */
-	.short 0x0000
-	.short 0x6702
-	.short 0x10c1
-	.short 0x2009
-	.short 0x9088
-	.short 0xc0bc
-	.short 0xffff
-	.short 0xff00
-	.short 0x672c
-	.short 0x41f0
-	.short 0x0800
-	.short 0x2448
-	.short 0xe088
-	.short 0x48e2
-	.short 0x7f10
-	.short 0x48e2
-	.short 0x7f10
-	.short 0x48e2
-	.short 0x7f10
-	.short 0x48e2
-	.short 0x7f10
-	.short 0x48e2
-	.short 0x7f10
-	.short 0x48e2
-	.short 0x7f10
-	.short 0x48e2
-	.short 0x7f10
-	.short 0x48e2
-	.short 0x7f10
-	.short 0x5380
-	.short 0x66dc
-	.short 0xb3c8
-/* 0x001f40: */
-	.short 0x6704
-	.short 0x10c1
-	.short 0x60f8
-	.short 0x4cdf
-	.short 0x08f8
-	rts
+    linkw %fp,#-4
+    moveal %fp@(8),%a0
+    moveb %a0@(1),%d0
+    extw %d0
+    .short 0xc07c,255                       /* andw #255,%d0 */
+    aslw #8,%d0
+    moveal %fp@(8),%a1
+    moveb %a1@,%d1
+    extw %d1
+    .short 0xc27c,255                       /* andw #255,%d1 */
+    orw %d1,%d0
+    unlk %fp
+    rts
+
+addr_1e84:
+    moveml %d3-%d7/%a3-%fp,%sp@-
+    subal %a5,%a5
+    moveal %a5@(prt_stat),%a0
+    jsr %a0@
+    moveml %sp@+,%d3-%d7/%a3-%fp
+    rts
+
+addr_1e96:
+    movew %sp@(6),%d0
+    moveml %d3-%d7/%a3-%fp,%sp@-
+    movew %d0,%sp@-
+    movew %d0,%sp@-
+    subal %a5,%a5
+    moveal %a5@(prt_vec),%a0
+    jsr %a0@
+    addqw #4,%sp
+    moveml %sp@+,%d3-%d7/%a3-%fp
+    rts
+
+addr_1eb2:
+    moveml %d3-%d7/%a3-%fp,%sp@-
+    subal %a5,%a5
+    moveal %a5@(aux_stat),%a0
+    jsr %a0@
+    moveml %sp@+,%d3-%d7/%a3-%fp
+    rts
+
+addr_1ec4:
+    movew %sp@(6),%d0
+    moveml %d3-%d7/%a3-%fp,%sp@-
+    movew %d0,%sp@-
+    movew %d0,%sp@-
+    subal %a5,%a5
+    moveal %a5@(aux_vec),%a0
+    jsr %a0@
+    addqw #4,%sp
+    moveml %sp@+,%d3-%d7/%a3-%fp
+    rts
+
+addr_1ee0:
+    moveal %sp@(4),%a0
+    moveal %sp@(8),%a1
+    moveml %d3-%d7/%a3,%sp@-
+    moveq #0,%d1
+    moveq #0,%d2
+    moveq #0,%d3
+    moveq #0,%d4
+    moveq #0,%d5
+    moveq #0,%d6
+    moveq #0,%d7
+    moveaw %d7,%a3
+    movel %a0,%d0
+    btst #0,%d0
+    beqs addr_1f06
+    moveb %d1,%a0@+
+addr_1f06:
+    movel %a1,%d0
+    subl %a0,%d0
+    .short 0xc0bc                           /* andl #0xffffff00,%d0 */
+    .long 0xffffff00
+    beqs addr_1f3e
+    lea %a0@(0x0,%d0:l),%a0
+    moveal %a0,%a2
+    lsrl #8,%d0
+addr_1f1a:
+    moveml %d1-%d7/%a3,%a2@-
+    moveml %d1-%d7/%a3,%a2@-
+    moveml %d1-%d7/%a3,%a2@-
+    moveml %d1-%d7/%a3,%a2@-
+    moveml %d1-%d7/%a3,%a2@-
+    moveml %d1-%d7/%a3,%a2@-
+    moveml %d1-%d7/%a3,%a2@-
+    moveml %d1-%d7/%a3,%a2@-
+    subql #1,%d0
+    bnes addr_1f1a
+addr_1f3e:
+    cmpal %a0,%a1
+    beqs addr_1f46
+    moveb %d1,%a0@+
+    bras addr_1f3e
+addr_1f46:
+    moveml %sp@+,%d3-%d7/%a3
+    rts
+
 addr_1f4c:
 .global addr_1f4c
 	.short 0x6122
@@ -2637,6 +2600,7 @@ addr_1f4c:
 	.short 0x60be
 	.short 0x7000
 	rts
+
 	.short 0x70ff
 	rts
 
@@ -2677,6 +2641,7 @@ addr_1f70:
 	.short 0x0000
 	.short 0x001d
 	rts
+
 	.short 0x2e4a
 	.short 0x2342
 	.short 0x0008
