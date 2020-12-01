@@ -1,11 +1,11 @@
 SECTIONS {
-    .ram : {
-        *(.ram)
-    }
+	.ram : {
+			*(.ram)
+	}
 
-    .cart : {
-        *(.cart)
-    }
+	.cart : {
+			*(.cart)
+	}
 
 	.text . : SUBALIGN(0) {
 		*(.text)
@@ -22,9 +22,9 @@ SECTIONS {
 		. = ALIGN(2);
 	}
 
-    .mmu : {
-        *(.mmu)
-    }
+	.mmu : {
+			*(.mmu)
+	}
 
 	/DISCARD/ : {
 		*(.group)

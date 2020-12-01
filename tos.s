@@ -370,9 +370,9 @@ trap14_vectors:
 	.long dummy_subroutine                  /* 1 - Ssbrk() - not implemented */
 	.long physbase                          /* 2 - Physbase() - returns physical address of screen memory */
 	.long logbase                           /* 3 - Logbase() */
-	.long getrez                            /* 4 - int16_t Getrez() */
+	.long Getrez                            /* 4 - int16_t Getrez() */
 	.long setscreen                         /* 5 - Setscreen(void *laddr, void *paddr, int16_t rez) */
-	.long setpalette                        /* 6 - Setpalette(void *pal) */
+	.long Setpalette                        /* 6 - Setpalette(void *pal) */
 	.long setcolor                          /* 7 - int16_t Setcolor(int16_t colornum, int16_t color) */
     /* 8 - int16_t Floprd(void *buf, int32_t filler, int16_t devno, int16_t sectno, int16_t trackno, int16_t sideno, int16_t count); */
 	.long floprd
@@ -595,7 +595,7 @@ logbase:
     2 - high res
 */
 addr_a72:
-getrez:
+Getrez:
 	moveq #0,%d0
     moveb %a5@(video_res),%d0
     .short 0xc03c,0003                      /* andb #3,%d0 */
@@ -626,8 +626,7 @@ addr_ac2:
     rts
 
 addr_ac4:
-setpalette:
-.global setpalette
+Setpalette:
 	movel %sp@(4),%a5@(colorptr)
 	rts
 
@@ -20897,6 +20896,7 @@ linea_handler:
 
 addr_b222:
 v_clrwk:
+.global v_clrwk
 	.short 0x2f00
 	.short 0x3039
 	.short 0x0000
@@ -20977,10 +20977,15 @@ init_g:
 	.short 0x3080
 	rts
 
+/* MOVED to C func */
 addr_b2b6:
-_FindDevice:
+_OldFindDevice:
+		/*jmp FindDevice*/
+
+		/* Comment out these 2 to replace with jmp instruction */
     movew #4,%sp@-
     trap #14                                /* Getrez() - get current video mode */
+
     addql #2,%sp
     moveb %d0,%d2                           /* Save the original resolution value */
     .short 0xb43c,0x0002                    /* cmpb #2,%d2 - current rez = mono? */
@@ -21054,6 +21059,7 @@ addr_b332:
 /* Default palette for medium */
 addr_b344:
 paltab4:
+.global paltab4
 	.short 0x0777
 	.short 0x0700
 	.short 0x0070
@@ -21062,6 +21068,7 @@ paltab4:
 /* Default palette for low */
 addr_b34c:
 paltab16:
+.global paltab16
 	.short 0x0777
 	.short 0x0700
 	.short 0x0070
@@ -21079,6 +21086,8 @@ paltab16:
 	.short 0x0377
 	.short 0x0000
 
+/* End of FindDevice */
+    
 	.short 0x48e7
 	.short 0xfffe
 	.short 0x2079
@@ -21089,9 +21098,10 @@ paltab16:
 	.short 0x7fff
 	.short 0x2f39
 	.short 0x0000
-/* 0x00b380: */
 	.short 0x2a9e
 	rts
+
+/* . = 0xb384 */
 
 addr_b384:
 dinit_g:
@@ -22989,8 +22999,8 @@ addr_c2fe:
 
     movel #ram8x8,font_ring + 4             /* font_ring[1] = &ram8x8 */
 
-	.short 0x4eb9
-	.long _FindDevice                       /* jsr FindDevice */
+		.short 0x4eb9
+		.long FindDevice                        /* jsr FindDevice */
 
     movew %d0,%fp@(-40)                     /* return value ==> curRez */
     cmpiw #2,%fp@(-40)                      /* is it 2? (medium) */
@@ -97062,546 +97072,9 @@ addr_2f9b6:
 	.short 0x0005
 	.short 0x0014
 	.short 0x0000
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fc00: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fc40: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fc80: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fcc0: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fd00: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fd40: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fd80: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fdc0: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fe00: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fe40: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fe80: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02fec0: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02ff00: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02ff40: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02ff80: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-/* 0x02ffc0: */
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
-	.short 0xffff
+
+
+
 	.short 0xffff
 	.short 0xffff
 	.short 0xffff

@@ -3,10 +3,11 @@ AS=m68k-elf-as
 OBJCOPY=m68k-elf-objcopy
 OBJDUMP=m68k-elf-objdump
 
+CFLAGS=-I. -Os -Wall
 ASFLAGS=-m68000 --no-pad-sections
 LDFLAGS=-m68000 -nostdlib
 
-OBJECTS=extern.o boot.o tos.o
+OBJECTS=extern.o boot.o tos.o find_device.o
 
 tos.bin: $(OBJECTS)
 	m68k-elf-ld \
@@ -19,7 +20,7 @@ tos.bin: $(OBJECTS)
 		--remove-section=.ram --remove-section=.cart --remove-section=.mmu \
 		--output-target=binary tos.elf tos.bin
 
-	@TMP=$$( cmp tos.bin tos104uk.img | sed -e "s/.*differ: byte \([^ ,]*\).*/\1/ p; d" ); if [ -n "$$TMP" ]; then echo $$TMP | xargs printf "\n*** No match to TOS 1.4 at: 0x%0x\n\n"; fi
+#@TMP=$$( cmp tos.bin tos104uk.img | sed -e "s/.*differ: byte \([^ ,]*\).*/\1/ p; d" ); if [ -n "$$TMP" ]; then echo $$TMP | xargs printf "\n*** No match to TOS 1.4 at: 0x%0x\n\n"; fi
 
 clean:
 	$(RM) *.o tos.elf tos.bin
