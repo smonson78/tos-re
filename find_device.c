@@ -83,17 +83,19 @@ int FindDevice() {
   : "d0", "d1", "d2", "a0", "a1", "a2" // clobbered regs
   );
 
+  curres &= 0xff;
+
   //if (curres == SHIFTER_MODE_HIGH) {
     // Mono - can't be changed. Reset the palette and then exit.
   //  newres = curres;
   //} else {
 
-    int newres = *INTIN;
-    if (newres == SYSTEM_VIDMODE_NOCHANGE) {
-      newres = curres;
-    } else {
-      newres -= 2;
-    }
+  int newres = INTIN[0] & 0xff;
+  if (newres == SYSTEM_VIDMODE_NOCHANGE) {
+    newres = curres;
+  } else {
+    newres -= 2;
+  }
   //}
 
   // curres and newres should both be in shifter mode numbers now
