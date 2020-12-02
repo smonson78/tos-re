@@ -30,4 +30,14 @@ fcb5b0:	2079 0000 2b82 	moveal 0x2b82,%a0
   | sed -e "s/0xfc\([0-9a-f]\{4\}\)/addr_\1/g" \
   | sed -e "s/0xfd\([0-9a-f]\{4\}\)/addr_1\1/g" \
   | sed -e "s/0xfe\([0-9a-f]\{4\}\)/addr_2\1/g" \
-  | sed -e "s/addr_0*/addr_/"
+  | sed -e "s/addr_0*/addr_/" | sed -e "s/\t/  /"
+
+
+  Make a preprocessor that changes stuff into inline shorts so that gas doesn't fuck around with the opcodes.
+  e.g.
+    * cmp --> cmpi
+    * andw --> andi
+    * ori -->
+    * sub --> subi
+    * cmpi sometimes???
+    * move with a zero displacement - GNU as removes the displacement operand.

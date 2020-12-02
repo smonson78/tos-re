@@ -1,0 +1,9 @@
+#!/bin/sh
+
+~/dev/decompiler2020/decompiler2/disassembler/dasm -s -e $1 -f $2 -b fc0000 -n extern.s \
+  ~/dev/tos-re/tos104uk.img \
+  | ~/dev/decompiler2020/decompiler2/assisted-disassembler/add_labels.py /dev/stdin \
+  | sed -e "s/0xfc\([0-9a-f]\{4\}\)/addr_\1/g" \
+  | sed -e "s/0xfd\([0-9a-f]\{4\}\)/addr_1\1/g" \
+  | sed -e "s/0xfe\([0-9a-f]\{4\}\)/addr_2\1/g" \
+  | sed -e "s/addr_0*/addr_/"

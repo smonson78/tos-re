@@ -2,20 +2,21 @@
 
 addr_0:
 os_entry:
-    bras boot           /* Initial SP */
+    bras _main        /* OS entry, branch to main() */
 addr_2:
 os_version:
 	.short 0x0104       /* TOS v1.04 */
 addr_4:
 reseth:    
-	.long boot          /* Initial PC */
+	.long _main         /* Reset handler */
 addr_8:
 os_beg:	
 	.long os_entry      /* Start of OS */
 addr_c:
 os_end:
-	.long 0x0000611c    /* Start of free RAM */
-	.long boot          /* Default shell (reset) */
+	.long 0x0000611c    /* Value of _endvdibss (start of free RAM) */
+os_res1:
+	.long _main         /* Reserved */
 addr_14:    
 os_magic:
 	.long gem_magic     /* Address for GEM magic */
@@ -24,26 +25,61 @@ os_date:
 	.long 0x04061989    /* TOS date 04/06/1989 */
 addr_1c:    
 os_conf:
-	.short 0x0007       /* PAL version */
+	.short 0x0007       /* Country flag, PAL version flag */
 addr_1e:    
 os_dosdate:
 	.short 0x1286       /* Date in DOS format */
 addr_20:
-pp_root:
-	.long 0x0000378c    /*  */
+os_root:
+	.long 0x0000378c    /* Value of _pool (pointer to GEMDOS mem pool) */
 addr_24:
-ppbkshift:
-	.long 0x00000e7d    /*  */
-addr_28:    
-pp_run:
-	.long 0x00005622    /*  */
+os_kbshift:
+	.long 0x00000e7d    /* Pointer to keyboard shift key states */
+addr_28:
+os_run:
+	.long 0x00005622    /* Pointer to a pointer to the actual basepage */
+os_dummy:
 	.long 0x00000000    /*  */
 
 .global os_entry
+.global os_conf
+.global os_beg
+.global os_end
+.global os_res1
 .global os_magic
+.global os_date
+.global os_conf
+.global os_dosdate
+.global os_root
+.global os_kbshift
+.global os_run
+.global os_dummy
 
-boot:
-.global boot
+/*
+.section .data
+
+	dc.l GEM_MUPB_MAGIC
+	dc.l _endgembss
+	dc.l gemstart
+*/
+
+/*
+ * Get in supervisor mode and reset all Hardware
+ *
+ * The following considerations have been taken into account:
+ * 1. for unknown reasons, real Falcons need an access to location $ffff8006
+ *    before and after the reset instruction
+ * 2. in order to run the same code on systems without a register at $ffff8006,
+ *    the bus error vector must be intercepted prior to #1
+ * 3. since non-68000 systems use the VBR to point to the start of the exception
+ *    vectors, the VBR must be zeroed prior to #2 via MOVEC
+ * 4. in order to run the same code on 68000 systems (which don't have MOVEC),
+ *    the illegal instruction vector must be intercepted prior to #3.  for this,
+ *    it doesn't matter if the VBR is non-zero because, if it is, the MOVEC
+ *    instruction must be legal so the trap won't get taken ...
+ */
+_main:
+.global _main
 	movew #0x2700,%sr
 	reset
 	subal %a5,%a5
@@ -317,7 +353,7 @@ addr_384:
     .short 0x41f9                               /* lea bios_vectors,%a0 - ROM copy of BIOS routine vectors */
     .long bios_vectors
 
-    moveaw #xconstat,%a1                        /* 4 tables of 8 vectors each: xconstat, xconin, xcostat, xconout */
+    moveaw #xconstat_vec,%a1                    /* 4 tables of 8 vectors each: xconstat, xconin, xcostat, xconout */
     moveq #31,%d0                               /* Copy 32 longwords */
 addr_396:    
     movel %a0@+,%a1@+                           /* Copy */
@@ -356,7 +392,7 @@ addr_3f6:
     bnes addr_414                               /* Not medium res? */
     movew %a5@(palette + 30),%a5@(palette + 6)  /* Copy colour 15 (black) to colour 3 */
 addr_414:
-    movel #boot,%a5@(swv_vec)                   /* Reboot on resolution-change vector */
+    movel #_main,%a5@(swv_vec)                  /* Reboot on resolution-change vector */
     movew #1,%a5@(vblsem)
     clrw %d0
     bsrw cartscan
@@ -371,7 +407,7 @@ addr_414:
 
     jsr addr_1f4c
     bccs addr_462                               /* 2 calls out of these three: Boot from floppy? */
-    bsrw addr_31a8                              /* Boot from DMA bus? */
+    bsrw igetdt                                 /* Boot from DMA bus? */
                                                 /* Execute reset-resident programs? */
     swap %d0
 
@@ -446,7 +482,7 @@ addr_4fc:
     trap #1                                     /* GEMDOS */
     addaw #14,%sp                               /* Correct stack pointer */
     .short 0x4ef9                               /* jmp boot - Reboot the machine */
-    .long boot
+    .long _main
 
 addr_50c:
 default_env:
@@ -468,4 +504,6 @@ addr_524:
 
 addr_52b:
 empty_string:
+.global empty_string
     .byte 0,0,0
+

@@ -109,10 +109,10 @@ etv_term:
 .set aux_stat,0x50e                         /* Vector for printer device status */
 .set aux_vec,0x512                          /* Vector for printer device byte output */
 .set memval3,0x51a                          /* On warm boot, contains 0x5555aaaa */
-.set xconstat,0x51e                         /* 8 Bconstat() vectors for 8 BIOS devices */
-.set xconin,0x53e                           /* 8 Bconin() vectors for 8 BIOS devices */
-.set xcostat,0x55e                          /* 8 Bcostat() vectors for 8 BIOS devices */
-.set xconout,0x57e                          /* 8 Bconout() vectors for 8 BIOS devices */
+.set xconstat_vec,0x51e                     /* 8 Bconstat() vectors for 8 BIOS devices */
+.set xconin_vec,0x53e                       /* 8 Bconin() vectors for 8 BIOS devices */
+.set xcostat_vec,0x55e                      /* 8 Bcostat() vectors for 8 BIOS devices */
+.set xconout_vec,0x57e                      /* 8 Bconout() vectors for 8 BIOS devices */
 .set _longframe,0x59e                       /* Something to do with C calling conventions */
 
 .global memvalid
@@ -164,10 +164,10 @@ etv_term:
 .global aux_stat
 .global aux_vec
 .global memval3
-.global xconstat
-.global xconin
-.global xcostat
-.global xconout
+.global xconstat_vec
+.global xconin_vec
+.global xcostat_vec
+.global xconout_vec
 .global _longframe
 
 
@@ -310,6 +310,12 @@ etv_term:
 .set ram_unknown129,0xa50
 .global ram_unknown129
 
+.set ram_unknown166,0xa54
+.global ram_unknown166
+
+.set ram_unknown178,0xa61
+.global ram_unknown178
+
 .set baudrate,0xa6e
 .global baudrate
 
@@ -334,6 +340,18 @@ etv_term:
 /* A mouse vector */
 .set mouseint,0xe3e
 .global mouseint
+
+.set clockbuf,0xe63
+.global clockbuf
+
+.set iclkrtime,0xe6c
+.global iclkrtime
+
+.set iclkwtime,0xe70
+.global iclkwtime
+
+.set iclkbuf,0xe74
+.global iclkbuf
 
 .set ram_unknown93,0xe7d
 .global ram_unknown93
@@ -361,6 +379,9 @@ etv_term:
 
 .set ram_unknown24,0xeac
 .global ram_unknown24
+
+.set iclk_ready,0xeae
+.global iclk_ready
 
 /* 32 bits */
 .set rseed,0xeb0
@@ -582,6 +603,9 @@ struct _pbdef
 .set ram_unknown108,0xfee
 .global ram_unknown108
 
+.set ram_unknown181,0xff2
+.global ram_unknown181
+
 /* Saved copy of SR register */
 .set saved_sr_register,0xffa
 .global saved_sr_register
@@ -786,12 +810,24 @@ struct _pbdef
 .set ram_unknown37,0x35a8
 .global ram_unknown37
 
+/* For some reason this is the same as "time" system variable */
 .set stack_top,0x378a
 .global stack_top
+.set time,0x378a
+.global time
+
+.set ram_unknown182,0x37dc
+.global ram_unknown182
+
+.set ram_unknown183,0x3ba0
+.global ram_unknown183
 
 /* Virtual workstation "ATTRIBUTE" structure (308+ bytes - to 3cde) */
 .set virt_work,0x3baa
 .global virt_work
+
+.set ram_unknown184,0x3ce2
+.global ram_unknown184
 
 .set ram_unknown17,0x52c8
 .global ram_unknown17
@@ -799,6 +835,9 @@ struct _pbdef
 /* A big font struct */
 .set ram8x8,0x52ca
 .global ram8x8
+
+.set ram_unknown180,0x5324
+.global ram_unknown180
 
 .set ram_unknown6,0x5622
 .global ram_unknown6
@@ -830,6 +869,9 @@ struct _pbdef
 
 .set ram_unknown18,0x5f36
 .global ram_unknown18
+
+.set ram_unknown179,0x5fb0
+.global ram_unknown179
 
 .set ram_unknown11,0x60b2
 .global ram_unknown11
@@ -1180,6 +1222,7 @@ cart_boot:
 .set kbd_acia_data,0xfffffc02
 .set midi_acia_control,0xfffffc04           /* -1020 */
 .set midi_acia_data,0xfffffc06
+.set real_time_clock1,0xfffffc20
 
 .global memctrl
 .global video_baseh
@@ -1205,6 +1248,7 @@ cart_boot:
 .global kbd_acia_data
 .global midi_acia_control
 .global midi_acia_data
+.global real_time_clock1
 
 .set STACK_SIZE,448
 .set uda_size,74+(4*STACK_SIZE)
