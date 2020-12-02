@@ -20987,7 +20987,7 @@ _FindDevice:
     beqs addr_b332                          /* Yes - can't be changed */
 
     moveal INTIN,%a0
-    movew %a0@,%d0                          /* get something from a variable and put it in d0, this must be the requested res */
+    movew %a0@,%d0                          /* Get requested res from INTIN[0] */
     .short 0xb07c,0x0001                    /* cmpw #1,%d0 */
     bnes addr_b2da                          /* 1 not requested, go here */
     tstb %d2
