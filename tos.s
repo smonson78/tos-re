@@ -2584,70 +2584,43 @@ addr_1f46:
 
 addr_1f4c:
 .global addr_1f4c
-	.short 0x6122
-	.short 0x651c
-	.short 0x6170
-	.short 0xb0bc
-	.short 0xffff
-	.short 0xffff
-	.short 0x6712
-	.short 0x33c0
-	.short 0x0000
-	.short 0x378a
-	.short 0x4840
-	.short 0x33c0
-	.short 0x0000
-	.short 0x60be
-	.short 0x7000
-	rts
-
-	.short 0x70ff
-	rts
+  bsrb addr_1f70
+  bcss addr_1f6c
+  bsrb addr_1fc2
+  cmpl #0xffffffff,%d0
+  beqs addr_1f6c
+  movew %d0,stack_top
+  swap %d0
+  movew %d0,ram_unknown2
+  moveq #0,%d0
+  rts
+addr_1f6c:
+  moveq #-1,%d0
+  rts
 
 addr_1f70:    
-	.short 0x93c9
-	.short 0x307c
-	.short 0xfc20
-	.short 0x2429
-	.short 0x0008
-	.short 0x244f
-	.short 0x237c
-	.short 0x00fc
-/* 0x001f80: */
-	.short 0x1fb6
-	.short 0x0008
-	.short 0x117c
-	.short 0x0009
-	.short 0x001b
-	.short 0x2342
-	.short 0x0008
-	.short 0x303c
-	.short 0x0a05
-	.short 0x0188
-	.short 0x0005
-	.short 0x0308
-	.short 0x0005
-	.short 0xc27c
-	.short 0x0f0f
-	.short 0xb240
-	.short 0x661a
-	.short 0x117c
-	.short 0x0001
-	.short 0x0001
-	.short 0x117c
-	.short 0x0008
-	.short 0x001b
-	.short 0x117c
-	.short 0x0000
-	.short 0x001d
-	rts
-
-	.short 0x2e4a
-	.short 0x2342
-	.short 0x0008
-	.short 0x003c
-	.short 0x0001
-/* 0x001fc0: */
+  subal %a1,%a1
+  moveaw #real_time_clock1,%a0
+  movel %a1@(8),%d2
+  moveal %sp,%a2
+  movel #addr_1fb6,%a1@(8)
+  moveb #0x9,%a0@(27)
+  movel %d2,%a1@(8)
+  movew #0xa05,%d0
+  movepw %d0,%a0@(5)
+  movepw %a0@(5),%d1
+  andw #0xf0f,%d1
+  cmpw %d0,%d1
+  bnes addr_1fbc
+  moveb #0x1,%a0@(1)
+  moveb #0x8,%a0@(27)
+  moveb #0x0,%a0@(29)
+  rts
+addr_1fb6:  
+  moveal %a2,%sp
+  movel %d2,%a1@(8)
+addr_1fbc:
+  orib #1,%ccr
 	rts
 
 addr_1fc2:	
