@@ -1180,6 +1180,7 @@ cart_boot:
 .set kbd_acia_data,0xfffffc02
 .set midi_acia_control,0xfffffc04           /* -1020 */
 .set midi_acia_data,0xfffffc06
+.set real_time_clock1,0xfffffc20
 
 .global memctrl
 .global video_baseh
@@ -1205,6 +1206,7 @@ cart_boot:
 .global kbd_acia_data
 .global midi_acia_control
 .global midi_acia_data
+.global real_time_clock1
 
 .set STACK_SIZE,448
 .set uda_size,74+(4*STACK_SIZE)
