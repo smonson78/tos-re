@@ -315,7 +315,7 @@ trap13_handler:
 .global trap13_handler
   lea %pc@(trap13_vectors),%a0
 
-addr_7ce:                                   /* Lookup and jump from table - table address in a0 */
+addr_7ce:                                 /* Lookup and jump from table - table address in a0 */
   moveal savptr,%a1                       /* location of saved registers */
   movew %sp@+,%d0                         /* Get a word off the stack (sr)... */
   movew %d0,%a1@-                         /* ...put it on saved stack location */
@@ -342,7 +342,7 @@ addr_802:
   moveml %a1@+,%d3-%d7/%a3-%sp            /* Restore previously-saved registers, including sp */
   movel %a1@+,%sp@-                       /* Restore longword to stack */
   movew %a1@+,%sp@-                       /* Restore word to stack */
-  movel %a1,savptr	                    /* Store the new saved-registers location */
+  movel %a1,savptr	                      /* Store the new saved-registers location */
   rte
 
 /* BIOS functions */
@@ -2623,103 +2623,74 @@ addr_1fbc:
   orib #1,%ccr
 	rts
 
-addr_1fc2:	
-	.short 0x61ac
-	.short 0x6500
-	.short 0x00b6
-	.short 0x43f9
-	.short 0x0000
-	.short 0x0a54
-	.short 0x45f9
-	.short 0x0000
-	.short 0x0a61
-	.short 0x6100
-	.short 0x008e
-	.short 0xc34a
-	.short 0x6100
-	.short 0x0088
-	.short 0x700c
-	.short 0x1231
-	.short 0x0000
-	.short 0xb232
-	.short 0x0000
-	.short 0x66ee
-	.short 0x51c8
-	.short 0xfff4
-	.short 0x7000
-	.short 0x1029
-	.short 0x000b
-	.short 0xc0fc
-	.short 0x000a
-	.short 0xd029
-	.short 0x000c
-	.short 0xe240
-	.short 0x3200
-/* 0x002000: */
-	.short 0x7000
-	.short 0x1029
-	.short 0x0009
-	.short 0xc0fc
-	.short 0x000a
-	.short 0xd029
-	.short 0x000a
-	.short 0xeb40
-	.short 0xd240
-	.short 0x7000
-	.short 0x1029
-	.short 0x0007
-	.short 0xc0fc
-	.short 0x000a
-	.short 0xd029
-	.short 0x0008
-	.short 0xe140
-	.short 0xe740
-	.short 0xd240
-	.short 0x4841
-	.short 0x7000
-	.short 0x1029
-	.short 0x0004
-	.short 0xc0fc
-	.short 0x000a
-	.short 0xd029
-	.short 0x0005
-	.short 0x3200
-	.short 0x7000
-	.short 0x1029
-	.short 0x0002
-	.short 0xc0fc
-/* 0x002040: */
-	.short 0x000a
-	.short 0xd029
-	.short 0x0003
-	.short 0xeb40
-	.short 0xd240
-	.short 0x7000
-	.short 0x1029
-	.short 0x0000
-	.short 0xc0fc
-	.short 0x000a
-	.short 0xd029
-	.short 0x0001
-	.short 0xe140
-	.short 0xe340
-	.short 0xd240
-	.short 0x4841
-	.short 0x2001
+addr_1fc2:
+	bsrb addr_1f70
+	bcsw addr_207c
+	lea 0xa54,%a1
+	lea 0xa61,%a2
+	bsrw addr_2064
+addr_1fd8:
+	exg %a1,%a2
+	bsrw addr_2064
+	moveq #12,%d0
+addr_1fe0:
+	moveb %a1@(0x0,%d0:w),%d1
+	cmpb %a2@(0x0,%d0:w),%d1
+	bnes addr_1fd8
+	dbf %d0,addr_1fe0
+	moveq #0,%d0
+	moveb %a1@(11),%d0
+	muluw #10,%d0
+	addb %a1@(12),%d0
+	asrw #1,%d0
+	movew %d0,%d1
+	moveq #0,%d0
+	moveb %a1@(9),%d0
+	muluw #10,%d0
+	addb %a1@(10),%d0
+	aslw #5,%d0
+	addw %d0,%d1
+	moveq #0,%d0
+	moveb %a1@(7),%d0
+	muluw #10,%d0
+	addb %a1@(8),%d0
+	aslw #8,%d0
+	aslw #3,%d0
+	addw %d0,%d1
+	swap %d1
+	moveq #0,%d0
+	moveb %a1@(4),%d0
+	muluw #10,%d0
+	addb %a1@(5),%d0
+	movew %d0,%d1
+	moveq #0,%d0
+	moveb %a1@(2),%d0
+	muluw #10,%d0
+	addb %a1@(3),%d0
+	aslw #5,%d0
+	addw %d0,%d1
+	moveq #0,%d0
+	moveb %a1@(0),%d0
+	muluw #10,%d0
+	addb %a1@(1),%d0
+	aslw #8,%d0
+	aslw #1,%d0
+	addw %d0,%d1
+	swap %d1
+	movel %d1,%d0
 	rts
-	.short 0x700c
-	.short 0x7201
-	.short 0x1430
-	.short 0x1000
-	.short 0xc43c
-	.short 0x000f
-	.short 0x1382
-	.short 0x0000
-	.short 0x5441
-	.short 0x51c8
-	.short 0xfff0
+addr_2064:
+	moveq #12,%d0
+	moveq #1,%d1
+addr_2068:
+	moveb %a0@(0x0,%d1:w),%d2
+	andb #0xf,%d2
+	moveb %d2,%a1@(0x0,%d0:w)
+	addqw #2,%d1
+	dbf %d0,addr_2068
 	rts
-	.short 0x70ff
+addr_207c:
+	moveq #-1,%d0
 	rts
 
 addr_2080:
@@ -16928,110 +16899,89 @@ addr_9348:
   bnes addr_9380
   moveal %a4,%sp
   movel %fp,%usp
+addr_9374:
   movel %a3,%sp@-
   movew %d0,%sp@-
   moveml %a5@(104),%d0/%a3-%fp
   rte
-
 addr_9380:
-	.short 0x2e4e
-	.short 0x4e64
-	.short 0x60ee
-
+	moveal %fp,%sp
+	movel %a4,%usp
+	bras addr_9374
 addr_9386:
-	.short 0x2228
-	.short 0x0002
-	.short 0x6708
-	.short 0x5381
-	.short 0x6744
-	.short 0x2068
-	.short 0x0002
-	.short 0x301f
-	.short 0x211f
-	.short 0x0040
-	.short 0x2000
-	.short 0x3100
-	.short 0x200f
-	.short 0x2e48
-	.short 0x4e73
-
+	movel %a0@(2),%d1
+	beqs addr_9394
+	subql #1,%d1
+	beqs addr_93d4
+	moveal %a0@(2),%a0
+addr_9394:
+	movew %sp@+,%d0
+	movel %sp@+,%a0@-
+	oriw #8192,%d0
+	movew %d0,%a0@-
+	movel %sp,%d0
+	moveal %a0,%sp
+	rte
 addr_93a4:
-	.short 0x222f
-	.short 0x0008
-	.short 0x671e
-	.short 0x5381
-	.short 0x6726
-	.short 0x226f
-	.short 0x0008
-	.short 0x301f
-	.short 0x231f
-	.short 0x3300
-	.short 0x4e68
-	.short 0xbfc8
-	.short 0x6706
-	.short 0x211f
-/* 0x0093c0: */
-	.short 0x2e49
-	.short 0x6008
-	.short 0x2e49
-	.short 0x6006
-	.short 0x204f
-	.short 0x5c88
-	.short 0x4e60
-	.short 0x0257
-	.short 0xdfff
-	.short 0x4e73
-	.short 0x203c
-	.short 0x0000
-	.short 0x2000
-	.short 0xc057
-	.short 0x6702
-	.short 0x70ff
-	.short 0x4e73
-	.short 0x4e56
-	.short 0x0000
-	.short 0x2f08
-	.short 0x41ee
-	.short 0x0008
-	.short 0x2f08
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x97c8
-	.short 0x588f
-	.short 0x205f
-	.short 0x4e5e
+	movel %sp@(8),%d1
+	beqs addr_93c8
+	subql #1,%d1
+	beqs addr_93d4
+	moveal %sp@(8),%a1
+	movew %sp@+,%d0
+	movel %sp@+,%a1@-
+	movew %d0,%a1@-
+	movel %usp,%a0
+	cmpal %a0,%sp
+	beqs addr_93c4
+	movel %sp@+,%a0@-
+	moveal %a1,%sp
+	bras addr_93cc
+addr_93c4:
+	moveal %a1,%sp
+	bras addr_93ce
+addr_93c8:
+	moveal %sp,%a0
+	addql #6,%a0
+addr_93cc:
+	movel %a0,%usp
+addr_93ce:
+	andiw #57343,%sp@
+	rte
+addr_93d4:
+	movel #0x2000,%d0
+	andw %sp@,%d0
+	beqs addr_93e0
+	moveq #-1,%d0
+addr_93e0:
+	rte
+	linkw %fp,#0
+	movel %a0,%sp@-
+	lea %fp@(8),%a0
+	movel %a0,%sp@-
+	jsr addr_97c8
+	addql #4,%sp
+	moveal %sp@+,%a0
+	unlk %fp
 	rts
-  .short 0x4eb9
-	.short 0x00fc
-/* 0x009400: */
-	.short 0x1f70
-	.short 0x651c
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x1fc2
-	.short 0x40c1
-	.short 0x007c
-	.short 0x0700
-	.short 0x33c0
-	.short 0x0000
-	.short 0x378a
-	.short 0x4840
-	.short 0x33c0
-	.short 0x0000
-	.short 0x60be
-	.short 0x46c1
+	jsr addr_1f70
+	bcss addr_9420
+	jsr addr_1fc2
+	movew %sr,%d1
+	oriw #1792,%sr
+	movew %d0,stack_top
+	swap %d0
+	movew %d0,ram_unknown2
+	movew %d1,%sr
+addr_9420:
 	rts
-	.short 0x3f39
-	.short 0x0000
-	.short 0x378a
-	.short 0x3f39
-	.short 0x0000
-	.short 0x60be
-	.short 0x3f3c
-	.short 0x0016
-	.short 0x4e4e
-	.short 0x5c4f
+	movew stack_top,%sp@-
+	movew ram_unknown2,%sp@-
+	movew #0x16,%sp@-
+	trap #14
+	addqw #6,%sp
 	rts
+
 
 addr_9438:
 	.short 0x4e56
