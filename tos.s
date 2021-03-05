@@ -16849,8 +16849,8 @@ trap1_handler:
   beqw addr_9386                          /* Special handling */
   bras addr_92f4                          /* Otherwise, skip */
 addr_92ea:
-  cmpiw #32,%sp@(6)                       /* No idea */
-  beqw addr_93a4                          /* But if so, branch */
+  cmpiw #32,%sp@(6)                       /* Toggle/inquire state */
+  beqw addr_93a4                          /* yes, go perform function*/
 addr_92f4:
   movel %fp,%sp@-                         /* Push a6 */
   moveal ram_unknown6,%fp                 /* Save copy of regs in special location 0x5622 */
@@ -16881,12 +16881,15 @@ addr_932e:
   movel %a0,%sp@-
   movel %sp,%fp@(124)
   lea %sp@(50),%a0
-  moveal #ram_unknown16,%sp
+  moveal #ram_unknown16,%sp								/* in TOS 306 this address is calculated from fstack+2*1034 */
 addr_9348:
   movel %a0,%sp@-
   .short 0x4eb9                           /* jsr addr_97c8 */
   .long addr_97c8
   addql #4,%sp                            /* Correct stack */
+	/* ...fall through */
+
+gouser:
   moveal ram_unknown6,%a5
   movel %d0,%a5@(104)
   moveal %a5@(124),%fp
@@ -16921,6 +16924,8 @@ addr_9394:
 	movel %sp,%d0
 	moveal %a0,%sp
 	rte
+
+/* Supervisor mode entry point */
 addr_93a4:
 	movel %sp@(8),%d1
 	beqs addr_93c8
@@ -16954,6 +16959,8 @@ addr_93d4:
 	moveq #-1,%d0
 addr_93e0:
 	rte
+
+addr_93e2:	
 	linkw %fp,#0
 	movel %a0,%sp@-
 	lea %fp@(8),%a0
@@ -16963,6 +16970,7 @@ addr_93e0:
 	moveal %sp@+,%a0
 	unlk %fp
 	rts
+
 	jsr addr_1f70
 	bcss addr_9420
 	jsr addr_1fc2
@@ -16974,6 +16982,7 @@ addr_93e0:
 	movew %d1,%sr
 addr_9420:
 	rts
+
 	movew stack_top,%sp@-
 	movew ram_unknown2,%sp@-
 	movew #0x16,%sp@-
@@ -17389,99 +17398,74 @@ addr_9658:
 	.short 0x4e5e
 	rts
 
+/* int32_t osif(int16_t *pw) */
 addr_97c8:
-  linkw %fp,#-58
-  addqb #1,ram_unknown12
-  clrw ram_unknown17
-  addqw #1,ram_unknown17
-  moveal %fp@(8),%a0
-  movew %a0@,%fp@(-26)
-  cmpiw #87,%fp@(-26)
-  bles addr_97f4
-  moveq #-32,%d0
-  braw addr_9eaa
+osif:
+	linkw %fp,#-58
+	addqb #1,ram_unknown12
+	clrw ram_unknown17
+osif_restart:
+	addqw #1,ram_unknown17
+	moveal %fp@(8),%a0
+	movew %a0@,%fp@(-26)
+	cmpiw #87,%fp@(-26)												/* Reject function numbers above 87 (0x57) */
+	bles addr_97f4
+	moveq #-32,%d0														/* return E_INVFN */
+	braw c_func_return
 addr_97f4:
-  movel #ram_unknown18,%sp@
-  .short 0x4eb9                           /* jsr addr_92a2 */
+	movel #0x5f36,%sp@
+	.short 0x4eb9                           	/* jsr addr_92a2 (xsetjmp) */
   .long addr_92a2
-  movel %d0,%fp@(-34)
-  beqw addr_9894
-  cmpil #-14,%fp@(-34)
-
-	.short 0x662c
-	.short 0x2eae
-	.short 0xffde
-	.short 0x3f39
-	.short 0x0000
-	.short 0x5fb0
-	.short 0x6100
-	.short 0x07d0
-	.short 0x548f
-	.short 0x2d40
-	.short 0xffde
-	.short 0x6708
-	.short 0x202e
-	.short 0xffde
-	.short 0x6000
-	.short 0x067c
-	.short 0x42b9
-	.short 0x0000
-	.short 0x5324
-	.short 0x4279
-	.short 0x0000
-	.short 0x5fb0
-	.short 0x609a
-	.short 0x426e
-/* 0x009840: */
-	.short 0xffe8
-	.short 0x6040
-	.short 0x306e
-	.short 0xffe8
-	.short 0xd1c8
-	.short 0xd1c8
-	.short 0xd1fc
-	.short 0x0000
-	.short 0x04b2
-	.short 0x2d50
-	.short 0xffee
-	.short 0x6022
-	.short 0x206e
-	.short 0xffee
-	.short 0x3028
-	.short 0x0004
-	.short 0xb079
-	.short 0x0000
-	.short 0x5fb0
-	.short 0x660a
-	.short 0x206e
-	.short 0xffee
-	.short 0x317c
-	.short 0xffff
-	.short 0x0004
-	.short 0x206e
-	.short 0xffee
-	.short 0x2d50
-	.short 0xffee
-	.short 0x4aae
-	.short 0xffee
-	.short 0x66d8
-/* 0x009880: */
-	.short 0x526e
-	.short 0xffe8
-	.short 0x0c6e
-	.short 0x0002
-	.short 0xffe8
-	.short 0x6db8
-	.short 0x202e
-	.short 0xffde
-
-	.short 0x6000
-	.short 0x0618
+	movel %d0,%fp@(-34)												/* rc stack variable */
+	beqw addr_9894
+	cmpil #-14,%fp@(-34)
+	bnes addr_983e
+	movel %fp@(-34),%sp@
+	movew 0x5fb0,%sp@-
+	bsrw addr_9fee
+	addql #2,%sp
+	movel %d0,%fp@(-34)
+	beqs addr_9830
+	movel %fp@(-34),%d0
+	braw c_func_return
+addr_9830:
+	clrl 0x5324
+	clrw 0x5fb0
+	bras osif_restart
+addr_983e:
+	clrw %fp@(-24)
+	bras addr_9884
+addr_9844:
+	moveaw %fp@(-24),%a0
+	addal %a0,%a0
+	addal %a0,%a0
+	addal #0x4b2,%a0
+	movel %a0@,%fp@(-18)
+	bras addr_987a
+addr_9858:
+	moveal %fp@(-18),%a0
+	movew %a0@(4),%d0
+	cmpw 0x5fb0,%d0
+	bnes addr_9872
+	moveal %fp@(-18),%a0
+	movew #0xffffffff,%a0@(4)
+addr_9872:
+	moveal %fp@(-18),%a0
+	movel %a0@,%fp@(-18)
+addr_987a:
+	tstl %fp@(-18)
+	bnes addr_9858
+	addqw #1,%fp@(-24)
+addr_9884:
+	cmpiw #2,%fp@(-24)
+	blts addr_9844
+	movel %fp@(-34),%d0
+	braw c_func_return
 
 addr_9894:
 	movew %fp@(-26),%d0
-	mulsw #6,%d0
-	.short 0xd0bc															/* addl addr_2856a,%d0 */
+	mulsw #6,%d0															/* Make offset to requested function fn in d0 */
+	.short 0xd0bc															/* addl addr_2856a,%d0 - "funcs" array, each 6 bytes */
 	.long addr_2856a
 	movel %d0,%fp@(-42)
 	moveal %fp@(-42),%a0
@@ -17535,11 +17519,11 @@ addr_98fe:
 	moveb %fp@(-14),%d0
 	extw %d0
 	extl %d0
-	braw addr_9eaa
+	braw c_func_return
 	bras addr_9966
 addr_9960:
 	clrl %d0
-	braw addr_9eaa
+	braw c_func_return
 addr_9966:
 	pea %fp@(-14)
 	movel #1,%sp@-
@@ -17550,7 +17534,7 @@ addr_9966:
 	moveb %fp@(-14),%d0
 	extw %d0
 	extl %d0
-	braw addr_9eaa
+	braw c_func_return
 
 addr_998a:
 	.short 0x2eae
@@ -18239,8 +18223,10 @@ addr_9b22:
 	.short 0x202e
 	.short 0xffde
 
+/* End of C function - used as exit point by osif() */
 addr_9eaa:
-  .short 0x4e5e
+c_func_return:
+  unlk %fp
 	rts
 
 	.short 0x4e56
@@ -18408,6 +18394,8 @@ addr_9eaa:
 	.short 0x0080
 	.short 0x4e5e
 	rts
+
+addr_9fee:	
 	.short 0x4e56
 	.short 0xffee
 	.short 0x306e
@@ -81421,63 +81409,63 @@ addr_2841c:
 	.short 0x001f
 	.short 0x001e
 	.short 0x001f
+/*
+	in bdos/sup.c in TOS306:
+
+	typedef ERROR (*gdf) PROTO ((int16_t, ...));
+
+	#define FND struct _fnd
+	FND
+	{
+					gdf fncall;
+					int16_t fntyp;
+	};
+
+	FND const funcs[0x58] = {
+	...
+	}
+*/
 
 addr_2856a:
-	.short 0x00fc
-	.short 0x8128
+funcs:
+	/* Console functions */
+	.long 0x00fc8128													/* 0 - x0term() */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x4862
+	.long 0x00fc4862													/* 1 - xconin() */
 	.short 0x0080
-	.short 0x00fc
-	.short 0x464e
+	.long 0x00fc464e													/* 2 - xtabout() */
 	.short 0x0081
-	.short 0x00fc
-	.short 0x48b4
-/* 0x028580: */
+	.long 0x00fc48b4													/* 3 - xauxin() */
 	.short 0x0082
-	.short 0x00fc
-	.short 0x4710
+	.long 0x00fc4710													/* 4 - xauxout() */
 	.short 0x0082
-	.short 0x00fc
-	.short 0x4738
+	.long 0x00fc4738													/* 5 - xprtout() */
 	.short 0x0083
-	.short 0x00fc
-	.short 0x48d8
+	.long 0x00fc48d8													/* 6 - rawconio() */
 	.short 0x0080
-	.short 0x00fc
-	.short 0x480e
+	.long 0x00fc480e													/* 7 - x7in() */
 	.short 0x0080
-	.short 0x00fc
-	.short 0x487c
+	.long 0x00fc487c													/* 8 - x8in() */
 	.short 0x0080
-	.short 0x00fc
-	.short 0x4938
+	.long 0x00fc4938													/* 9 - xprt_line() */
 	.short 0x0081
-	.short 0x00fc
-	.short 0x4a68
+	.long 0x00fc4a68													/* 10 - readline() */
 	.short 0x0080
-	.short 0x00fc
-	.short 0x4364
+	.long 0x00fc4364													/* 11 - xconstat() */
 	.short 0x0080
-	.short 0x00fc
-	.short 0x95f8
+	/* Disk functions */
+	.long 0x00fc95f8													/* 12 - not implemented */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long 0x00fc95f8													/* 13 - not implemented */
 	.short 0x0000
-	.short 0x00fc
-/* 0x0285c0: */
-	.short 0x7bfc
+	.long 0x00fc7bfc													/* 14 - xsetdrv */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long 0x00fc95f8													/* 15 - not implemented */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x437e
+	/* Extended console functions */
+	.long 0x00fc437e													/* 16 - xconostat() */
 	.short 0x0081
-	.short 0x00fc
-	.short 0x43a2
+	.long 0x00fc43a2													/* 17 - xprtostat() */
 	.short 0x0083
 	.short 0x00fc
 	.short 0x43c6
