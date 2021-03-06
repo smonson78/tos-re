@@ -2587,7 +2587,8 @@ addr_1f4c:
   bsrb addr_1f70
   bcss addr_1f6c
   bsrb addr_1fc2
-  cmpl #0xffffffff,%d0
+  .short 0xb0bc															/* cmpl #0xffffffff,%d0 */
+	.long -1
   beqs addr_1f6c
   movew %d0,stack_top
   swap %d0
@@ -2609,7 +2610,7 @@ addr_1f70:
   movew #0xa05,%d0
   movepw %d0,%a0@(5)
   movepw %a0@(5),%d1
-  andw #0xf0f,%d1
+  .short 0xc27c,0xf0f												/* andw #0xf0f,%d1 */
   cmpw %d0,%d1
   bnes addr_1fbc
   moveb #0x1,%a0@(1)
@@ -2626,8 +2627,8 @@ addr_1fbc:
 addr_1fc2:
 	bsrb addr_1f70
 	bcsw addr_207c
-	lea 0xa54,%a1
-	lea 0xa61,%a2
+	lea ram_unknown166,%a1
+	lea ram_unknown178,%a2
 	bsrw addr_2064
 addr_1fd8:
 	exg %a1,%a2
@@ -2670,7 +2671,7 @@ addr_1fe0:
 	aslw #5,%d0
 	addw %d0,%d1
 	moveq #0,%d0
-	moveb %a1@(0),%d0
+	.short 0x1029,0x0000											/* moveb %a1@(0),%d0 */
 	muluw #10,%d0
 	addb %a1@(1),%d0
 	aslw #8,%d0
@@ -2684,7 +2685,7 @@ addr_2064:
 	moveq #1,%d1
 addr_2068:
 	moveb %a0@(0x0,%d1:w),%d2
-	andb #0xf,%d2
+	.short 0xc43c,0xf													/* andb #0xf,%d2 */
 	moveb %d2,%a1@(0x0,%d0:w)
 	addqw #2,%d1
 	dbf %d0,addr_2068
@@ -16886,7 +16887,7 @@ addr_932e:
 addr_9348:
   movel %a0,%sp@-
   .short 0x4eb9                           /* jsr addr_97c8 */
-  .long addr_97c8
+  .long osif
   addql #4,%sp                            /* Correct stack */
 	/* ...fall through */
 
@@ -16966,15 +16967,18 @@ addr_93e2:
 	movel %a0,%sp@-
 	lea %fp@(8),%a0
 	movel %a0,%sp@-
-	jsr addr_97c8
+	.short 0x4eb9															/* jsr addr_97c8 */
+	.long osif
 	addql #4,%sp
 	moveal %sp@+,%a0
 	unlk %fp
 	rts
 
-	jsr addr_1f70
+	.short 0x4eb9 														/* jsr addr_1f70 */
+	.long addr_1f70
 	bcss addr_9420
-	jsr addr_1fc2
+	.short 0x4eb9															/* jsr addr_1fc2 */
+	.long addr_1fc2
 	movew %sr,%d1
 	oriw #1792,%sr
 	movew %d0,stack_top
@@ -17414,7 +17418,7 @@ osif_restart:
 	moveq #-32,%d0														/* return E_INVFN */
 	braw c_func_return
 addr_97f4:
-	movel #0x5f36,%sp@
+	movel #ram_unknown18,%sp@
 	.short 0x4eb9                           	/* jsr addr_92a2 (xsetjmp) */
   .long addr_92a2
 	movel %d0,%fp@(-34)												/* rc stack variable */
@@ -17422,7 +17426,7 @@ addr_97f4:
 	cmpil #-14,%fp@(-34)
 	bnes addr_983e
 	movel %fp@(-34),%sp@
-	movew 0x5fb0,%sp@-
+	movew ram_unknown179,%sp@-
 	bsrw addr_9fee
 	addql #2,%sp
 	movel %d0,%fp@(-34)
@@ -17430,8 +17434,8 @@ addr_97f4:
 	movel %fp@(-34),%d0
 	braw c_func_return
 addr_9830:
-	clrl 0x5324
-	clrw 0x5fb0
+	clrl ram_unknown180
+	clrw ram_unknown179
 	bras osif_restart
 addr_983e:
 	clrw %fp@(-24)
@@ -17446,10 +17450,10 @@ addr_9844:
 addr_9858:
 	moveal %fp@(-18),%a0
 	movew %a0@(4),%d0
-	cmpw 0x5fb0,%d0
+	cmpw ram_unknown179,%d0
 	bnes addr_9872
 	moveal %fp@(-18),%a0
-	movew #0xffffffff,%a0@(4)
+	movew #-1,%a0@(4)
 addr_9872:
 	moveal %fp@(-18),%a0
 	movel %a0@,%fp@(-18)

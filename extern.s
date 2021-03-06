@@ -310,6 +310,12 @@ etv_term:
 .set ram_unknown129,0xa50
 .global ram_unknown129
 
+.set ram_unknown166,0xa54
+.global ram_unknown166
+
+.set ram_unknown178,0xa61
+.global ram_unknown178
+
 .set baudrate,0xa6e
 .global baudrate
 
@@ -800,6 +806,9 @@ struct _pbdef
 .set ram8x8,0x52ca
 .global ram8x8
 
+.set ram_unknown180,0x5324
+.global ram_unknown180
+
 .set ram_unknown6,0x5622
 .global ram_unknown6
 
@@ -830,6 +839,9 @@ struct _pbdef
 
 .set ram_unknown18,0x5f36
 .global ram_unknown18
+
+.set ram_unknown179,0x5fb0
+.global ram_unknown179
 
 .set ram_unknown11,0x60b2
 .global ram_unknown11
