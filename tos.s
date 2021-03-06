@@ -16697,7 +16697,6 @@ addr_91b0:
 
   .short 0x4eb9                           /* jsr 0xfc9610 */
   .long addr_9610
-
   rts
 
 	.short 0x23df
@@ -17192,7 +17191,10 @@ addr_956e:
   unlk %fp
   rts
 
+/* A do-nothing GEMDOS call (returns a "not implemented" error) */
 addr_95f8:
+trap1_not_implemented:
+.global trap1_not_implemented
   linkw %fp,#-4
   moveq #-32,%d0
   unlk %fp
@@ -81417,6 +81419,8 @@ addr_2841c:
 	FND const funcs[0x58] = {
 	...
 	}
+
+	(88 vectors)
 */
 
 addr_2856a:
@@ -81447,240 +81451,164 @@ funcs:
 	.long 0x00fc4364													/* 11 - xconstat() */
 	.short 0x0080
 	/* Disk functions */
-	.long 0x00fc95f8													/* 12 - not implemented */
+	.long trap1_not_implemented								/* 12 */
 	.short 0x0000
-	.long 0x00fc95f8													/* 13 - not implemented */
+	.long trap1_not_implemented								/* 13 */
 	.short 0x0000
 	.long 0x00fc7bfc													/* 14 - xsetdrv */
 	.short 0x0000
-	.long 0x00fc95f8													/* 15 - not implemented */
+	.long trap1_not_implemented								/* 15 */
 	.short 0x0000
 	/* Extended console functions */
 	.long 0x00fc437e													/* 16 - xconostat() */
 	.short 0x0081
 	.long 0x00fc43a2													/* 17 - xprtostat() */
 	.short 0x0083
-	.short 0x00fc
-	.short 0x43c6
+	.long 0x00fc43c6													/* 18 - xauxistat() */
 	.short 0x0082
-	.short 0x00fc
-	.short 0x43e2
+	.long 0x00fc43e2													/* 19 - xauxostat() */
 	.short 0x0082
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 20 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 21 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 22 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 23 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 24 */
 	.short 0x0000
-/* 0x028600: */
-	.short 0x00fc
-	.short 0x7c1c
+	.long 0x00fc7c1c													/* 25 - xgetdrv() */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x7be8
+	.long 0x00fc7be8													/* 26 - xsetdta() */
 	.short 0x0001
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 27 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 28 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 29 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 30 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 31 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 32 - xgsps - Super() (handled in dispatcher) */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 33 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 34 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
-/* 0x028640: */
+	.long trap1_not_implemented								/* 35 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 36 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 37 - S_SetVec() XBIOS function in GEMDOS */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 38 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 39 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 40 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 41 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0xa1a6
+	.long 0x00fca1a6													/* 42 - xgetdate() */
 	.short 0x0000
-	.short 0x00fc
-	.short 0xa1b6
+	.long 0x00fca1b6													/* 43 - xsetdate() */
 	.short 0x0000
-	.short 0x00fc
-	.short 0xa234
+	.long 0x00fca234													/* 44 - xgettime() */
 	.short 0x0000
-	.short 0x00fc
-	.short 0xa244
+	.long 0x00fca244													/* 45 - xsettime() */
 	.short 0x0000
-	.short 0x00fc
-/* 0x028680: */
-	.short 0x95f8
+	.long trap1_not_implemented								/* 46 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x7bd6
+	.long 0x00fc7bd6													/* 47 - xgetdta() */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x9602
+	.long 0x00fc9602													/* 48 - xgetver() */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x809e
+	.long 0x00fc809e													/* 49 - xtermres() */
 	.short 0x0001
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 50 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 51 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 52 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 53 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x5d64
+	.long 0x00fc5d64													/* 54 - xgetfree() */
 	.short 0x0001
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 55 */
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented								/* 56 */
 	.short 0x0000
-/* 0x0286c0: */
-	.short 0x00fc
-	.short 0x6498
+	.long 0x00fc6498
 	.short 0x0001
-	.short 0x00fc
-	.short 0x66a4
+	.long 0x00fc66a4
 	.short 0x0001
-	.short 0x00fc
-	.short 0x6212
+	.long 0x00fc6212
 	.short 0x0001
-	.short 0x00fc
-	.short 0x7c54
+	.long 0x00fc7c54
 	.short 0x0001
-	.short 0x00fc
-	.short 0x7c90
+	.long 0x00fc7c90
 	.short 0x0001
-	.short 0x00fc
-	.short 0x79ec
+	.long 0x00fc79ec
 	.short 0x0000
-	.short 0x00fc
-	.short 0x7ab8
+	.long 0x00fc7ab8
 	.short 0x0082
-	.short 0x00fc
-	.short 0x7af8
+	.long 0x00fc7af8
 	.short 0x0082
-	.short 0x00fc
-	.short 0x723e
+	.long 0x00fc723e
 	.short 0x0001
-	.short 0x00fc
-	.short 0x76be
+	.long 0x00fc76be
 	.short 0x0081
-	.short 0x00fc
-	.short 0x70ae
-/* 0x028700: */
+	.long 0x00fc70ae
 	.short 0x0001
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented
 	.short 0x0000
-	.short 0x00fc
-	.short 0x78a2
+	.long 0x00fc78a2
 	.short 0x0000
-	.short 0x00fc
-	.short 0x7926
+	.long 0x00fc7926
 	.short 0x0000
-	.short 0x00fc
-	.short 0x630e
+	.long 0x00fc630e
 	.short 0x0001
-	.short 0x00fc
-	.short 0x8bb6
+	.long 0x00fc8bb6
 	.short 0x0001
-	.short 0x00fc
-	.short 0x8c0a
+	.long 0x00fc8c0a
 	.short 0x0001
-	.short 0x00fc
-	.short 0x8a1e
+	.long 0x00fc8a1e
 	.short 0x0002
-	.short 0x00fc
-	.short 0x81f6
+	.long 0x00fc81f6
 	.short 0x0003
-	.short 0x00fc
-	.short 0x80cc
+	.long 0x00fc80cc
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented
 	.short 0x0000
-	.short 0x00fc
-/* 0x028740: */
-	.short 0x7c32
+	.long 0x00fc7c32
 	.short 0x0001
-	.short 0x00fc
-	.short 0x68b0
+	.long 0x00fc68b0
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented
 	.short 0x0000
-	.short 0x00fc
-	.short 0x95f8
+	.long trap1_not_implemented
 	.short 0x0000
-	.short 0x00fc
-	.short 0x73ce
+	.long 0x00fc73ce
 	.short 0x0002
-	.short 0x00fc
-	.short 0x718c
+	.long 0x00fc718c
 	.short 0x0001
+
 addr_2877a:
 	.short 0xffff
 	.short 0xfefd
 	.short 0xffff
-/* 0x028780: */
 	.short 0x00fc
 	.short 0x9966
 	.short 0x00fc
