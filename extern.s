@@ -109,10 +109,10 @@ etv_term:
 .set aux_stat,0x50e                         /* Vector for printer device status */
 .set aux_vec,0x512                          /* Vector for printer device byte output */
 .set memval3,0x51a                          /* On warm boot, contains 0x5555aaaa */
-.set xconstat,0x51e                         /* 8 Bconstat() vectors for 8 BIOS devices */
-.set xconin,0x53e                           /* 8 Bconin() vectors for 8 BIOS devices */
-.set xcostat,0x55e                          /* 8 Bcostat() vectors for 8 BIOS devices */
-.set xconout,0x57e                          /* 8 Bconout() vectors for 8 BIOS devices */
+.set xconstat_vec,0x51e                     /* 8 Bconstat() vectors for 8 BIOS devices */
+.set xconin_vec,0x53e                       /* 8 Bconin() vectors for 8 BIOS devices */
+.set xcostat_vec,0x55e                      /* 8 Bcostat() vectors for 8 BIOS devices */
+.set xconout_vec,0x57e                      /* 8 Bconout() vectors for 8 BIOS devices */
 .set _longframe,0x59e                       /* Something to do with C calling conventions */
 
 .global memvalid
@@ -164,10 +164,10 @@ etv_term:
 .global aux_stat
 .global aux_vec
 .global memval3
-.global xconstat
-.global xconin
-.global xcostat
-.global xconout
+.global xconstat_vec
+.global xconin_vec
+.global xcostat_vec
+.global xconout_vec
 .global _longframe
 
 
@@ -587,6 +587,9 @@ struct _pbdef
 
 .set ram_unknown108,0xfee
 .global ram_unknown108
+
+.set ram_unknown181,0xff2
+.global ram_unknown181
 
 /* Saved copy of SR register */
 .set saved_sr_register,0xffa

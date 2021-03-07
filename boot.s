@@ -317,7 +317,7 @@ addr_384:
     .short 0x41f9                               /* lea bios_vectors,%a0 - ROM copy of BIOS routine vectors */
     .long bios_vectors
 
-    moveaw #xconstat,%a1                        /* 4 tables of 8 vectors each: xconstat, xconin, xcostat, xconout */
+    moveaw #xconstat_vec,%a1                    /* 4 tables of 8 vectors each: xconstat, xconin, xcostat, xconout */
     moveq #31,%d0                               /* Copy 32 longwords */
 addr_396:    
     movel %a0@+,%a1@+                           /* Copy */

@@ -449,25 +449,25 @@ supexec:
 addr_956:
 Bconstat:
 .global Bconstat
-	lea %a5@(xconstat),%a0
+	lea %a5@(xconstat_vec),%a0
 	bras addr_96c
 
 addr_95c:
 Bconin:
 .global Bconin
-  lea %a5@(xconin),%a0
+  lea %a5@(xconin_vec),%a0
   bras addr_96c
 
 addr_962:
 Bcostat:
 .global Bcostat
-  lea %a5@(xcostat),%a0
+  lea %a5@(xcostat_vec),%a0
 	bras addr_96c
 
 addr_968:
 Bconout:
 .global Bconout
-	lea %a5@(xconout),%a0
+	lea %a5@(xconout_vec),%a0
   /* Just fall through to next function */
 
 /* Shared BIOS calling code for Bconstat, Bconin, Bcostat and Bconout. Jumps to a vector in system RAM based on the paramater passed. */
@@ -6718,6 +6718,9 @@ kbdvbase:
 	.short 0x00c0
 	.short 0x4e5e
 	rts
+
+addr_464e:
+xtabout:
 	.short 0x4e56
 	.short 0xfffc
 	.short 0x3eae
@@ -6992,6 +6995,9 @@ kbdvbase:
 	.short 0x00c0
 	.short 0x4e5e
 	rts
+
+addr_4862:
+xconin:
 	.short 0x4e56
 	.short 0xfffc
 	.short 0x2079
@@ -7005,6 +7011,7 @@ kbdvbase:
 	.short 0x61b2
 	.short 0x4e5e
 	rts
+
 	.short 0x4e56
 	.short 0x0000
 /* 0x004880: */
@@ -7034,6 +7041,9 @@ kbdvbase:
 	.short 0x00c0
 	.short 0x4e5e
 	rts
+
+addr_48b4:
+xauxin:
 	.short 0x4e56
 	.short 0xfffc
 	.short 0x2079
@@ -14443,66 +14453,50 @@ addr_7bfc:
 	.short 0x6104
 	.short 0x4e5e
 	rts
-	.short 0x4e56
-	.short 0x0000
-	.short 0x48e7
-	.short 0x0104
-	.short 0x2ebc
-	.short 0xffff
-	.short 0xffff
-	.short 0x2f3c
-	.short 0x0005
-	.short 0x0102
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x91fe
-	.short 0x588f
-	.short 0x2e80
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x9280
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x93fc
-	.short 0x2a79
-	.short 0x0000
-	.short 0x5622
-	.short 0x23ed
-	.short 0x0024
-/* 0x008100: */
-	.short 0x0000
-	.short 0x5622
-	.short 0x2e8d
-	.short 0x612c
-	.short 0x2079
-	.short 0x0000
-	.short 0x5622
-	.short 0x4280
-	.short 0x302e
-	.short 0x0008
-	.short 0x2140
-	.short 0x0068
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x9352
-	.short 0x4a9f
-	.short 0x4cdf
-	.short 0x2000
-	.short 0x4e5e
+
+addr_80cc:
+	linkw %fp,#0
+	moveml %d7/%a5,%sp@-
+	movel #0xffffffff,%sp@
+	movel #0x50102,%sp@-
+	.short 0x4eb9															/* jsr addr_91fe */
+	.long addr_91fe
+	addql #4,%sp
+	movel %d0,%sp@
+	.short 0x4eb9															/* jsr addr_9280 */
+	.long addr_9280
+	.short 0x4eb9															/* jsr addr_93fc */
+	.long addr_93fc
+	moveal ram_unknown6,%a5
+	movel %a5@(36),ram_unknown6
+	movel %a5,%sp@
+	bsrb addr_8134
+	moveal ram_unknown6,%a0
+	clrl %d0
+	movew %fp@(8),%d0
+	movel %d0,%a0@(104)
+	.short 0x4eb9															/* jsr addr_9352 */
+	.long addr_9352
+	tstl %sp@+
+	moveml %sp@+,%a5
+	unlk %fp
 	rts
-	.short 0x4e56
-	.short 0xfffc
-	.short 0x4257
-	.short 0x619c
-	.short 0x4e5e
+
+addr_8128:
+x0term:
+	linkw %fp,#-4
+	clrw %sp@
+	bsrb addr_80cc
+	unlk %fp
 	rts
+
+addr_8134:
 	.short 0x4e56
 	.short 0x0000
 	.short 0x48e7
 	.short 0x070c
 	.short 0x4246
 	.short 0x6018
-/* 0x008140: */
 	.short 0x206e
 	.short 0x0008
 	.short 0x1030
@@ -14596,6 +14590,7 @@ addr_7bfc:
 	.short 0x30c0
 	.short 0x4e5e
 	rts
+
 	.short 0x4e56
 	.short 0xffd2
 	.short 0x4240
@@ -16699,22 +16694,16 @@ addr_91b0:
   .long addr_9610
   rts
 
-	.short 0x23df
-/* 0x009200: */
-	.short 0x0000
-	.short 0x0ff2
-	.short 0x4e4d
-	.short 0x2f39
-	.short 0x0000
-	.short 0x0ff2
+addr_91fe:
+	movel %sp@+,ram_unknown181
+	trap #13
+	movel ram_unknown181,%sp@-
 	rts
-	.short 0x23df
-	.short 0x0000
-	.short 0x0ff2
-	.short 0x4e4e
-	.short 0x2f39
-	.short 0x0000
-	.short 0x0ff2
+
+addr_920e:
+	movel %sp@+,ram_unknown181
+	trap #14
+	movel ram_unknown181,%sp@-
 	rts
 
 /* Trap 2 handler ? */
@@ -16780,9 +16769,8 @@ user_ex_vec_1:
 	.short 0x1814
 	rts
 
-/* 0x009280: */
-	.short 0x2f2f
-	.short 0x0004
+addr_9280:
+	movel %sp@(4),%sp@-
 	rts
 
 	.short 0x206f
@@ -16890,6 +16878,7 @@ addr_9348:
   addql #4,%sp                            /* Correct stack */
 	/* ...fall through */
 
+addr_9352:
 gouser:
   moveal ram_unknown6,%a5
   movel %d0,%a5@(104)
@@ -16973,6 +16962,7 @@ addr_93e2:
 	unlk %fp
 	rts
 
+addr_93fc:
 	.short 0x4eb9 														/* jsr addr_1f70 */
 	.long addr_1f70
 	bcss addr_9420
@@ -17191,10 +17181,9 @@ addr_956e:
   unlk %fp
   rts
 
-/* A do-nothing GEMDOS call (returns a "not implemented" error) */
+/* A do-nothing GEMDOS call (returns a "not implemented" error E_INVFN) */
 addr_95f8:
 trap1_not_implemented:
-.global trap1_not_implemented
   linkw %fp,#-4
   moveq #-32,%d0
   unlk %fp
@@ -81426,13 +81415,13 @@ addr_2841c:
 addr_2856a:
 funcs:
 	/* Console functions */
-	.long 0x00fc8128													/* 0 - x0term() */
+	.long x0term															/* 0 - x0term() (0xfc8128) */
 	.short 0x0000
-	.long 0x00fc4862													/* 1 - xconin() */
+	.long xconin															/* 1 - xconin() (0xfc4862) */
 	.short 0x0080
-	.long 0x00fc464e													/* 2 - xtabout() */
+	.long xtabout															/* 2 - xtabout() (0xfc464e) */
 	.short 0x0081
-	.long 0x00fc48b4													/* 3 - xauxin() */
+	.long xauxin															/* 3 - xauxin() */
 	.short 0x0082
 	.long 0x00fc4710													/* 4 - xauxout() */
 	.short 0x0082
