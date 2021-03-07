@@ -6417,6 +6417,8 @@ kbdvbase:
 	.short 0x548f
 	.short 0x4e5e
 	rts
+
+addr_4406:	
 	.short 0x4e56
 	.short 0xfffe
 	.short 0x48e7
@@ -6767,47 +6769,36 @@ addr_46b8:
 	unlk %fp
 	rts
 
-
 addr_46c2:
-	.short 0x4e56
-	.short 0x0000
-	.short 0x48e7
-	.short 0x0700
-	.short 0x3e2e
-	.short 0x0008
-	.short 0x3c2e
-	.short 0x000a
-	.short 0xcc7c
-	.short 0x00ff
-	.short 0xbc7c
-	.short 0x0009
-	.short 0x660a
-	.short 0x3e86
-	.short 0x3f07
-	.short 0x6190
-	.short 0x548f
-	.short 0x6020
-	.short 0xbc7c
-	.short 0x0020
-	.short 0x6c10
-	.short 0x3ebc
-	.short 0x005e
-	.short 0x3f07
-	.short 0x6100
-	.short 0xfed0
-	.short 0x548f
-	.short 0x8c7c
-	.short 0x0040
-	.short 0x3e86
-	.short 0x3f07
-/* 0x004700: */
-	.short 0x6100
-	.short 0xfec2
-	.short 0x548f
-	.short 0x4a9f
-	.short 0x4cdf
-	.short 0x00c0
-	.short 0x4e5e
+	linkw %fp,#0
+	moveml %d5-%d7,%sp@-
+	movew %fp@(8),%d7
+	movew %fp@(10),%d6
+	.short 0xcc7c,0xff												/* andw #0xff,%d6 */
+	.short 0xbc7c,9														/* cmpw #0x9,%d6 */
+	bnes addr_46e6
+	movew %d6,%sp@
+	movew %d7,%sp@-
+	bsrb addr_4672
+	addql #2,%sp
+	bras addr_4706
+addr_46e6:
+	.short 0xbc7c,0x20												/* cmpw #0x20,%d6 */
+	bges addr_46fc
+	movew #0x5e,%sp@
+	movew %d7,%sp@-
+	bsrw addr_45c4
+	addql #2,%sp
+	.short 0x8c7c,0x40												/* orw #0x40,%d6 */
+addr_46fc:
+	movew %d6,%sp@
+	movew %d7,%sp@-
+	bsrw addr_45c4
+	addql #2,%sp
+addr_4706:
+	tstl %sp@+
+	moveml %sp@+,%d6-%d7
+	unlk %fp
 	rts
 
 addr_4710:
@@ -6847,6 +6838,8 @@ xauxout:
 	.short 0x588f
 	.short 0x4e5e
 	rts
+
+addr_4760:
 	.short 0x4e56
 	.short 0x0000
 	.short 0x48e7
@@ -6951,50 +6944,39 @@ xauxout:
 	.short 0xff3c
 	.short 0x4e5e
 	rts
-	.short 0x4e56
-	.short 0x0000
-	.short 0x48e7
-	.short 0x0700
-	.short 0x3e2e
-	.short 0x0008
-	.short 0x3ebc
-	.short 0x0001
-	.short 0x3f07
-	.short 0x6100
-	.short 0xfbc8
-/* 0x004840: */
-	.short 0x548f
-	.short 0x3e87
-	.short 0x6100
-	.short 0xff1a
-	.short 0x2c00
-	.short 0x2006
-	.short 0x3e80
-	.short 0x3f07
-	.short 0x6100
-	.short 0xfd72
-	.short 0x548f
-	.short 0x2006
-	.short 0x4a9f
-	.short 0x4cdf
-	.short 0x00c0
-	.short 0x4e5e
+	
+addr_482a:
+	linkw %fp,#0
+	moveml %d5-%d7,%sp@-
+	movew %fp@(8),%d7
+	movew #0x1,%sp@
+	movew %d7,%sp@-
+	bsrw addr_4406
+	addql #2,%sp
+	movew %d7,%sp@
+	bsrw addr_4760
+	movel %d0,%d6
+	movel %d6,%d0
+	movew %d0,%sp@
+	movew %d7,%sp@-
+	bsrw addr_45c4
+	addql #2,%sp
+	movel %d6,%d0
+	tstl %sp@+
+	moveml %sp@+,%d6-%d7
+	unlk %fp
 	rts
 
 addr_4862:
 xconin:
-	.short 0x4e56
-	.short 0xfffc
-	.short 0x2079
-	.short 0x0000
-	.short 0x5622
-	.short 0x1028
-	.short 0x0030
-	.short 0x4880
-	.short 0x3e80
-	.short 0x5657
-	.short 0x61b2
-	.short 0x4e5e
+	linkw %fp,#-4
+	moveal ram_unknown6,%a0
+	moveb %a0@(48),%d0
+	extw %d0
+	movew %d0,%sp@
+	addqw #3,%sp@
+	bsrb addr_482a
+	unlk %fp
 	rts
 
 	.short 0x4e56
