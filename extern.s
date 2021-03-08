@@ -795,8 +795,11 @@ struct _pbdef
 .set ram_unknown37,0x35a8
 .global ram_unknown37
 
+/* For some reason this is the same as "time" system variable */
 .set stack_top,0x378a
 .global stack_top
+.set time,0x378a
+.global time
 
 .set ram_unknown182,0x37dc
 .global ram_unknown182
@@ -807,6 +810,9 @@ struct _pbdef
 /* Virtual workstation "ATTRIBUTE" structure (308+ bytes - to 3cde) */
 .set virt_work,0x3baa
 .global virt_work
+
+.set ram_unknown184,0x3ce2
+.global ram_unknown184
 
 .set ram_unknown17,0x52c8
 .global ram_unknown17
