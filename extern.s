@@ -801,6 +801,9 @@ struct _pbdef
 .set ram_unknown182,0x37dc
 .global ram_unknown182
 
+.set ram_unknown183,0x3ba0
+.global ram_unknown183
+
 /* Virtual workstation "ATTRIBUTE" structure (308+ bytes - to 3cde) */
 .set virt_work,0x3baa
 .global virt_work
