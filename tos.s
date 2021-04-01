@@ -10554,276 +10554,156 @@ addr_60be:
 	.short 0x38c0
 	.short 0x4e5e
 	rts
-	.short 0x4e56
-	.short 0xffce
-	.short 0x3ebc
-	.short 0x0010
-	.short 0x2f2e
-	.short 0x0008
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x6d86
-	.short 0x588f
-	.short 0x2d40
-	.short 0xfff6
-	.short 0x3d40
-	.short 0xfffe
-	.short 0x6c08
-	.short 0x202e
-	.short 0xfff6
-	.short 0x6000
-	.short 0x01e4
-	.short 0x3eae
-/* 0x0064c0: */
-	.short 0xfffe
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x7860
-	.short 0x2d40
-	.short 0xfff2
-	.short 0x2ebc
-	.short 0x00fe
-	.short 0x84b8
-	.short 0x2f3c
-	.short 0x0000
-	.short 0x0001
-	.short 0x2f2e
-	.short 0xfff2
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x6c4e
-	.short 0x508f
-	.short 0x2d40
-	.short 0xfff6
-	.short 0xb0bc
-	.short 0x0000
-	.short 0x0001
-	.short 0x6742
-	.short 0x206e
-	.short 0xfff2
-	.short 0x3d68
-	.short 0x000a
-	.short 0xffec
-	.short 0x206e
-	.short 0xfff2
-	.short 0x2ea8
-/* 0x006500: */
-	.short 0x001c
-	.short 0x486e
-	.short 0xffd2
-	.short 0x206e
-	.short 0xfff2
-	.short 0x2f28
-	.short 0x0014
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x72ae
-	.short 0x508f
-	.short 0x3eae
-	.short 0xfffe
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x79ec
-	.short 0x4aae
-	.short 0xfff6
-	.short 0x6706
-	.short 0x202e
-	.short 0xfff6
-	.short 0x6002
-	.short 0x70dc
-	.short 0x6000
-	.short 0x0170
-	.short 0x4297
-	.short 0x2f2e
-	.short 0xfff2
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x7720
-	.short 0x588f
-/* 0x006540: */
-	.short 0x486e
-	.short 0xffd2
-	.short 0x2f3c
-	.short 0x00fe
-	.short 0x84b8
-	.short 0x3f3c
-	.short 0x0016
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x7cce
-	.short 0xdefc
-	.short 0x000a
-	.short 0x1d7c
-	.short 0x0010
-	.short 0xffdd
-	.short 0x3d79
-	.short 0x0000
-	.short 0x378a
-	.short 0xffe8
-	.short 0x2e8e
-	.short 0x0697
-	.short 0xffff
-	.short 0xffe8
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x9286
-	.short 0x3d79
-	.short 0x0000
-	.short 0x60be
-	.short 0xffea
-	.short 0x2e8e
-	.short 0x0697
-/* 0x006580: */
-	.short 0xffff
-	.short 0xffea
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x9286
-	.short 0x206e
-	.short 0xfff2
-	.short 0x3d68
-	.short 0x000a
-	.short 0xffec
-	.short 0x2e8e
-	.short 0x0697
-	.short 0xffff
-	.short 0xffec
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x9286
-	.short 0x42ae
-	.short 0xffee
-	.short 0x486e
-	.short 0xffd2
-	.short 0x2f3c
-	.short 0x0000
-	.short 0x0020
-	.short 0x2f2e
-	.short 0xfff2
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x6c4e
-	.short 0xdefc
-	.short 0x000c
-	.short 0x486e
-/* 0x0065c0: */
-	.short 0xffd2
-	.short 0x2f3c
-	.short 0x00fe
-	.short 0x84ce
-	.short 0x3f3c
-	.short 0x0016
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x7cce
-	.short 0xdefc
-	.short 0x000a
-	.short 0x1d7c
-	.short 0x0010
-	.short 0xffdd
-	.short 0x206e
-	.short 0xfff2
-	.short 0x2068
-	.short 0x0018
-	.short 0x3d68
-	.short 0x0006
-	.short 0xffe8
-	.short 0x206e
-	.short 0xfff2
-	.short 0x2068
-	.short 0x0018
-	.short 0x3d68
-	.short 0x0008
-	.short 0xffea
-	.short 0x206e
-	.short 0xfff2
-	.short 0x2068
-	.short 0x0018
-/* 0x006600: */
-	.short 0x3d68
-	.short 0x000a
-	.short 0xfffc
-	.short 0x4a6e
-	.short 0xfffc
-	.short 0x6c04
-	.short 0x426e
-	.short 0xfffc
-	.short 0x2e8e
-	.short 0x5997
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x9286
-	.short 0x3d6e
-	.short 0xfffc
-	.short 0xffec
-	.short 0x42ae
-	.short 0xffee
-	.short 0x486e
-	.short 0xffd2
-	.short 0x2f3c
-	.short 0x0000
-	.short 0x0020
-	.short 0x2f2e
-	.short 0xfff2
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x6c4e
-	.short 0xdefc
-	.short 0x000c
-	.short 0x486e
-	.short 0xfff2
-/* 0x006640: */
-	.short 0x486e
-	.short 0xffd2
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x1ee0
-	.short 0x508f
-	.short 0x206e
-	.short 0xfff2
-	.short 0x2068
-	.short 0x0010
-	.short 0x3028
-	.short 0x000e
-	.short 0x48c0
-	.short 0x81fc
-	.short 0x0020
-	.short 0x5540
-	.short 0x3d40
-	.short 0xfffa
-	.short 0x601c
-	.short 0x486e
-	.short 0xffd2
-	.short 0x2f3c
-	.short 0x0000
-	.short 0x0020
-	.short 0x2f2e
-	.short 0xfff2
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x6c4e
-	.short 0xdefc
-	.short 0x000c
-	.short 0x536e
-/* 0x006680: */
-	.short 0xfffa
-	.short 0x4a6e
-	.short 0xfffa
-	.short 0x66de
-	.short 0x206e
-	.short 0xfff2
-	.short 0x217c
-	.short 0x0000
-	.short 0x0000
-	.short 0x000c
-	.short 0x3eae
-	.short 0xfffe
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x79ec
-	.short 0x4280
-	.short 0x4e5e
+
+addr_6498:
+	linkw %fp,#-50
+	movew #0x10,%sp@
+	movel %fp@(8),%sp@-
+	.short 0x4eb9															/* jsr addr_6d86 */
+	.long addr_6d86
+	addql #4,%sp
+	movel %d0,%fp@(-10)
+	movew %d0,%fp@(-2)
+	bges addr_64be
+	movel %fp@(-10),%d0
+	braw addr_66a0
+addr_64be:
+	movew %fp@(-2),%sp@
+	.short 0x4eb9															/* jsr addr_7860 */
+	.long addr_7860
+	movel %d0,%fp@(-14)
+	movel #addr_284b8,%sp@
+	movel #1,%sp@-
+	movel %fp@(-14),%sp@-
+	.short 0x4eb9															/* jsr addr_6c4e */
+	.long addr_6c4e
+	addql #8,%sp
+	movel %d0,%fp@(-10)
+	.short 0xb0bc,0,1													/* cmpl #1,%d0 */
+	beqs addr_6532
+	moveal %fp@(-14),%a0
+	movew %a0@(10),%fp@(-20)
+	moveal %fp@(-14),%a0
+	movel %a0@(28),%sp@
+	pea %fp@(-46)
+	moveal %fp@(-14),%a0
+	movel %a0@(20),%sp@-
+	.short 0x4eb9															/* jsr addr_72ae */
+	.long addr_72ae
+	addql #8,%sp
+	movew %fp@(-2),%sp@
+	.short 0x4eb9															/* jsr addr_79ec */
+	.long addr_79ec
+	tstl %fp@(-10)
+	beqs addr_652c
+	movel %fp@(-10),%d0
+	bras addr_652e
+addr_652c:
+	moveq #-36,%d0
+addr_652e:
+	braw addr_66a0
+addr_6532:
+	clrl %sp@
+	movel %fp@(-14),%sp@-
+	.short 0x4eb9															/* jsr addr_7720 */
+	.long addr_7720
+	addql #4,%sp
+	pea %fp@(-46)
+	movel #addr_284b8,%sp@-
+	movew #0x16,%sp@-
+	.short 0x4eb9															/* jsr addr_7cce */
+	.long addr_7cce
+	addaw #0xa,%sp
+	moveb #0x10,%fp@(-35)
+	movew stack_top,%fp@(-24)
+	movel %fp,%sp@
+	addil #-24,%sp@
+	.short 0x4eb9															/* jsr addr_9286 */
+	.long addr_9286
+	movew ram_unknown2,%fp@(-22)
+	movel %fp,%sp@
+	addil #-22,%sp@
+	.short 0x4eb9															/* jsr addr_9286 */
+	.long addr_9286
+	moveal %fp@(-14),%a0
+	movew %a0@(10),%fp@(-20)
+	movel %fp,%sp@
+	addil #-20,%sp@
+	.short 0x4eb9															/* jsr addr_9286 */
+	.long addr_9286
+	clrl %fp@(-18)
+	pea %fp@(-46)
+	movel #0x20,%sp@-
+	movel %fp@(-14),%sp@-
+	.short 0x4eb9															/* jsr addr_6c4e */
+	.long addr_6c4e
+	addaw #0xc,%sp
+	pea %fp@(-46)
+	movel #addr_284ce,%sp@-
+	movew #0x16,%sp@-
+	.short 0x4eb9															/* jsr addr_7cce */
+	.long addr_7cce
+	addaw #0xa,%sp
+	moveb #0x10,%fp@(-35)
+	moveal %fp@(-14),%a0
+	moveal %a0@(24),%a0
+	movew %a0@(6),%fp@(-24)
+	moveal %fp@(-14),%a0
+	moveal %a0@(24),%a0
+	movew %a0@(8),%fp@(-22)
+	moveal %fp@(-14),%a0
+	moveal %a0@(24),%a0
+	movew %a0@(10),%fp@(-4)
+	tstw %fp@(-4)
+	bges addr_6610
+	clrw %fp@(-4)
+addr_6610:
+	movel %fp,%sp@
+	subql #4,%sp@
+	.short 0x4eb9															/* jsr addr_9286 */
+	.long addr_9286
+	movew %fp@(-4),%fp@(-20)
+	clrl %fp@(-18)
+	pea %fp@(-46)
+	movel #0x20,%sp@-
+	movel %fp@(-14),%sp@-
+	.short 0x4eb9															/* jsr addr_6c4e */
+	.long addr_6c4e
+	addaw #0xc,%sp
+	pea %fp@(-14)
+	pea %fp@(-46)
+	.short 0x4eb9															/* jsr addr_1ee0 */
+	.long addr_1ee0
+	addql #8,%sp
+	moveal %fp@(-14),%a0
+	moveal %a0@(16),%a0
+	movew %a0@(14),%d0
+	extl %d0
+	divsw #0x20,%d0
+	subqw #2,%d0
+	movew %d0,%fp@(-6)
+	bras addr_6682
+addr_6666:
+	pea %fp@(-46)
+	movel #0x20,%sp@-
+	movel %fp@(-14),%sp@-
+	.short 0x4eb9															/* jsr addr_6c4e */
+	.long addr_6c4e
+	addaw #0xc,%sp
+	subqw #1,%fp@(-6)
+addr_6682:
+	tstw %fp@(-6)
+	bnes addr_6666
+	moveal %fp@(-14),%a0
+	movel #0x0,%a0@(12)
+	movew %fp@(-2),%sp@
+	.short 0x4eb9															/* jsr addr_79ec */
+	.long addr_79ec
+	clrl %d0
+addr_66a0:
+	unlk %fp
 	rts
+
 	.short 0x4e56
 	.short 0xfff0
 	.short 0x48e7
@@ -11572,6 +11452,8 @@ addr_60be:
 	.short 0x20c0
 	.short 0x4e5e
 	rts
+
+addr_6c4e:
 	.short 0x4e56
 	.short 0xfffc
 	.short 0x2ebc
@@ -11733,6 +11615,8 @@ addr_60be:
 	.short 0x3800
 	.short 0x4e5e
 	rts
+
+addr_6d86:
 	.short 0x4e56
 	.short 0xffe6
 	.short 0x48e7
@@ -12413,6 +12297,8 @@ addr_60be:
 	.short 0x3000
 	.short 0x4e5e
 	rts
+
+addr_72ae:
 	.short 0x4e56
 	.short 0xfffc
 	.short 0x48e7
@@ -13000,6 +12886,8 @@ addr_60be:
 	.short 0x2000
 	.short 0x4e5e
 	rts
+
+addr_7720:
 	.short 0x4e56
 	.short 0xfffc
 	.short 0x48e7
@@ -13165,6 +13053,8 @@ addr_60be:
 	.short 0x0080
 	.short 0x4e5e
 	rts
+
+addr_7860:
 	.short 0x4e56
 	.short 0xfffc
 	.short 0x4a6e
@@ -13369,6 +13259,8 @@ addr_60be:
 	.short 0x20e0
 	.short 0x4e5e
 	rts
+
+addr_79ec:
 	.short 0x4e56
 	.short 0x0000
 	.short 0x48e7
@@ -13744,6 +13636,8 @@ xgetdrv:
 	.short 0x0080
 	.short 0x4e5e
 	rts
+
+addr_7cce:
 	.short 0x4e56
 	.short 0x0000
 	.short 0x48e7
@@ -16589,19 +16483,20 @@ addr_9280:
 	movel %sp@(4),%sp@-
 	rts
 
-	.short 0x206f
-	.short 0x0004
-	.short 0x3010
-	.short 0xe058
-	.short 0x3080
+addr_9286:
+	moveal %sp@(4),%a0
+	movew %a0@,%d0
+	rorw #8,%d0
+	movew %d0,%a0@
 	rts
-	.short 0x206f
-	.short 0x0004
-	.short 0x2010
-	.short 0xe058
-	.short 0x4840
-	.short 0xe058
-	.short 0x2080
+
+addr_9292:
+	moveal %sp@(4),%a0
+	movel %a0@,%d0
+	rorw #8,%d0
+	swap %d0
+	rorw #8,%d0
+	movel %d0,%a0@
 	rts
 
 addr_92a2:
@@ -81097,6 +80992,8 @@ addr_28454:
 	.short 0x7fff
 	.short 0xffff
 	.short 0xffff
+
+addr_284b8:	
 	.short 0x2e20
 	.short 0x2020
 	.short 0x2020
@@ -81109,6 +81006,8 @@ addr_28454:
 	.short 0x0000
 	.short 0x0000
 	.short 0x0000
+	
+addr_284ce:
 	.short 0x2e2e
 	.short 0x2020
 	.short 0x2020
@@ -81192,6 +81091,7 @@ addr_28550:
 	.short 0x001f
 	.short 0x001e
 	.short 0x001f
+
 /*
 	GEMDOS vectors
 
@@ -81332,7 +81232,7 @@ funcs:
 	.short 0x0000
 	.long trap1_not_implemented								/* 56 */
 	.short 0x0000
-	.long 0x00fc6498
+	.long addr_6498
 	.short 0x0001
 	.long 0x00fc66a4
 	.short 0x0001
