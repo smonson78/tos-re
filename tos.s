@@ -10556,11 +10556,12 @@ addr_60be:
 	rts
 
 addr_6498:
+xmkdir:
 	linkw %fp,#-50
 	movew #0x10,%sp@
 	movel %fp@(8),%sp@-
 	.short 0x4eb9															/* jsr addr_6d86 */
-	.long addr_6d86
+	.long ixcreat
 	addql #4,%sp
 	movel %d0,%fp@(-10)
 	movew %d0,%fp@(-2)
@@ -10570,13 +10571,13 @@ addr_6498:
 addr_64be:
 	movew %fp@(-2),%sp@
 	.short 0x4eb9															/* jsr addr_7860 */
-	.long addr_7860
+	.long getofd
 	movel %d0,%fp@(-14)
-	movel #addr_284b8,%sp@
+	movel #dots,%sp@
 	movel #1,%sp@-
 	movel %fp@(-14),%sp@-
 	.short 0x4eb9															/* jsr addr_6c4e */
-	.long addr_6c4e
+	.long ixwrite
 	addql #8,%sp
 	movel %d0,%fp@(-10)
 	.short 0xb0bc,0,1													/* cmpl #1,%d0 */
@@ -10609,7 +10610,7 @@ addr_6532:
 	.long addr_7720
 	addql #4,%sp
 	pea %fp@(-46)
-	movel #addr_284b8,%sp@-
+	movel #dots,%sp@-
 	movew #0x16,%sp@-
 	.short 0x4eb9															/* jsr addr_7cce */
 	.long addr_7cce
@@ -10636,10 +10637,10 @@ addr_6532:
 	movel #0x20,%sp@-
 	movel %fp@(-14),%sp@-
 	.short 0x4eb9															/* jsr addr_6c4e */
-	.long addr_6c4e
+	.long ixwrite
 	addaw #0xc,%sp
 	pea %fp@(-46)
-	movel #addr_284ce,%sp@-
+	movel #dots2,%sp@-
 	movew #0x16,%sp@-
 	.short 0x4eb9															/* jsr addr_7cce */
 	.long addr_7cce
@@ -10668,7 +10669,7 @@ addr_6610:
 	movel #0x20,%sp@-
 	movel %fp@(-14),%sp@-
 	.short 0x4eb9															/* jsr addr_6c4e */
-	.long addr_6c4e
+	.long ixwrite
 	addaw #0xc,%sp
 	pea %fp@(-14)
 	pea %fp@(-46)
@@ -10688,7 +10689,7 @@ addr_6666:
 	movel #0x20,%sp@-
 	movel %fp@(-14),%sp@-
 	.short 0x4eb9															/* jsr addr_6c4e */
-	.long addr_6c4e
+	.long ixwrite
 	addaw #0xc,%sp
 	subqw #1,%fp@(-6)
 addr_6682:
@@ -11454,6 +11455,7 @@ addr_66a0:
 	rts
 
 addr_6c4e:
+ixwrite:
 	.short 0x4e56
 	.short 0xfffc
 	.short 0x2ebc
@@ -11617,6 +11619,7 @@ addr_6c4e:
 	rts
 
 addr_6d86:
+ixcreat:
 	.short 0x4e56
 	.short 0xffe6
 	.short 0x48e7
@@ -13055,6 +13058,7 @@ addr_7720:
 	rts
 
 addr_7860:
+getofd:
 	.short 0x4e56
 	.short 0xfffc
 	.short 0x4a6e
@@ -80993,14 +80997,12 @@ addr_28454:
 	.short 0xffff
 	.short 0xffff
 
-addr_284b8:	
-	.short 0x2e20
-	.short 0x2020
-	.short 0x2020
-	.short 0x2020
-/* 0x0284c0: */
-	.short 0x2020
-	.short 0x2000
+/* Used for creating directory structures. Note padding bytes up to 22 bytes total. */
+addr_284b8:
+dots:
+	/* 11 chars for filename entry (8+3) */
+	.ascii ".          "
+	.byte 0
 	.short 0x0000
 	.short 0x0000
 	.short 0x0000
@@ -81008,17 +81010,15 @@ addr_284b8:
 	.short 0x0000
 	
 addr_284ce:
-	.short 0x2e2e
-	.short 0x2020
-	.short 0x2020
-	.short 0x2020
-	.short 0x2020
-	.short 0x2000
+dots2:
+	.ascii "..         "
+	.byte 0
 	.short 0x0000
 	.short 0x0000
 	.short 0x0000
 	.short 0x0000
 	.short 0x0000
+
 	.short 0x2a2e
 	.short 0x2a00
 	.short 0x1b48
@@ -81232,51 +81232,51 @@ funcs:
 	.short 0x0000
 	.long trap1_not_implemented								/* 56 */
 	.short 0x0000
-	.long addr_6498
+	.long xmkdir  														/* 57 - xmkdir() (0xfc6498) */
 	.short 0x0001
-	.long 0x00fc66a4
+	.long 0x00fc66a4													/* 58 - xrmdir() (0xfc66a4) */
 	.short 0x0001
-	.long 0x00fc6212
+	.long 0x00fc6212													/* 59 - xchdir() (0xfc6212) */
 	.short 0x0001
-	.long 0x00fc7c54
+	.long 0x00fc7c54													/* 60 - xcreat() (0xfc7c54) */
 	.short 0x0001
-	.long 0x00fc7c90
+	.long 0x00fc7c90													/* 61 - xopen() (0xfc7c90) */
 	.short 0x0001
-	.long 0x00fc79ec
+	.long 0x00fc79ec													/* 62 - xclose() (0xfc79ec) */
 	.short 0x0000
-	.long 0x00fc7ab8
+	.long 0x00fc7ab8													/* 63 - xread() (0xfc7ab8) */
 	.short 0x0082
-	.long 0x00fc7af8
+	.long 0x00fc7af8													/* 64 - xwrite() (0xfc7af8) */
 	.short 0x0082
-	.long 0x00fc723e
+	.long 0x00fc723e													/* 65 - xunlink() (0xfc723e) */
 	.short 0x0001
-	.long 0x00fc76be
+	.long 0x00fc76be													/* 66 - xlseek() (0xfc76be) */
 	.short 0x0081
-	.long 0x00fc70ae
+	.long 0x00fc70ae													/* 67 - xchmod() (0xfc70ae) */
 	.short 0x0001
 	.long trap1_not_implemented
 	.short 0x0000
-	.long 0x00fc78a2
+	.long 0x00fc78a2													/* 69 - xdup() (0xfc78a2) */
 	.short 0x0000
-	.long 0x00fc7926
+	.long 0x00fc7926													/* 70 - xforce() (0xfc7926) */
 	.short 0x0000
-	.long 0x00fc630e
+	.long 0x00fc630e													/* 71 - xgetdir() (0xfc630e) */
 	.short 0x0001
-	.long 0x00fc8bb6
+	.long 0x00fc8bb6													/* 72 - xmalloc() (0xfc8bb6) */
 	.short 0x0001
-	.long 0x00fc8c0a
+	.long 0x00fc8c0a													/* 73 - xmfree() (0xfc8c0a) */
 	.short 0x0001
-	.long 0x00fc8a1e
+	.long 0x00fc8a1e													/* 74 - xsetblk() (0xfc8a1e) */
 	.short 0x0002
-	.long 0x00fc81f6
+	.long 0x00fc81f6													/* 75 - xexec() (0xfc81f6) */
 	.short 0x0003
-	.long 0x00fc80cc
+	.long 0x00fc80cc													/* 76 - xterm() (0xfc80cc) */
 	.short 0x0000
 	.long trap1_not_implemented
 	.short 0x0000
-	.long 0x00fc7c32
+	.long 0x00fc7c32													/* 78 - xsfirst() (0xfc7c32) */
 	.short 0x0001
-	.long 0x00fc68b0
+	.long 0x00fc68b0													/* 79 - xsnext() (0xfc68b0) */
 	.short 0x0000
 	.long trap1_not_implemented
 	.short 0x0000
@@ -81290,9 +81290,9 @@ funcs:
 	.short 0x0000
 	.long trap1_not_implemented
 	.short 0x0000
-	.long 0x00fc73ce
+	.long 0x00fc73ce													/* 86 - xrename() (0xfc73ce) */
 	.short 0x0002
-	.long 0x00fc718c
+	.long 0x00fc718c													/* 87 - xgsdtof() (0xfc718c) */
 	.short 0x0001
 
 addr_2877a:
