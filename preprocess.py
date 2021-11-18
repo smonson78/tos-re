@@ -57,20 +57,31 @@ for text in generate_text():
     if len(stripped) > 0 and stripped[-1] != ":" and stripped[0] != ".":
         # Check for transforms
 
-        # cmpb <imm>, reg
-        if len(stripped) > 4 and stripped[0:5] == "cmpb " and stripped[5] == "#":
+        # cmp[bwl] #<imm>, reg
+        if len(stripped) > 5 and stripped[0:3] == "cmp" and stripped[3] in ["b", "w", "l"] and stripped[4:6] == " #":
 
+            width = stripped[3]
             imm, reg = stripped[6:].split(",", 1)
             imm = get_multibase(imm)
 
             # Build operand
             opcode = 0xb000
+            
+            # Width - in bits 7+6 (0=b, 1=w)
+            if width == "w":
+                opcode |= 0x0040
+            elif width == "l":
+                opcode |= 0x00b0
+
             # Other operand - immediate:
             opcode |= 0x003c
             # Add other operand register number
             opcode |= getreg(reg) << 9
 
-            text = ".short 0x{:04x},0x{:04x} /* {} */".format(opcode, imm, stripped)
+            if width == "l":
+                text = ".short 0x{:04x}\n.long 0x{:08x} /* {} */".format(opcode, imm, stripped)
+            else:
+                text = ".short 0x{:04x},0x{:04x} /* {} */".format(opcode, imm, stripped)
 
             #print(stripped)
             #print(text)

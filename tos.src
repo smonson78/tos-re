@@ -42,7 +42,7 @@ addr_54e:
 addr_55e:
   addw %a0@+,%d0
   dbf %d1,addr_55e
-  .short 0xb07c,0x1234                    /* cmpw #0x1234,%d0 */
+  cmpw #0x1234,%d0
   bnes addr_570
   moveal %a4@(_dskbufp),%a0
   jsr %a0@
@@ -977,7 +977,7 @@ addr_e04:
 addr_e26:
   addw %a1@+,%d0
   dbf %d1,addr_e26
-  .short 0xb07c,0x5678                    /* cmpw #0x5678,%d0 */
+  cmpw #0x5678,%d0
   bnes addr_e04
   movel %a0,%sp@-
   jsr %a0@(8)
@@ -1735,7 +1735,7 @@ floprate:
 addr_16a4:
   movew %a0@(2),%d0
   movew %sp@(6),%d1
-  .short 0xb27c,-1                        /* cmpw #-1,%d1 */
+  cmpw #-1,%d1
   beqs addr_16b6
   movew %d1,%a0@(2)
 addr_16b6:
@@ -1833,8 +1833,7 @@ addr_1764:
   movel %d0,%fp@(-12)
 addr_17a4:
   movel %fp@(-12),%d0
-  .short 0xb0bc                           /* cmpl #65536,%d0 */
-  .long 0x10000
+  cmpl #65536,%d0
   beqs addr_1764
   tstl %fp@(-12)
   bges addr_17bc
@@ -1909,7 +1908,7 @@ addr_1894:
   moveb %a1@(8),%a0@(28)
   addqw #1,%d7
 addr_18aa:
-  .short 0xbe7c,3                         /* cmpw #3,%d7 */
+  cmpw #3,%d7
   blts addr_1894
   moveal #ram_unknown158,%a0
   moveaw %fp@(8),%a1
@@ -1989,13 +1988,13 @@ addr_1956:
   movew %d6,%sp@
   bsrw addr_18ec
   movew %d0,%d7
-  .short 0xbe7c,2                         /* cmpw #2,%d7 */
+  cmpw #2,%d7
   bnes addr_1988
   movew %d7,%d0
   braw addr_1a1a
   braw addr_1a18
 addr_1988:
-  .short 0xbe7c,1                         /* cmpw #1,%d7 */
+  cmpw #1,%d7
   bnew addr_1a18
 addr_1990:
   movew #1,%sp@
@@ -2018,8 +2017,7 @@ addr_1990:
   addql #2,%sp
   movel %d0,%d5
 addr_19c4:
-  .short 0xbabc                           /* cmpl #0x10000,%d5 */
-  .long 0x10000
+  cmpl #0x10000,%d5
   beqs addr_1990
   tstl %d5
   bges addr_19d4
@@ -2041,7 +2039,7 @@ addr_19d8:
 addr_19f2:
   addqw #1,%d7
 addr_19f4:
-  .short 0xbe7c,3                         /* cmpw #3,%d7 */
+  cmpw #3,%d7
   blts addr_19d8
   moveaw %d6,%a0
   addal #ram_unknown158,%a0
@@ -2066,7 +2064,7 @@ addr_1a24:
   moveml %d5-%d7,%sp@-
   movew %fp@(18),%d7
   movew %d7,%d0
-  .short 0xb07c,2                         /* cmpw #2,%d0 */
+  cmpw #2,%d0
   blts addr_1a3e
   moveq #-15,%d0
   braw addr_1aa2
@@ -2094,8 +2092,7 @@ addr_1a66:
   movel %d0,%d6
   tstl %d6
   beqs addr_1a8a
-  .short 0xbcbc                           /* cmpl #0x2,%d6 */
-  .long 2
+  cmpl #0x2,%d6
   bnes addr_1a86
   moveq #-14,%d6
 addr_1a86:
@@ -2257,17 +2254,15 @@ addr_1c06:
   movel %d0,%d7
   cmpiw #2,%fp@(8)
   bges addr_1c3c
-  .short 0xbebc                           /* cmpl #0x10000,%d7 */
-  .long 0x10000
+	cmpl #0x10000,%d7
   bnes addr_1c3c
   movew %fp@(16),%sp@
   bsrw addr_1956
-  .short 0xb07c,2                         /* cmpw #0x2,%d0 */
+  cmpw #0x2,%d0
   bnes addr_1c3c
   moveq #-14,%d7
 addr_1c3c:
-  .short 0xbebc                           /* cmpl #0x10000,%d7 */
-  .long 0x10000
+  cmpl #0x10000,%d7
   beqw addr_1b4a
   tstl %d7
   bges addr_1c4e
@@ -2357,7 +2352,7 @@ addr_1d1c:
   movel #disk_buffer,%sp@-
   bsrw addr_1e2e
   addql #4,%sp
-  .short 0xb07c,0x1234                    /* cmpw #0x1234,%d0 */
+  cmpw #0x1234,%d0
   bnes addr_1d36
   clrw %d0
   bras addr_1d38
@@ -2380,7 +2375,7 @@ protobt:
   movel %fp@(8),%sp@-
   bsrw addr_1e2e
   addql #4,%sp
-  .short 0xb07c, 0x1234                   /* cmpw #0x1234,%d0 */
+  cmpw #0x1234,%d0
   beqs addr_1d68
   clrw %d0
   bras addr_1d6a
@@ -2392,8 +2387,7 @@ addr_1d6e:
   tstl %fp@(12)
   blts addr_1db2
   movel %fp@(12),%d0
-  .short 0xb0bc                           /* cmpl #0xffffff,%d0 */
-  .long 0xffffff
+  cmpl #0xffffff,%d0
   bles addr_1d88
   bsrw random
   movel %d0,%fp@(12)
@@ -2412,7 +2406,7 @@ addr_1d8c:
   movel %d0,%fp@(12)
   addqw #1,%d7
 addr_1dac:
-  .short 0xbe7c,3                         /* cmpw #3,%d7 */
+  cmpw #3,%d7
   blts addr_1d8c
 addr_1db2:
   tstw %fp@(16)
@@ -2431,7 +2425,7 @@ addr_1dc4:
   addqw #1,%d6
   addqw #1,%d7
 addr_1dda:
-  .short 0xbe7c,19                        /* cmpw #19,%d7 */
+  cmpw #19,%d7
   blts addr_1dc4
 addr_1de0:
   clrw %fp@(-6)
@@ -2587,8 +2581,7 @@ addr_1f4c:
   bsrb addr_1f70
   bcss addr_1f6c
   bsrb addr_1fc2
-  .short 0xb0bc															/* cmpl #0xffffffff,%d0 */
-	.long -1
+  cmpl #-1,%d0
   beqs addr_1f6c
   movew %d0,stack_top
   swap %d0
@@ -3197,7 +3190,7 @@ addr_2614:
 addr_263e:
 	addqw #1,%d7
 addr_2640:
-	.short 0xbe7c,16                        /* cmpw #16,%d7 */
+	cmpw #16,%d7
 	bltw addr_23c2
 addr_2648:
 	tstb ram_unknown59
@@ -3478,7 +3471,7 @@ addr_2a46:
 	clrb %a0@
 	addqw #1,%d7
 addr_2a52:
-	.short 0xbe7c,8                         /* cmpw #8,%d7 */
+	cmpw #8,%d7
 	blts addr_2a46
 	clrw %d7
 	bras addr_2a7a
@@ -3493,7 +3486,7 @@ addr_2a5c:
 	movew #8,%a0@
 	addqw #1,%d7
 addr_2a7a:
-	.short 0xbe7c,4                         /* cmpw #4,%d7 */
+	cmpw #4,%d7
 	blts addr_2a5c
 	movew ram_unknown50,%d0
 	subw ram_unknown105,%d0
@@ -3777,7 +3770,7 @@ addr_2e04:
 	movew %d0,ram_unknown121
 	addqw #1,%d6
 addr_2e42:
-	.short 0xbc7c,8                         /* cmpw #8,%d6 */
+	cmpw #8,%d6
 	blts addr_2e04
 	moveb ram_unknown127,%d0
 	extw %d0
@@ -5200,7 +5193,7 @@ addr_3a26:
   /* first we grab the old ucs,rsr,tsr,scr contents */
   movepl %a1@(40),%d7
   movew %sp@(6),%d0
-  .short 0xb07c,0xffff                    /* cmpw #-1,%d0 - if -1 then don't change */
+  cmpw #-1,%d0														/* if -1 then don't change */
   beqs addr_3a58
   moveb %d0,%a0@(32)
   beqs addr_3a54
@@ -6724,7 +6717,7 @@ addr_4672:
 	movew %fp@(8),%d7
 	movew %fp@(10),%d6
 	.short 0xcc7c,255													/* andw #0xff,%d6 */
-	.short 0xbc7c,9														/* cmpw #0x9,%d6 */
+	cmpw #0x9,%d6
 	bnes addr_46ae
 addr_468c:
 	movew #0x20,%sp@
@@ -6755,7 +6748,7 @@ addr_46c2:
 	movew %fp@(8),%d7
 	movew %fp@(10),%d6
 	.short 0xcc7c,0xff												/* andw #0xff,%d6 */
-	.short 0xbc7c,9														/* cmpw #0x9,%d6 */
+	cmpw #0x9,%d6
 	bnes addr_46e6
 	movew %d6,%sp@
 	movew %d7,%sp@-
@@ -6763,7 +6756,7 @@ addr_46c2:
 	addql #2,%sp
 	bras addr_4706
 addr_46e6:
-	.short 0xbc7c,0x20												/* cmpw #0x20,%d6 */
+	cmpw #0x20,%d6
 	bges addr_46fc
 	movew #0x5e,%sp@
 	movew %d7,%sp@-
@@ -10580,7 +10573,7 @@ addr_64be:
 	.long ixwrite
 	addql #8,%sp
 	movel %d0,%fp@(-10)
-	.short 0xb0bc,0,1													/* cmpl #1,%d0 */
+	cmpl #1,%d0
 	beqs addr_6532
 	moveal %fp@(-14),%a0
 	movew %a0@(10),%fp@(-20)
@@ -16434,13 +16427,13 @@ addr_921e:
 trap2_handler:
   tstw %d0                        /* d0 = 0? This value seems undocumented */
   beqs addr_9246
-  .short 0xb07c,0x0073            /* cmpw #115,%d0 - opcode == 115? */
+  cmpw #115,%d0										/* opcode == 115? */
   bnes addr_9230                  /* No */
   .short 0x4eb9                   /* jsr vdi_dispatcher */ /* Yes - go to VDI dispatcher */
   .long vdi_dispatcher
   rte
 addr_9230:
-  .short 0xb07c,0xffff            /* cmpw #-1,%d0 - opcode == -1? */
+  cmpw #-1,%d0										/* opcode == -1? */
   bnes addr_923e                  /* No */
   movel #vdi_dispatcher,%d0       /* Yes - get address of VDI dispatcher */
   rte
@@ -16937,7 +16930,7 @@ addr_9644:
   moveb %a1@,%a0@(48)
   addqw #1,%d7
 addr_9658:
-  .short 0xbe7c,0x0006            /* cmpw #6,%d7 */
+  cmpw #6,%d7
   blts addr_9644
   clrw %d0
   moveb %d0,ram_unknown7
@@ -17218,8 +17211,7 @@ addr_98fe:
 	.short 0x4eb9															/* jsr addr_7ab8 */
 	.long addr_7ab8
 	addaw #10,%sp
-	.short 0xb0bc															/* cmpl #1,%d0 */
-	.long 1
+	cmpl #1,%d0
 	bnes addr_9960
 	moveb %fp@(-14),%d0
 	extw %d0
@@ -18351,22 +18343,22 @@ xsetdate:
 	movew %fp@(8),%d0
 	moveq #9,%d1
 	asrw %d1,%d0
-	.short 0xb07c,0x77												/* cmpw #0x77,%d0 */
+	cmpw #0x77,%d0
 	bles addr_a1e2
 	moveq #-1,%d0
 	bras addr_a22a
 addr_a1e2:
-	.short 0xbe7c,12													/* cmpw #0xc,%d7 */
+	cmpw #0xc,%d7
 	bles addr_a1ec
 	moveq #-1,%d0
 	bras addr_a22a
 addr_a1ec:
-	.short 0xbe7c,2														/* cmpw #0x2,%d7 */
+	cmpw #0x2,%d7
 	bnes addr_a208
 	movew %fp@(8),%d0
 	.short 0xc07c,0x600												/* andw #0x600,%d0 */
 	bnes addr_a208
-	.short 0xbc7c,0x1d												/* cmpw #0x1d,%d6 */
+	cmpw #0x1d,%d6
 	bles addr_a206
 	moveq #-1,%d0
 	bras addr_a22a
@@ -18404,21 +18396,21 @@ xsettime:
 	linkw %fp,#-4
 	movew %fp@(8),%d0
 	.short 0xc07c,0x1f												/* andw #0x1f,%d0 */
-	.short 0xb07c,0x1e												/* cmpw #0x1e,%d0 */
+	cmpw #0x1e,%d0
 	blts addr_a25a
 	moveq #-1,%d0
 	bras addr_a28e
 addr_a25a:
 	movew %fp@(8),%d0
 	.short 0xc07c,0x7e0												/* andw #0x7e0,%d0 */
-	.short 0xb07c,0x780												/* cmpw #0x780,%d0 */
+	cmpw #0x780,%d0
 	blts addr_a26c
 	moveq #-1,%d0
 	bras addr_a28e
 addr_a26c:
 	movew %fp@(8),%d0
 	.short 0xc07c,0xf800											/* andw #0xf800,%d0 */
-	.short 0xb07c,0xc000											/* cmpw #0xc000,%d0 */
+	cmpw #0xc000,%d0
 	bcss addr_a27e
 	moveq #-1,%d0
 	bras addr_a28e
@@ -18505,7 +18497,7 @@ addr_a30a:
 
 addr_a320:
 normal_ascii:
-  .short 0xb27c,32                        /* cmpw #32,%d1 */
+  cmpw #32,%d1
   bgew ascii_out
   cmpb #27,%d1
   bnes handle_control
@@ -18515,7 +18507,7 @@ addr_a334:
 handle_control:
   subqw #7,%d1
   bmis addr_a390
-  .short 0xb27c,6                         /* cmpw #6,%d1 */
+  cmpw #6,%d1
   bgts addr_a390
   addw %d1,%d1
   movew %pc@(addr_a348, %d1:w),%d1
@@ -18560,9 +18552,9 @@ addr_a36c:
   bsrb load_state
   .short 0x927c,65                        /* subw #65,%d1 */
   bmis addr_a390
-  .short 0xb27c,12                        /* cmpw #12,%d1 */
+  cmpw #12,%d1
   blew addr_a402
-  .short 0xb27c,24                        /* cmpw #24,%d1 */
+  cmpw #24,%d1
   bnes addr_a3f4
   lea %pc@(addr_a392),%a0
 addr_a38a:
@@ -19018,7 +19010,7 @@ addr_a6c6:
 cursconf:
   lea ram_unknown13,%a4
   movew %sp@(4),%d0
-  .short 0xb07c,7                         /* cmpw #7,%d0 */
+  cmpw #7,%d0
   bhis addr_a6c4                          /* dodgy hack */
   addw %d0,%d0
   movew %pc@(addr_a6e0,%d0:w),%d0
@@ -20573,16 +20565,16 @@ init_g:
 
 addr_b2b6:
 _FindDevice:
-    movew #4,%sp@-
-    trap #14                                /* Getrez() - get current video mode */
-    addql #2,%sp
-    moveb %d0,%d2                           /* Save the original resolution value */
-    cmpb #2,%d2															/* current rez = mono? */
-    beqs addr_b332                          /* Yes - can't be changed */
+	movew #4,%sp@-
+	trap #14                                /* Getrez() - get current video mode */
+	addql #2,%sp
+	moveb %d0,%d2                           /* Save the original resolution value */
+	cmpb #2,%d2															/* current rez = mono? */
+	beqs addr_b332                          /* Yes - can't be changed */
 
   moveal INTIN,%a0
   movew %a0@,%d0                          /* Get requested res from INTIN[0] */
-  .short 0xb07c,0x0001                    /* cmpw #1,%d0 */
+	cmpw #1,%d0
   bnes addr_b2da                          /* 1 not requested, go here */
   tstb %d2
   beqs addr_b2f6                          /* Originally low, mode "1" now selected - go here */
@@ -20590,7 +20582,7 @@ _FindDevice:
 
 /* Video mode 1 was not requested */
 addr_b2da:
-  .short 0xb07c,0x0003                    /* cmpw #3,%d0 - switch to medium res? */
+	cmpw #3,%d0															/* switch to medium res? */
   beqs addr_b308                          /* yes */
   tstb %d2
   beqs addr_b2f6                          /* Originally low res? -> no need to change */
@@ -20863,7 +20855,7 @@ addr_b4d8:
   bsrw rezinit
   lea f8x8,%a0                            /* Address of 8x8 font */
   movew %sp@+,%d0                         /* Restore shifter mode */
-  .short 0xb07c,0x0002                    /* cmpw #2,%d0 - is it mono? */
+  cmpw #2,%d0															/* is it mono? */
   bnes addr_b4f2                          /* Nope -> skip */
   lea f8x16,%a0                           /* Use 8x16 font instead */
 addr_b4f2:
@@ -20994,9 +20986,9 @@ _screen:
 
   clrw _flip_y
 
-  .short 0xbe7c,0x0001                    /* cmpw #1,%d7 - if opcode == 1 */
+  cmpw #1,%d7															/* if opcode == 1 */
   beqw addr_b74c
-  .short 0xbe7c,0x0064                    /* cmpw #100,%d7 - if opcode == 100 */
+  cmpw #100,%d7														/* if opcode == 100 */
   beqw addr_b74c
 
   /* Search the chain of handles to find the correct attribute area */
@@ -21012,7 +21004,7 @@ addr_b674:
   movel %a4,cur_work
   movew %a4@(2),%d0
   movew %d0,ram_unknown21 + 18
-  movew %d0,ram_unknown23 + 162           /*  */
+  movew %d0,ram_unknown23 + 162
   movew %a4@(300),ram_unknown21 + 20
   movew %a4@(304),ram_unknown21 + 22
   movew %a4@(302),ram_unknown21 + 24
@@ -21047,9 +21039,9 @@ addr_b6da:
   movew %a4@,ram_unknown21 + 68
 
 addr_b74c:
-  .short 0xbe7c,0x0001                    /* cmpw #1,%d7 - if opcode >= 1 */
+  cmpw #1,%d7                             /* if opcode >= 1 */
   blts addr_b76e
-  .short 0xbe7c,0x0027                    /* cmpw #39,%d7 - and <= 39 then continue */
+  cmpw #39,%d7                             /* and <= 39 then continue */
   bgts addr_b76e
 
   subqw #1,%d7                            /* jump to jmptb1[opcode - 1] (in longwords) */
@@ -21063,9 +21055,9 @@ addr_b74c:
 
   bras addr_b790
 addr_b76e:
-  .short 0xbe7c,0x0064 /* cmpw #100,%d7 */
+  cmpw #100,%d7
   blts addr_b790
-  .short 0xbe7c,0x0083 /* cmpw #131,%d7 */
+  cmpw #131,%d7
   bgts addr_b790
   .short 0x9e7c,0x0064 /* subw #100,%d7 */
 
@@ -22537,7 +22529,7 @@ addr_c294:
   movew %a5@+,%a4@+                       /* Copy one word */
   addqw #1,%d7
 addr_c298:
-  .short 0xbe7c,45                        /* cmpw #45,%d7 - Loop 0 to 44 */
+  cmpw #45,%d7                             /* Loop 0 to 44 */
   blts addr_c294
 
   moveal #rom_inq_tab,%a5                 /* Same again, for inq_tab */
@@ -22549,7 +22541,7 @@ addr_c2ae:
   movew %a5@+,%a4@+
   addqw #1,%d7
 addr_c2b2:
-  .short 0xbe7c,45                        /* cmpw #45,%d7 */
+  cmpw #45,%d7
   blts addr_c2ae
 
   movew max_vert,inq_tab + 28
@@ -22563,7 +22555,7 @@ addr_c2d2:
   movew %a5@+,%a4@+
   addqw #1,%d7
 addr_c2d6:
-  .short 0xbe7c,12                        /* cmpw #12,%d7 */
+  cmpw #12,%d7
   blts addr_c2d2
 
   moveal #f8x8,%a1
@@ -26253,7 +26245,7 @@ init_wk:
   addql #2,%a5
   moveal cur_work,%a3                     /* a3 is work_ptr in C source */
   movew %a5@+,%d7
-  .short 0xbe7c,0x0007                    /* cmpw #7,%d7 */
+  cmpw #7,%d7
   bgts addr_dfe2
   tstw %d7
   bges addr_dfe6
@@ -26279,7 +26271,7 @@ addr_dffe:
   movew %a0@,%a3@(44)
   movew %a5@+,%d7
   subqw #1,%d7
-  .short 0xbe7c,0x0006                    /* cmpw #6,%d7 */
+  cmpw #6,%d7
   bges addr_e01a
   tstw %d7
   bges addr_e01e
@@ -26318,7 +26310,7 @@ addr_e054:
   movew ram_unknown60,%a3@(58)
   movew #1,%a3@(62)
   movew %a5@+,%d7
-  .short 0xbe7c,0x0004                    /* cmpw #4,%d7 */
+  cmpw #4,%d7
   bgts addr_e07c
   tstw %d7
   bges addr_e080
@@ -26330,11 +26322,11 @@ addr_e080:
 addr_e082:
   movew %d0,%a3@(36)
   movew %a5@+,%d7
-  .short 0x0c6b,0x0002,0x0024             /* cmpiw #2,%a3@(36) */
+  cmpiw #2,%a3@(36)
   bnes addr_e0a6
-  .short 0xbe7c,0x0018                    /* cmpw #24,%d7 */
+  cmpw #24,%d7
   bgts addr_e09c
-  .short 0xbe7c,0x0001                    /* cmpw #1,%d7 */
+  cmpw #1,%d7
   bges addr_e0a0
 addr_e09c:
   moveq #1,%d0
@@ -38505,7 +38497,7 @@ addr_13d4a:
   movel %d0,eul
   addqw #1,%d7
 addr_13d74:
-  .short 0xbe7c,0x000f                    /* cmpw #15,%d7 */
+  cmpw #15,%d7
   blts addr_13d4a
 
   clrl ram_unknown90
@@ -38544,7 +38536,7 @@ addr_13dd8:
   addql #4,%sp
   addqw #1,%d7
 addr_13e02:
-  .short 0xbe7c,0x0003                    /* cmpw #3,%d7 */
+  cmpw #3,%d7
   blts addr_13dd8
 
   movel %a5,%a5@(4622)
@@ -44462,11 +44454,11 @@ addr_16b72:
 addr_16b74:                                 /* switch() statement on d0, 0-3 */
   tstw %d0
   beqs addr_16b00                         /* 0 */
-  .short 0xb07c,0x0001                    /* cmpw #1,%d0 */
+  cmpw #1,%d0
   beqs addr_16b60                         /* 1 */
-  .short 0xb07c,0x0002                    /* cmpw #2,%d0 */
+  cmpw #2,%d0
   beqs addr_16b2a                         /* 2 */
-  .short 0xb07c,0x0003                    /* cmpw #3,%d0 */
+  cmpw #3,%d0
   beqs addr_16b10                         /* 3 */
 
 addr_16b8a:
@@ -48035,13 +48027,13 @@ addr_1866c:
 
   addqw #1,%d5
 addr_18684:
-  .short 0xba7c,0003                      /* cmpw #3,%d5 - a FOR loop from 0 to 2 */
+  cmpw #3,%d5                             /* a FOR loop from 0 to 2 */
   blts addr_1866c
 
   movew #4,%sp@
   .short 0xf0ec
   movew %d0,%d4
-  .short 0xb87c,0x0002                    /* cmpw #2,%d4 */
+  cmpw #2,%d4
   beqs addr_186a6
   moveal %d7,%a0
   addal #394,%a0
@@ -48075,7 +48067,7 @@ addr_186be:
   .short 0xf4c4
 
   addql #4,%sp
-  .short 0xb07c,0x0011                    /* cmpw #17,%d0 */
+  cmpw #17,%d0
   bnes addr_1874a                         /* if d0 != 17, return 0 */
 
   movew #5,%sp@
@@ -58275,7 +58267,7 @@ aes_dispatcher:
   .long interrupts_on
 
 
-  .short 0xb07c,0x00c8                    /* cmpw #200,%d0 - 200 is CRYSTAL1 */
+  cmpw #200,%d0                           /* 200 is CRYSTAL1 */
   bnes addr_1d468                         /* if CRYSTAL2, fall into dsptch (same as appl_yield() for PC-GEM) */
 
   movel %d1,%sp@-                         /* d1 was provided by whoever called TRAP #2 - it's the address of the AES parameter block (6 pointers) */
@@ -76696,7 +76688,7 @@ inf_what:
   movel %sp@(8),%sp@-
   .short 0xf2b0                           /* Call something(y, z, 2) */
   addql #8,%sp
-  .short 0xb07c,0xffff                    /* cmpw #-1,%d0 - check return val */
+  cmpw #-1,%d0														/* check return val */
   beqs addr_26036                         /* if it was -1, return 1 */
   movew %d0,%d1
   addw %d0,%sp@(8)                        /* y = y + return val */

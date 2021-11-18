@@ -35,5 +35,8 @@ fcb5b0:	2079 0000 2b82 	moveal 0x2b82,%a0
 
   Make a preprocessor that changes stuff into inline shorts so that gas doesn't fuck around with the opcodes.
   e.g.
-    * cmpb --> cmpib
-    * jsr <addr> --> jsr pc-relative with offset
+    * cmp --> cmpi
+    * andw --> andi
+    * ori -->
+    * sub --> subi
+    * cmpi sometimes???
