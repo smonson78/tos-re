@@ -200,7 +200,7 @@ autovec_lvl_4:
   moveb %a5@(mfp_pp),%d1
   moveb %a5@(video_res),%d0
   .short 0xc03c,0x0003                    /* andb #3,%d0 */
-  .short 0xb03c,0x0002                    /* cmpb #2,%d0 */
+  cmpb #2,%d0
   bges addr_702                          /* Are we in mono mode? */
 
   /* In colour modes: */
@@ -219,7 +219,7 @@ addr_702:
   btst #7,%d1                             /* Check mono detect */
   beqs lvl4_vec_nochange                  /* Monitor is present */
   moveb %a5@(defshiftmod),%d0             /* Get default shifter mode */
-  .short 0xb03c,0x0002                    /* cmpb #2,%d0 */
+  cmpb #2,%d0
   blts lvl4_vec_chmode                    /* Default shifter mode compatible with colour monitor --> jump over */
   clrb %d0                                /* Set to fallback mode 0 (low) */
 
@@ -16450,37 +16450,29 @@ addr_923e:
 
 /* Trap #2 opcode 0... */
 addr_9246:
-	.short 0x2e79
-	.short 0x00fe
-	.short 0x854c
-	.short 0x4267
-	.short 0x6100
-	.short 0xee7c
+	moveal addr_2854c,%sp
+	clrw %sp@-
+	bsrw addr_80cc
 	.short 0x4afc
-	.short 0x4e73
-	.short 0x302f
-	.short 0x0004
-	.short 0xb03c
-	.short 0x0061
-	.short 0x6d0a
+	rte
 
-	.short 0xb03c
-	.short 0x007a
-	.short 0x6e04
-	.short 0x0880
-	.short 0x0005
+	movew %sp@(4),%d0
+	cmpb #0x61,%d0
+	blts addr_926a
+	cmpb #0x7a,%d0
+	bgts addr_926a
+	bclr #5,%d0
+addr_926a:
 	rts
 
+addr_926c:
 user_ex_vec_1:
-	.short 0x3f2f
-	.short 0x0004
-	.short 0x4eb9
-	.short 0x00fc
-	.short 0x9eae
-	.short 0x548f
-	.short 0x2f39
-	.short 0x0000
-	.short 0x1814
+	movew %sp@(4),%sp@-
+	.short 0x4eb9															/* jsr addr_9eae */
+	.long addr_9eae
+	
+	addql #2,%sp
+	movel saved_vectors,%sp@-
 	rts
 
 addr_9280:
@@ -16503,6 +16495,7 @@ addr_9292:
 	movel %d0,%a0@
 	rts
 
+xsetjmp:
 addr_92a2:
 	linkw %fp,#0
 	moveal %fp@(8),%a0
@@ -17126,8 +17119,8 @@ osif_restart:
 	braw c_func_return
 addr_97f4:
 	movel #ram_unknown18,%sp@
-	.short 0x4eb9                           	/* jsr addr_92a2 (xsetjmp) */
-  .long addr_92a2
+	.short 0x4eb9                           	/* jsr xsetjmp */
+  .long xsetjmp
 	movel %d0,%fp@(-34)												/* rc stack variable */
 	beqw addr_9894
 	cmpil #-14,%fp@(-34)
@@ -17941,6 +17934,8 @@ c_func_return:
   unlk %fp
 	rts
 
+addr_9eae:
+.global addr_9eae
 	.short 0x4e56
 	.short 0x0000
 	.short 0x48e7
@@ -18512,7 +18507,7 @@ addr_a320:
 normal_ascii:
   .short 0xb27c,32                        /* cmpw #32,%d1 */
   bgew ascii_out
-  .short 0xb23c,27                        /* cmpb #27,%d1 */
+  cmpb #27,%d1
   bnes handle_control
   lea %pc@(addr_a36c),%a0
   bras load_state
@@ -20582,7 +20577,7 @@ _FindDevice:
     trap #14                                /* Getrez() - get current video mode */
     addql #2,%sp
     moveb %d0,%d2                           /* Save the original resolution value */
-    .short 0xb43c,0x0002                    /* cmpb #2,%d2 - current rez = mono? */
+    cmpb #2,%d2															/* current rez = mono? */
     beqs addr_b332                          /* Yes - can't be changed */
 
   moveal INTIN,%a0
@@ -81073,6 +81068,8 @@ dots2:
 	.short 0x2a2a
 	.short 0x2a1b
 	.short 0x4b00
+
+addr_2854c:
 	.short 0x0000
 	.short 0x1810
 

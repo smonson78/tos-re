@@ -3,7 +3,7 @@ AS=m68k-elf-as
 OBJCOPY=m68k-elf-objcopy
 OBJDUMP=m68k-elf-objdump
 
-ASFLAGS=-m68000 --no-pad-sections
+ASFLAGS=-m68000 --no-pad-sections --traditional-format
 LDFLAGS=-m68000 -nostdlib
 
 OBJECTS=extern.o boot.o tos.o
@@ -21,8 +21,11 @@ tos.bin: $(OBJECTS)
 
 	@TMP=$$( cmp tos.bin tos104uk.img | sed -e "s/.*differ: byte \([^ ,]*\).*/\1/ p; d" ); if [ -n "$$TMP" ]; then echo $$TMP | xargs printf "\n*** No match to TOS 1.4 at: 0x%0x\n\n"; fi
 
+%.s: %.src
+	./preprocess.py $^ >$@
+
 clean:
-	$(RM) *.o tos.elf tos.bin
+	$(RM) *.o tos.elf tos.bin tos.s
 
 view:
 	$(OBJDUMP) -b binary -m 68000 --adjust-vma=0xfc0000 -D tos.bin | less
