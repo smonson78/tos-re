@@ -3889,34 +3889,28 @@ addr_315e:
   bsrw addr_3254
   lsrb #1,%d0
   addb %d0,%d2
-  movel %d2,%a5@(ram_unknown186)
-  moveb #0x0,%a5@(ram_unknown187)
+  movel %d2,%a5@(iclkrtime)
+  moveb #0x0,%a5@(iclk_ready)
   rts
 
 addr_31a8:
-.global addr_31a8
-	.short 0x1b7c
-	.short 0xffff
-	.short 0x0eae
-	.short 0x123c
-	.short 0x001c
-	.short 0x6100
-	.short 0x02ac
-	.short 0x206d
-	.short 0x04ba
-	.short 0xd0fc
-	.short 0x00c8
-	.short 0x7000
-/* 0x0031c0: */
-	.short 0xb1ed
-	.short 0x04ba
-	.short 0x650a
-	.short 0x4a2d
-	.short 0x0eae
-	.short 0x66f4
-	.short 0x202d
-	.short 0x0e6c
-	rts
+igetdt:
+.global igetdt
+  moveb #0xffffffff,%a5@(iclk_ready)
+  moveb #0x1c,%d1
+  bsrw ikbd_writeb
+  moveal %a5@(_hz_200),%a0
+  addaw #0xc8,%a0
+  moveq #0,%d0
+addr_31c0:
+  cmpal %a5@(_hz_200),%a0
+  bcss addr_31d0
+  tstb %a5@(iclk_ready)
+  bnes addr_31c0
+  movel %a5@(iclkrtime),%d0
+addr_31d0:
+  rts
+
 addr_31d2:
 isetdt:
 	movel %sp@(4),%a5@(iclkwtime)

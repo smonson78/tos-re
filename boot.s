@@ -371,7 +371,7 @@ addr_414:
 
     jsr addr_1f4c
     bccs addr_462                               /* 2 calls out of these three: Boot from floppy? */
-    bsrw addr_31a8                              /* Boot from DMA bus? */
+    bsrw igetdt                                 /* Boot from DMA bus? */
                                                 /* Execute reset-resident programs? */
     swap %d0
 
