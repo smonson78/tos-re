@@ -21,13 +21,11 @@ tos.bin: $(OBJECTS)
 
 	@TMP=$$( cmp tos.bin tos104uk.img | sed -e "s/.*differ: byte \([^ ,]*\).*/\1/ p; d" ); if [ -n "$$TMP" ]; then echo $$TMP | xargs printf "\n*** No match to TOS 1.4 at: 0x%0x\n\n"; fi
 
-tos.o: tos.s
-
-%.s: %.src
+%.s: %-source.s
 	./preprocess.py $^ >$@
 
 clean:
-	$(RM) *.o tos.elf tos.bin tos.s
+	$(RM) *.o *.pp tos.elf tos.bin 
 
 view:
 	$(OBJDUMP) -b binary -m 68000 --adjust-vma=0xfc0000 -D tos.bin | less
