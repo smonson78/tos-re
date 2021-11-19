@@ -59,11 +59,14 @@ def signedhex(num):
 def make_imm_arg(imm, width):
     try:
         imm = get_multibase(imm)
-        if width == "l":
-            imm = "0x{:08x}".format(signedhex(imm))
-        else:
+        if width == "b":
+            imm = imm & 0xff
+            imm = "0x{:04x}".format(signedhex(imm))
+        elif width == "w":
             imm = imm & 0xffff
             imm = "0x{:04x}".format(signedhex(imm))
+        else:
+            imm = "0x{:08x}".format(signedhex(imm))
     except ValueError:
         pass
     return imm
@@ -166,12 +169,38 @@ for text in generate_text():
             #print(text)
             #print()            
 
-        # The solution is to move the target to another file.
-        # jsr <dest>
-        #if len(stripped) > 4 and stripped[0:3] == 'jsr ':
-        #    dest = stripped[4:]
-        #    opcode = 0x4eb9
-        #    text = ".short 0x{:04x}\n.long {} /* {} */".format(opcode, dest, stripped)
+        # and[bwl] #<imm>, reg
+        if len(stripped) > 5 and stripped[0:3] == "and" and stripped[3] in ["b", "w", "l"] and stripped[4:6] == " #":
+
+            width = stripped[3]
+
+            imm, reg = stripped[6:].split(",", 1)
+
+            imm = make_imm_arg(imm, width)
+
+            # Build operand
+            opcode = 0xc000
+            
+            # Width - in bits 7+6 (0=b, 1=w, 2=l)
+            if width == "w":
+                opcode |= 0x0040
+            elif width == "l":
+                opcode |= 0x0080
+
+            # Other operand - immediate:
+            opcode |= 0x003c
+            # Add other operand register number
+            opcode |= getreg(reg) << 9
+
+            if width == "l":
+                text = ".short 0x{:04x}\n.long {} /* {} */".format(opcode, imm, stripped)
+            else:
+                text = ".short 0x{:04x},{} /* {} */".format(opcode, imm, stripped)
+
+            #print(stripped)
+            #print(imm, reg)
+            #print(text)
+            #print()   
 
     print(text)
 

@@ -87,7 +87,7 @@ addr_5c8:
   bnes addr_5f0
   movew #138,%fp@
   movew %a5@,%d0
-  .short 0xc07c,0x00ff                    /* andw #255,%d0 */
+  andw #255,%d0
   beqs addr_5f2
   dbf %d5,addr_57a
 addr_5f0:
@@ -180,7 +180,7 @@ autovec_lvl_2:
 .global autovec_lvl_2
   movew %d0,%sp@-                         /* Save d0 */
 	movew %sp@(2),%d0
-	.short 0xc07c,0x0700                    /* andw #0x700,%d0 - check something, I think this is %sr maybe */
+	andw #0x700,%d0													/* check something, I think this is %sr maybe */
   bnes addr_6bc
   oriw #0x300,%sp@(2)                     /* Set two bits in word on stack */
 addr_6bc:
@@ -199,7 +199,7 @@ autovec_lvl_4:
   subal %a5,%a5
   moveb %a5@(mfp_pp),%d1
   moveb %a5@(video_res),%d0
-  .short 0xc03c,0x0003                    /* andb #3,%d0 */
+  andb #3,%d0
   cmpb #2,%d0
   bges addr_702                          /* Are we in mono mode? */
 
@@ -598,7 +598,7 @@ addr_a72:
 getrez:
 	moveq #0,%d0
   moveb %a5@(video_res),%d0
-  .short 0xc03c,0003                      /* andb #3,%d0 */
+  andb #3,%d0
 	rts
 
 /* Trap 14, opcode 5 */
@@ -637,10 +637,10 @@ setcolor:
 .global setcolor
   movew %sp@(4),%d1
   addw %d1,%d1
-  .short 0xc27c,0x001f                    /* andw #31,%d1 - (colornum * 2) & 0b11111 */
+  andw #31,%d1														/* (colornum * 2) & 0b11111 */
   lea %a5@(palette),%a0
   movew %a0@(0,%d1:w),%d0                 /* Get that colour from the palette */
-  .short 0xc07c,0x0777                    /* andw #0x777,%d0 - Limit to STFM palette range, and return that value */
+  andw #0x777,%d0													/* Limit to STFM palette range, and return that value */
   tstw %sp@(6)
   bmis addr_aee                           /* Check color is positive */
   movew %sp@(6),%a0@(0,%d1:w)             /* Write color into palette */
@@ -691,7 +691,7 @@ addr_b28:
 addr_b56:
 drawbombs:
   moveb %a5@(video_res),%d7
-  .short 0xce7c,0x0003                    /* andw #3,%d7 */
+  andw #3,%d7
   addw %d7,%d7                            /* Twice the video mode = 0, 2, or 4 */
   moveq #0,%d0
   moveb %a5@(video_baseh + 1),%d0
@@ -883,14 +883,14 @@ addr_d0c:
   clrw %a5@(ram_unknown151)
   movew %a5@(ram_unknown24),%d1
   lsrw #3,%d1
-  .short 0xc27c,1                         /* andw #1,%d1 */
+  andw #1,%d1
   movew %d1,%a5@(ram_unknown152)
   movew %a5@(ram_unknown24),%d1
   movew %d1,%d0
   lsrw #4,%d0
-  .short 0xc07c,1                         /* andw #1,%d0 */
+  andw #1,%d0
   movew %d0,%a5@(ram_unknown153)
-  .short 0xc27c,7                         /* andw #7,%d1 */
+  andw #7,%d1
   moveb %pc@(printer_types, %d1:w),%d0
   movew %d0,ram_unknown142
   pea %a5@(ram_unknown143)
@@ -1125,7 +1125,7 @@ addr_f94:
   beqs addr_fd0                           /* (when its zero -- retry) */
   movew #128,%fp@                         /* examine 1770 status register */
   bsrw rdfdcd0
-  .short 0xc03c,0x001c                    /* andb #28,%d0 - check for RNF, checksum, lost-data */
+  andb #28,%d0														/* check for RNF, checksum, lost-data */
   bnes addr_fce                           /* (bail on error) */
   movew #2,%a5@(fd_retry)                 /* reset retry count for next sector */
   addqw #1,%a5@(fd_sect)                  /* advance sector # */
@@ -1207,7 +1207,7 @@ addr_1074:
   bsrw addr_fe8
   btst #6,%d0
   bnew flopfail
-  .short 0xc03c,92                        /* andb #92,%d0 */
+  andb #92,%d0
   bnes addr_10ae
   movew #2,%a5@(fd_retry)
   addqw #1,%a5@(fd_sect)
@@ -1351,7 +1351,7 @@ addr_1260:
   movew #384,%fp@                         /* Get 1770 status */
   bsrw rdfdcd0                            /* Check for write protect and lost data */
   bsrw fdcerr                             /* Return error (NE) on 1770 error */
-  .short 0xc03c,0x0044                    /* andb #68,%d0 */
+  andb #68,%d0
 	rts
 
 addr_127e:
@@ -1409,7 +1409,7 @@ addr_1310:
   movew #128,%fp@
   bsrw addr_1626
   bsrw addr_fe8
-  .short 0xc03c,28                        /* andb #28,%d0 */
+  andb #28,%d0
   bnes addr_1346
 addr_132e:
   addqw #1,%a5@(fd_sect)
@@ -1435,11 +1435,11 @@ addr_1360:
   bnes addr_13da
   movel %a5@(_frlock),%d0
   moveb %d0,%d1
-  .short 0xc23c,7                         /* andb #7,%d1 */
+  andb #7,%d1
   bnes addr_13b0
   movew #128,%fp@
   lsrb #3,%d0
-  .short 0xc07c,1                         /* andw #1,%d0 */
+  andw #1,%d0
   lea %a5@(ram_unknown162),%a0
   addaw %d0,%a0
   cmpw %a5@(_nflops),%d0
@@ -1575,7 +1575,7 @@ go2track:
   bsrb addr_153e
   bnes addr_1526
   .short 0x336d,fd_curtrack,0             /* movew %a5@(fd_curtrack),%a1@(0) */
-  .short 0xce3c,24                        /* andb #24,%d7 */
+  andb #24,%d7
 addr_1526:
   rts
 
@@ -1592,7 +1592,7 @@ addr_153c:
 
 addr_153e:
   movew %a1@(2),%d0
-  .short 0xc03c,3                         /* andb #3,%d0 */
+  andb #3,%d0
   orb %d0,%d6
   movel #0x40000,%d7
   movew #128,%fp@
@@ -1636,7 +1636,7 @@ select:
   lslb #1,%d0
   orw %a5@(fd_side),%d0
   eorib #7,%d0
-  .short 0xc03c,7                         /* andb #7,%d0 */
+  andb #7,%d0
   bsrb addr_15e2
   movew #130,%fp@
   .short 0x3e29,0                         /* movew %a1@(0),%d7 */
@@ -1657,7 +1657,7 @@ addr_15e2:
   moveb #14,psg
   moveb psg,%d1
   moveb %d1,%d2
-  .short 0xc23c,0xf8                      /* andb #-8,%d1 */
+  andb #-8,%d1
   orb %d0,%d1
   moveb %d1,psg_write_data
   movew %sp@+,%sr
@@ -1846,7 +1846,7 @@ addr_17bc:
   bles addr_17d8
   moveb ram_unknown175,%d6
   extw %d6
-  .short 0xcc7c,255                       /* andw #255,%d6 */
+  andw #255,%d6
   bgts addr_17de
 addr_17d8:
   clrl %d0
@@ -2306,8 +2306,7 @@ addr_1c98:
   movel %d0,rseed
   movel rseed,%d0
   asrl #8,%d0
-  .short 0xc0bc                           /* andl #0x00ffffff,%d0 */
-  .long 0x00ffffff
+  andl #0x00ffffff,%d0
   unlk %fp
 	rts
 
@@ -2396,8 +2395,7 @@ addr_1d88:
   bras addr_1dac
 addr_1d8c:
   movel %fp@(12),%d0
-  .short 0xc0bc                           /* andl #255,%d0 */
-  .long 255
+  andl #255,%d0
   moveaw %d7,%a1
   addal %fp@(8),%a1
   moveb %d0,%a1@(8)
@@ -2480,12 +2478,12 @@ addr_1e5e:
   moveal %fp@(8),%a0
   moveb %a0@(1),%d0
   extw %d0
-  .short 0xc07c,255                       /* andw #255,%d0 */
+  andw #255,%d0
   aslw #8,%d0
   moveal %fp@(8),%a1
   moveb %a1@,%d1
   extw %d1
-  .short 0xc27c,255                       /* andw #255,%d1 */
+  andw #255,%d1
   orw %d1,%d0
   unlk %fp
   rts
@@ -2549,8 +2547,7 @@ addr_1ee0:
 addr_1f06:
   movel %a1,%d0
   subl %a0,%d0
-  .short 0xc0bc                           /* andl #0xffffff00,%d0 */
-  .long 0xffffff00
+  andl #0xffffff00,%d0
   beqs addr_1f3e
   lea %a0@(0x0,%d0:l),%a0
   moveal %a0,%a2
@@ -2602,7 +2599,7 @@ addr_1f70:
   movew #0xa05,%d0
   movepw %d0,%a0@(5)
   movepw %a0@(5),%d1
-  .short 0xc27c,0xf0f												/* andw #0xf0f,%d1 */
+  andw #0xf0f,%d1
   cmpw %d0,%d1
   bnes addr_1fbc
   moveb #0x1,%a0@(1)
@@ -2677,7 +2674,7 @@ addr_2064:
 	moveq #1,%d1
 addr_2068:
 	moveb %a0@(0x0,%d1:w),%d2
-	.short 0xc43c,0xf													/* andb #0xf,%d2 */
+	andb #0xf,%d2
 	moveb %d2,%a1@(0x0,%d0:w)
 	addqw #2,%d1
 	dbf %d0,addr_2068
@@ -2984,7 +2981,7 @@ addr_239e:
   beqs addr_23bc
   moveal ram_unknown86,%a0
   movew %a0@,%d0
-  .short 0xc07c,1                         /* andw #1,%d0 */
+  andw #1,%d0
   movew %d0,ram_unknown87
   braw addr_2648
 addr_23bc:
@@ -2993,21 +2990,21 @@ addr_23bc:
 addr_23c2:
   moveal ram_unknown86,%a0
   movew %a0@,%d0
-  .short 0xc07c,0x777                     /* andw #0x777,%d0 */
+  andw #0x777,%d0
   movew %d0,prtbtcol
   addql #2,ram_unknown86
   cmpiw #0x777,prtbtcol
   beqw addr_2614
   movew prtbtcol,%d0
-  .short 0xc07c,7                         /* andw #7,%d0 */
+  andw #7,%d0
   movew %d0,prtbbval
   movew prtbtcol,%d0
   asrw #4,%d0
-  .short 0xc07c,7                         /* andw #7,%d0 */
+  andw #7,%d0
   movew %d0,prtbgval
   movew prtbtcol,%d0
   asrw #8,%d0
-  .short 0xc07c,7                         /* andw #7,%d0 */
+  andw #7,%d0
   movew %d0,prtbrval
   tstb ram_unknown67
   beqw addr_25c2
@@ -3233,8 +3230,7 @@ addr_26b0:
 	mulsw ram_unknown98,%d0
 	movew %d0,ram_unknown104
 	movel ram_unknown36,%d0
-	.short 0xc0bc                           /* andl #-2,%d0 */
-  .long -2
+	andl #-2,%d0
 	movel %d0,ram_unknown106
 	movel ram_unknown36,%d0
 	cmpl ram_unknown106,%d0
@@ -3267,7 +3263,7 @@ addr_273a:
 	movel %d0,ram_unknown112
 	moveq #15,%d0
 	movew ram_unknown52,%d1
-	.short 0xc27c,15                        /* andw #15,%d1 */
+	andw #15,%d1
 	subw %d1,%d0
 	movew %d0,ram_unknown102
 	movew ram_unknown52,ram_unknown101
@@ -3302,7 +3298,7 @@ addr_2802:
 	moveq #15,%d1
 	subw ram_unknown102,%d1
 	asrw %d1,%d0
-	.short 0xc07c,1                         /* andw #1,%d0 */
+	andw #1,%d0
 	mulsw ram_unknown119,%d0
 	addw %d0,ram_unknown110
 	addql #2,ram_unknown117
@@ -3531,7 +3527,7 @@ addr_2b1e:
 	moveq #15,%d1
 	subw ram_unknown102,%d1
 	asrw %d1,%d0
-	.short 0xc07c,1                         /* andw #1,%d0 */
+	andw #1,%d0
 	mulsw ram_unknown119,%d0
 	addw %d0,ram_unknown110
 	addql #2,ram_unknown117
@@ -3758,7 +3754,7 @@ addr_2e04:
 	moveq #7,%d1
 	subw %d7,%d1
 	asrw %d1,%d0
-	.short 0xc07c,1                         /* andw #1,%d0 */
+	andw #1,%d0
 	mulsw ram_unknown121,%d0
 	moveb ram_unknown127,%d1
 	addb %d0,%d1
@@ -4268,8 +4264,7 @@ addr_32c0:
   moveq #0,%d1
 addr_32e0:
   .short 0x2268,0                         /* moveal %a0@(0),%a1 */
-  .short 0xc2bc                           /* andl #0xffff,%d1 */
-  .long 0xffff
+  andl #0xffff,%d1
   moveb %a1@(0,%d1:l),%d0
   movew %d1,%a0@(6)
 addr_32f2:
@@ -4481,8 +4476,7 @@ addr_34aa:
   moveq #0,%d1
 addr_34ca:
   .short 0x2268,0                         /* moveal %a0@(0),%a1 */
-  .short 0xc2bc                           /* andl #0xffff,%d1 */
-  .long 0xffff
+	andl #0xffff,%d1
   movel %a1@(0,%d1:l),%d0
   movew %d1,%a0@(6)
 addr_34dc:
@@ -5094,8 +5088,7 @@ addr_397a:
   cmpw %a0@(6),%d1
   beqs addr_397a
   .short 0x2268,0                         /* moveal %a0@(0),%a1 */
-  .short 0xc2bc                           /* andl #65535,%d1 */
-  .long 0xffff
+  andl #65535,%d1
   moveb %d0,%a1@(0,%d1:l)
   movew %d1,%a0@(8)
   rts
@@ -5196,7 +5189,7 @@ addr_3a26:
   beqs addr_3a58
   moveb %d0,%a0@(32)
   beqs addr_3a54
-  .short 0xc03c,0x00fd                    /* andb #-3,%d0 */
+  andb #-3,%d0
   beqs addr_3a54
   moveb #1,%d0
 addr_3a54:
@@ -6715,7 +6708,7 @@ addr_4672:
 	moveml %d5-%d7,%sp@-
 	movew %fp@(8),%d7
 	movew %fp@(10),%d6
-	.short 0xcc7c,255													/* andw #0xff,%d6 */
+	andw #0xff,%d6
 	cmpw #0x9,%d6
 	bnes addr_46ae
 addr_468c:
@@ -6727,7 +6720,7 @@ addr_468c:
 	addal %a0,%a0
 	moveal #0x3ba0,%a1
 	movew %a0@(0x0,%a1:l),%d0
-	.short 0xc07c,7														/* andw #0x7,%d0 */
+	andw #0x7,%d0
 	bnes addr_468c
 	bras addr_46b8
 addr_46ae:
@@ -6746,7 +6739,7 @@ addr_46c2:
 	moveml %d5-%d7,%sp@-
 	movew %fp@(8),%d7
 	movew %fp@(10),%d6
-	.short 0xcc7c,0xff												/* andw #0xff,%d6 */
+	andw #0xff,%d6
 	cmpw #0x9,%d6
 	bnes addr_46e6
 	movew %d6,%sp@
@@ -17189,7 +17182,7 @@ addr_98f6:
 addr_98fe:
 	moveal ram_unknown6,%a0
 	movew %fp@(-20),%d1
-	.short 0xc27c,127													/* andw #127,%d1 */
+	andw #127,%d1
 	moveb %a0@(0x30,%d1:w),%d0
 	extw %d0
 	movew %d0,%fp@(-22)
@@ -18332,9 +18325,9 @@ xsetdate:
 	moveml %d5-%d7,%sp@-
 	movew %fp@(8),%d7
 	asrw #5,%d7
-	.short 0xce7c,0xf													/* andw #0xf,%d7 */
+	andw #0xf,%d7
 	movew %fp@(8),%d6
-	.short 0xcc7c,0x1f												/* andw #0x1f,%d6 */
+	andw #0x1f,%d6
 	movew %fp@(8),%d0
 	moveq #9,%d1
 	asrw %d1,%d0
@@ -18351,7 +18344,7 @@ addr_a1ec:
 	cmpw #0x2,%d7
 	bnes addr_a208
 	movew %fp@(8),%d0
-	.short 0xc07c,0x600												/* andw #0x600,%d0 */
+	andw #0x600,%d0
 	bnes addr_a208
 	cmpw #0x1d,%d6
 	bles addr_a206
@@ -18390,21 +18383,21 @@ addr_a244:
 xsettime:
 	linkw %fp,#-4
 	movew %fp@(8),%d0
-	.short 0xc07c,0x1f												/* andw #0x1f,%d0 */
+	andw #0x1f,%d0
 	cmpw #0x1e,%d0
 	blts addr_a25a
 	moveq #-1,%d0
 	bras addr_a28e
 addr_a25a:
 	movew %fp@(8),%d0
-	.short 0xc07c,0x7e0												/* andw #0x7e0,%d0 */
+	andw #0x7e0,%d0
 	cmpw #0x780,%d0
 	blts addr_a26c
 	moveq #-1,%d0
 	bras addr_a28e
 addr_a26c:
 	movew %fp@(8),%d0
-	.short 0xc07c,0xf800											/* andw #0xf800,%d0 */
+	andw #0xf800,%d0
 	cmpw #0xc000,%d0
 	bcss addr_a27e
 	moveq #-1,%d0
@@ -18486,7 +18479,7 @@ addr_a2fe:
 addr_a30a:
   movew %sp@(6),%d1
   lea v_stat_0,%a4
-  .short 0xc27c,255                       /* andw #255,%d1 */
+  andw #255,%d1
   moveal con_state,%a0
   jmp %a0@
 
@@ -20669,7 +20662,8 @@ paltab16:
 	.short 0x7fff
 	.short 0x2f39
 	.short 0x0000
-/* 0x00b380: */
+
+addr_b380:
 	.short 0x2a9e
 	rts
 
@@ -21022,7 +21016,7 @@ addr_b6da:
   movel %a4@(4),ram_unknown23
   moveal ram_unknown23,%a0
   movew %a0@(66),%d0
-  .short 0xc07c,0x0008                    /* andw #8,%d0 */
+  andw #8,%d0
   movew %d0,ram_unknown21 + 34
   movew %a4@(24),ram_unknown21 + 76
   movel %a4@(20),ram_unknown21 + 72
@@ -38341,8 +38335,7 @@ addr_13b34:
   moveal %a5@(44),%a0                     /* save the environment pointer */
   movel %a0,_ad_envrn
   movel _drvbits,%d0
-  .short 0xc0bc                           /* andl #4,%d0 - drive C there? */
-  .long 4
+  andl #4,%d0 														/* drive C there? */
   beqs addr_13ba4                         /* nope, leave the env alone */
   cmpil #0x50415448,%a0@+                 /* 'PATH' check 1st longword ; BUG: might be unaligned access */
   bnes addr_13ba4
