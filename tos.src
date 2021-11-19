@@ -995,10 +995,10 @@ gettime:
 	bras addr_e58
 addr_e4c:
 settime:
-  .short 0x47f9                           /* lea addr_2080,%a3 */
-  .long addr_2080
-  .short 0x49f9                           /* lea addr_31d2,%a4 */
-  .long addr_31d2
+  .short 0x47f9                           /* lea writeRTCTime,%a3 */
+  .long writeRTCTime
+  .short 0x49f9                           /* lea isetdt,%a4 */
+  .long isetdt
 addr_e58:
   bsrw addr_1f70
   bccs addr_e60
@@ -2684,6 +2684,7 @@ addr_207c:
 	rts
 
 addr_2080:
+writeRTCTime:
 	.short 0x6100
 	.short 0xfeee
 	.short 0x6500
@@ -4115,65 +4116,47 @@ addr_31a8:
 	.short 0x0e6c
 	rts
 
-addr_31d2:    
-	.short 0x2b6f
-	.short 0x0004
-	.short 0x0e70
-	.short 0x41f9
-	.short 0x0000
-	.short 0x0e7a
-	.short 0x242d
-	.short 0x0e70
-	.short 0x1002
-	.short 0x0200
-	.short 0x001f
-	.short 0xe300
-	.short 0x6154
-	.short 0xea8a
-	.short 0x1002
-	.short 0x0200
-	.short 0x003f
-	.short 0x614a
-	.short 0xec8a
-	.short 0x1002
-	.short 0x0200
-	.short 0x001f
-	.short 0x6140
-/* 0x003200: */
-	.short 0xea8a
-	.short 0x1002
-	.short 0x0200
-	.short 0x001f
-	.short 0x6136
-	.short 0xea8a
-	.short 0x1002
-	.short 0x0200
-	.short 0x000f
-	.short 0x612c
-	.short 0xe88a
-	.short 0x1002
-	.short 0x0200
-	.short 0x007f
-	.short 0x6122
-	.short 0x0610
-	.short 0x0080
-	.short 0x123c
-	.short 0x001b
-	.short 0x6100
-	.short 0x0238
-	.short 0x7605
-	.short 0x45f9
-	.short 0x0000
-	.short 0x0e74
-	.short 0x6100
-	.short 0x0256
-	.short 0x123c
-	.short 0x001c
-	.short 0x6100
-	.short 0x0224
+addr_31d2:
+isetdt:
+	movel %sp@(4),%a5@(iclkwtime)
+	lea iclkbuf + 6,%a0
+	movel %a5@(iclkwtime),%d2
+	moveb %d2,%d0
+	andib #31,%d0
+	aslb #1,%d0
+	bsrb addr_3240
+	lsrl #5,%d2
+	moveb %d2,%d0
+	andib #63,%d0
+	bsrb addr_3240
+	lsrl #6,%d2
+	moveb %d2,%d0
+	andib #31,%d0
+	bsrb addr_3240
+	lsrl #5,%d2
+	moveb %d2,%d0
+	andib #31,%d0
+	bsrb addr_3240
+	lsrl #5,%d2
+	moveb %d2,%d0
+	andib #15,%d0
+	bsrb addr_3240
+	lsrl #4,%d2
+	moveb %d2,%d0
+	andib #127,%d0
+	bsrb addr_3240
+	addib #128,%a0@
+	moveb #0x1b,%d1
+	bsrw ikbd_writeb
+	moveq #5,%d3
+	lea iclkbuf,%a2
+	bsrw addr_348a
+	moveb #0x1c,%d1
+	bsrw ikbd_writeb
 	rts
-
+	
 /* 0x003240: */
+addr_3240:
 	.short 0x7200
 	.short 0x1200
 	.short 0x83fc
@@ -4425,6 +4408,7 @@ addr_345a:
 addr_345c:
   movew %sp@(6),%d1
 addr_3460:
+ikbd_writeb:
   lea kbd_acia_control,%a1
 addr_3466:
   .short 0x1429,0                         /* moveb %a1@(0),%d2 */
@@ -4446,7 +4430,7 @@ ikbdws:
   moveal %sp@(6),%a2
 addr_348a:
   moveb %a2@+,%d1
-  bsrb addr_3460
+  bsrb ikbd_writeb
   dbf %d3,addr_348a
   rts
 
@@ -6016,7 +6000,7 @@ initmouse:
   rts
 initmouse_disable:
   moveq #18,%d1
-  bsrw addr_3460
+  bsrw ikbd_writeb
   movel #addr_41a6,%a5@(mouseint)         /* Points to an rts instruction - disable mouse interrupt */
   bras addr_4154                          /* return -1 and exit */
 initmouse_relative:
