@@ -47,7 +47,7 @@ addr_55e:
   moveal %a4@(_dskbufp),%a0
   jsr %a0@
 addr_570:
-  .short 0xde3c,0x0020                    /* addb #32,%d7 */
+  addb #32,%d7
   bnes addr_54e
   rts
 
@@ -151,7 +151,7 @@ memtest:                                    /* %a5=return address, %a0=a small n
 addr_65c:
   cmpw %a0@+,%d0                          /* Test this word for bit pattern */
   bnes addr_668                           /* Not equal - exit loop */
-  .short 0xd07c,0xfa54                    /* addw #0xfa54,%d0 - Next bit pattern */
+  addw #0xfa54,%d0											  /* Next bit pattern */
   cmpal %a0,%a1                           /* End address reached? */
   bnes addr_65c                           /* No, go back */
 addr_668:
@@ -2438,8 +2438,7 @@ addr_1dec:
   addql #2,%fp@(-4)
 addr_1dfa:
   movel %fp@(8),%d0
-  .short 0xd0bc                           /* addl #0x1fe,%d0 */
-  .long 0x1fe
+  addl #0x1fe,%d0
   cmpl %fp@(-4),%d0
   bhis addr_1dec
   movew #0x1234,%d0
@@ -2961,7 +2960,7 @@ addr_2328:
   cmpiw #320,ram_unknown52
   blss addr_235a
   movew ram_unknown52,%d0
-  .short 0xd07c,-320                      /* addw #-320,%d0 */
+  addw #-320,%d0
   addw %d0,ram_unknown74
   movew #320,ram_unknown52
 	bras addr_237c
@@ -2969,7 +2968,7 @@ addr_235a:
   cmpiw #640,ram_unknown52
   blss addr_237c
   movew ram_unknown52,%d0
-  .short 0xd07c,-640                      /* addw #-640,%d0 */
+  addw #-640,%d0
   addw %d0,ram_unknown74
   movew #640,ram_unknown52
 addr_237c:
@@ -6837,16 +6836,13 @@ addr_4760:
 	movel %a0@(0x0,%a1:l),%d0
 	movew %d7,%d1
 	mulsw #0x140,%d1
-	.short 0xd2bc															/* addl #0x37dc,%d1 */
-	.long ram_unknown182
-	.short 0xd2bc															/* addl #0x140,%d1 */
-	.long 0x140
+	addl #ram_unknown182,%d1
+	addl #0x140,%d1
 	cmpl %d1,%d0
 	bnes addr_47f0
 	movew %d7,%d0
 	mulsw #0x140,%d0
-	.short 0xd0bc															/* addl #0x37dc,%d0 */
-	.long ram_unknown182
+	addl #ram_unknown182,%d0
 	moveaw %d7,%a1
 	addal %a1,%a1
 	addal %a1,%a1
@@ -17163,8 +17159,7 @@ addr_9884:
 addr_9894:
 	movew %fp@(-26),%d0
 	mulsw #6,%d0															/* Make offset to requested function fn in d0 */
-	.short 0xd0bc															/* addl addr_2856a,%d0 - "funcs" array, each 6 bytes */
-	.long addr_2856a
+	addl #addr_2856a,%d0 											/* "funcs" array, each 6 bytes */
 	movel %d0,%fp@(-42)
 	moveal %fp@(-42),%a0
 	movew %a0@(4),%fp@(-20)
@@ -17189,7 +17184,7 @@ addr_98dc:
 addr_98f4:
 	moveq #1,%d0
 addr_98f6:
-	.short 0xd07c,128													/* addw #128,%d0 */
+	addw #128,%d0
 	movew %d0,%fp@(-20)
 addr_98fe:
 	moveal ram_unknown6,%a0
@@ -38322,8 +38317,7 @@ addr_13b34:
   movel %a5@(12),%d0                      /* textlen */
   addl %a5@(20),%d0                       /* datalen */
   addl %a5@(28),%d0                       /* bsslen */
-  .short 0xd0bc                           /* addl #256,%d0 - skip los pageos baseos */
-  .long 0x100
+  addl #256,%d0 													/* skip los pageos baseos */
 
   movel %d0,%sp@-                         /* size */
   movel %a5,%sp@-                         /* basepage */
@@ -38492,8 +38486,7 @@ addr_13d4a:
   movew %d7,%d1
   mulsw #28,%d1
   addl %d1,%d0
-  .short 0xd0bc                           /* addl #5274,%d0 */
-  .long 0x0000149a
+  addl #5274,%d0
   movel %d0,eul
   addqw #1,%d7
 addr_13d74:
@@ -38555,7 +38548,7 @@ addr_13e02:
   movew curpid,%d1
   mulsw #184,%d1
   addl %d1,%d0
-  .short 0xd0bc,0x0000,0x1206             /* addl #4614,%d0 */
+  addl #4614,%d0
   movel %d0,rlr
 
   moveal rlr,%a0
@@ -48012,7 +48005,7 @@ addr_1865e:
 addr_1866c:
   moveal %d7,%a0
   movew %d5,%d1
-  .short 0xd27c,0x000e                    /* addw #14,%d1 */
+  addw #14,%d1
   mulsw #24,%d1
   addal %d1,%a0
   addal #10,%a0                           /* a0 = d7 + ((count + 14) * 24) + 10 */
@@ -48057,7 +48050,7 @@ addr_186be:
   subqw #2,%d4
   moveal %d7,%a0
   movew %d4,%d1
-  .short 0xd27c,0x000e                    /* addw #14,%d1 */
+  addw #14,%d1
   mulsw #24,%d1
   addal %d1,%a0
   addal #10,%a0
