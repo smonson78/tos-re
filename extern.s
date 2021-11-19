@@ -341,6 +341,12 @@ etv_term:
 .set mouseint,0xe3e
 .global mouseint
 
+.set ram_unknown185,0xe63
+.global ram_unknown185
+
+.set ram_unknown186,0xe6c
+.global ram_unknown186
+
 .set iclkwtime,0xe70
 .global iclkwtime
 
@@ -373,6 +379,9 @@ etv_term:
 
 .set ram_unknown24,0xeac
 .global ram_unknown24
+
+.set ram_unknown187,0xeae
+.global ram_unknown187
 
 /* 32 bits */
 .set rseed,0xeb0

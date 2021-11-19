@@ -40,3 +40,6 @@ desk.rsc: tos104uk.img
 stats: tos.s
 	@printf "%.2f%% disassembled\n" \
 	$$(echo "scale=4; (1-((" $$(cat tos.s boot.s | grep -c \.short) "* 2) / 195542))*100" | bc)
+
+freenames: extern.s
+	@echo `sed -e  "s/.*ram_unknown\([0-9]*\).*/\1/ p; d" $< | sort -rn | head -n 1` + 1 | bc

@@ -3865,44 +3865,34 @@ addr_314e:
 addr_315a:
   unlk %fp
   rts
-	.short 0x4bf9
-	.short 0x0000
-	.short 0x0000
-	.short 0x41ed
-	.short 0x0e63
-	.short 0x6100
-	.short 0x00ea
-	.short 0x0400
-	.short 0x0050
-	.short 0x1400
-	.short 0xe982
-	.short 0x6100
-	.short 0x00de
-	.short 0xd400
-	.short 0xeb82
-	.short 0x6100
-	.short 0x00d6
-/* 0x003180: */
-	.short 0xd400
-	.short 0xeb82
-	.short 0x6100
-	.short 0x00ce
-	.short 0xd400
-	.short 0xed82
-	.short 0x6100
-	.short 0x00c6
-	.short 0xd400
-	.short 0xeb82
-	.short 0x6100
-	.short 0x00be
-	.short 0xe208
-	.short 0xd400
-	.short 0x2b42
-	.short 0x0e6c
-	.short 0x1b7c
-	.short 0x0000
-	.short 0x0eae
-	rts
+
+addr_315e:
+  .short 0x4bf9															/* lea 0x0,%a5 */
+	.long 0
+  lea %a5@(ram_unknown185),%a0
+  bsrw addr_3254
+  subib #80,%d0
+  moveb %d0,%d2
+  asll #4,%d2
+  bsrw addr_3254
+  addb %d0,%d2
+  asll #5,%d2
+  bsrw addr_3254
+  addb %d0,%d2
+  asll #5,%d2
+  bsrw addr_3254
+  addb %d0,%d2
+  asll #6,%d2
+  bsrw addr_3254
+  addb %d0,%d2
+  asll #5,%d2
+  bsrw addr_3254
+  lsrb #1,%d0
+  addb %d0,%d2
+  movel %d2,%a5@(ram_unknown186)
+  moveb #0x0,%a5@(ram_unknown187)
+  rts
+
 addr_31a8:
 .global addr_31a8
 	.short 0x1b7c
@@ -3965,7 +3955,7 @@ isetdt:
 	moveb #0x1c,%d1
 	bsrw ikbd_writeb
 	rts
-/* 0x003240: */
+
 addr_3240:
 	.short 0x7200
 	.short 0x1200
@@ -3977,6 +3967,8 @@ addr_3240:
 	.short 0xd041
 	.short 0x1100
 	rts
+
+addr_3254:
 	.short 0x1018
 	.short 0x1200
 	.short 0xc07c
