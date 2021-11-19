@@ -341,8 +341,8 @@ etv_term:
 .set mouseint,0xe3e
 .global mouseint
 
-.set ram_unknown185,0xe63
-.global ram_unknown185
+.set clockbuf,0xe63
+.global clockbuf
 
 .set iclkrtime,0xe6c
 .global iclkrtime

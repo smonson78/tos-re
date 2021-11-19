@@ -3867,9 +3867,10 @@ addr_315a:
   rts
 
 addr_315e:
+clockvec:
   .short 0x4bf9															/* lea 0x0,%a5 */
 	.long 0
-  lea %a5@(ram_unknown185),%a0
+  lea %a5@(clockbuf),%a0
   bsrw addr_3254
   subib #80,%d0
   moveb %d0,%d2
