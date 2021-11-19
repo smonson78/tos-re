@@ -56,6 +56,18 @@ def signedhex(num):
         return 0xffffffff - (num - 1)
     return num
 
+def make_imm_arg(imm, width):
+    try:
+        imm = get_multibase(imm)
+        if width == "l":
+            imm = "0x{:08x}".format(signedhex(imm))
+        else:
+            imm = imm & 0xffff
+            imm = "0x{:04x}".format(signedhex(imm))
+    except ValueError:
+        pass
+    return imm
+
 for text in generate_text():
     stripped = text.strip()
 
@@ -68,19 +80,15 @@ for text in generate_text():
 
             width = stripped[3]
             imm, reg = stripped[6:].split(",", 1)
-            try:
-                imm = get_multibase(imm)
-            except ValueError:
-                pass
 
             # Build operand
             opcode = 0xb000
             
-            # Width - in bits 7+6 (0=b, 1=w)
+            # Width - in bits 7+6 (0=b, 1=w, 2=l)
             if width == "w":
                 opcode |= 0x0040
             elif width == "l":
-                opcode |= 0x00b0
+                opcode |= 0x0080
 
             # Other operand - immediate:
             opcode |= 0x003c
@@ -88,39 +96,29 @@ for text in generate_text():
             opcode |= getreg(reg) << 9
 
             if width == "l":
-                text = ".short 0x{:04x}\n.long 0x{:08x} /* {} */".format(opcode, imm, stripped)
+                text = ".short 0x{:04x}\n.long {} /* {} */".format(opcode, imm, stripped)
             else:
-                text = ".short 0x{:04x},0x{:04x} /* {} */".format(opcode, imm, stripped)
+                text = ".short 0x{:04x},{} /* {} */".format(opcode, imm, stripped)
 
             #print(stripped)
             #print(text)
             #print(imm, reg)
 
-        # add[b] #<imm>, reg
+        # add[bwl] #<imm>, reg
         if len(stripped) > 5 and stripped[0:3] == "add" and stripped[3] in ["b", "w", "l"] and stripped[4:6] == " #":
 
             width = stripped[3]
 
             imm, reg = stripped[6:].split(",", 1)
 
-            try:
-                imm = get_multibase(imm)
-                if width == "l":
-                    imm = "0x{:08x}".format(signedhex(imm))
-                else:
-                    imm = imm & 0xffff
-                    imm = "0x{:04x}".format(signedhex(imm))
-            except ValueError:
-                pass
-
             # Build operand
             opcode = 0xd000
             
-            # Width - in bits 7+6 (0=b, 1=w)
+            # Width - in bits 7+6 (0=b, 1=w, 2=l)
             if width == "w":
                 opcode |= 0x0040
             elif width == "l":
-                opcode |= 0x00b0
+                opcode |= 0x0080
 
             # Other operand - immediate:
             opcode |= 0x003c
@@ -136,6 +134,37 @@ for text in generate_text():
             #print(imm, reg)
             #print(text)
             #print()
+
+        # or[bwl] #<imm>, reg
+        if len(stripped) > 5 and stripped[0:2] == "or" and stripped[2] in ["b", "w", "l"] and stripped[3:5] == " #":
+
+            width = stripped[2]
+
+            imm, reg = stripped[5:].split(",", 1)
+
+            # Build operand
+            opcode = 0x8000
+            
+            # Width - in bits 7+6 (0=b, 1=w, 2=l)
+            if width == "w":
+                opcode |= 0x0040
+            elif width == "l":
+                opcode |= 0x0080
+
+            # Other operand - immediate:
+            opcode |= 0x003c
+            # Add other operand register number
+            opcode |= getreg(reg) << 9
+
+            if width == "l":
+                text = ".short 0x{:04x}\n.long {} /* {} */".format(opcode, imm, stripped)
+            else:
+                text = ".short 0x{:04x},{} /* {} */".format(opcode, imm, stripped)
+
+            #print(stripped)
+            #print(imm, reg)
+            #print(text)
+            #print()            
 
         # The solution is to move the target to another file.
         # jsr <dest>
