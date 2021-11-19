@@ -209,7 +209,7 @@ for text in generate_text():
             #print(stripped)
             #print(imm, reg)
             #print(text)
-            #print()   
+            #print()
 
         # GNU as assembles 8-bit negative signed numbers as 0xffxx while Pure C assembles them as 0x00xx.
         # This is a bit of a pain in the ass. Maybe I should write my own assembler.
