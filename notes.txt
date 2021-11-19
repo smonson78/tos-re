@@ -40,3 +40,4 @@ fcb5b0:	2079 0000 2b82 	moveal 0x2b82,%a0
     * ori -->
     * sub --> subi
     * cmpi sometimes???
+    * move with a zero displacement - GNU as removes the displacement operand.

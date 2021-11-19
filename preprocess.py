@@ -71,6 +71,15 @@ def make_imm_arg(imm, width):
         pass
     return imm
 
+def is_ad_reg(reg):
+    if reg[0] != "%":
+        return False
+    if reg[1:] in ["fp", "sp"]:
+        return True
+    if len(reg) == 3 and reg[1] in ["a", "d"] and reg[2].isdigit():
+        return True
+    return False
+
 for text in generate_text():
     stripped = text.strip()
 
@@ -79,7 +88,7 @@ for text in generate_text():
         # Check for transforms
 
         # cmp[bwl] #<imm>, reg
-        if len(stripped) > 5 and stripped[0:3] == "cmp" and stripped[3] in ["b", "w", "l"] and stripped[4:6] == " #":
+        if len(stripped) > 6 and stripped[0:3] == "cmp" and stripped[3] in ["b", "w", "l"] and stripped[4:6] == " #":
 
             width = stripped[3]
             imm, reg = stripped[6:].split(",", 1)
@@ -108,7 +117,7 @@ for text in generate_text():
             #print(imm, reg)
 
         # add[bwl] #<imm>, reg
-        if len(stripped) > 5 and stripped[0:3] == "add" and stripped[3] in ["b", "w", "l"] and stripped[4:6] == " #":
+        if len(stripped) > 6 and stripped[0:3] == "add" and stripped[3] in ["b", "w", "l"] and stripped[4:6] == " #":
 
             width = stripped[3]
 
@@ -170,7 +179,7 @@ for text in generate_text():
             #print()            
 
         # and[bwl] #<imm>, reg
-        if len(stripped) > 5 and stripped[0:3] == "and" and stripped[3] in ["b", "w", "l"] and stripped[4:6] == " #":
+        if len(stripped) > 6 and stripped[0:3] == "and" and stripped[3] in ["b", "w", "l"] and stripped[4:6] == " #":
 
             width = stripped[3]
 
@@ -201,6 +210,9 @@ for text in generate_text():
             #print(imm, reg)
             #print(text)
             #print()   
+
+        # GNU as assembles 8-bit negative signed numbers as 0xffxx while Pure C assembles them as 0x00xx.
+        # This is a bit of a pain in the ass. Maybe I should write my own assembler.
 
     print(text)
 
