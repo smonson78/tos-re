@@ -641,7 +641,7 @@ fdchange:
   beqs addr_167c
   movew %d0,%sp@-
   movew #-17,%sp@-
-  bsrw addr_7ba
+  bsrw callcrit
   addqw #4,%sp
   movew #-1,ram_unknown158
   lea ram_unknown159,%a0
@@ -761,8 +761,8 @@ addr_1764:
   movew %fp@(8),%sp@
   movel %fp@(-12),%d0
   movew %d0,%sp@-
-  .short 0x4eb9                           /* jsr addr_7ba */
-  .long addr_7ba
+  .short 0x4eb9                           /* jsr callcrit */
+  .long callcrit
   addql #2,%sp
   movel %d0,%fp@(-12)
 addr_17a4:
@@ -944,8 +944,8 @@ addr_1990:
   movew %d6,%sp@
   movel %d5,%d0
   movew %d0,%sp@-
-  .short 0x4eb9                           /* jsr addr_7ba */
-  .long addr_7ba
+  .short 0x4eb9                           /* jsr callcrit */
+  .long callcrit
   addql #2,%sp
   movel %d0,%d5
 addr_19c4:
@@ -1178,8 +1178,8 @@ addr_1c06:
   movew %fp@(16),%sp@
   movel %d7,%d0
   movew %d0,%sp@-
-  .short 0x4eb9                           /* jsr addr_7ba */
-  .long addr_7ba
+  .short 0x4eb9                           /* jsr callcrit */
+  .long callcrit
   addql #2,%sp
   movel %d0,%d7
   cmpiw #2,%fp@(8)
@@ -3697,27 +3697,19 @@ jdisint:
 addr_37b8:
 jenabint:
 .global jenabint
-	.short 0x302f
-	.short 0x0004
-	.short 0x0280
-	.short 0x0000
-	.short 0x000f
-	.short 0x48e7
-	.short 0xc0c0
-	.short 0x41f9
-	.short 0xffff
-	.short 0xfa01
-	.short 0x43e8
-	.short 0x0006
-	.short 0x6110
-	.short 0x03d1
-	.short 0x43e8
-	.short 0x0012
-	.short 0x6108
-	.short 0x03d1
-	.short 0x4cdf
-	.short 0x0303
-	rts
+  movew %sp@(4),%d0
+  andil #15,%d0
+  moveml %d0-%d1/%a0-%a1,%sp@-
+  lea mfp_pp,%a0
+  lea %a0@(6),%a1
+  bsrb addr_37e2
+  bset %d1,%a1@
+  lea %a0@(18),%a1
+  bsrb addr_37e2
+  bset %d1,%a1@
+  moveml %sp@+,%d0-%d1/%a0-%a1
+  rts
+	
 addr_37e2:
 	.short 0x1200
 	.short 0x0c01

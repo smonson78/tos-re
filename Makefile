@@ -7,7 +7,7 @@ ASFLAGS=-m68000 --no-pad-sections --traditional-format
 LDFLAGS=-m68000 -nostdlib
 
 OBJECTS=extern.o \
-	boot/start1x.o boot.o tos.o
+	boot/start1x.o tos.o
 
 tos.bin: $(OBJECTS)
 	m68k-elf-ld \
@@ -34,7 +34,7 @@ view:
 desk.rsc: tos104uk.img
 	dd if=tos104uk.img of=desk.rsc bs=1 skip=183754 count=11240
 
-stats: tos-source.s boot-source.s boot/start1x-source.s
+stats: tos-source.s boot/start1x-source.s
 	@printf "%.2f%% disassembled\n" \
 	$$(echo "scale=4; (1-((" $$(cat $^ | grep -c \.short) "* 2) / 195542))*100" | bc)
 
