@@ -2,50 +2,8 @@
 
 .section .text
 
-addr_0:
-os_entry:
-    bras boot           /* Initial SP */
-addr_2:
-os_version:
-	.short 0x0104       /* TOS v1.04 */
-addr_4:
-reseth:    
-	.long boot          /* Initial PC */
-addr_8:
-os_beg:	
-	.long os_entry      /* Start of OS */
-addr_c:
-os_end:
-	.long 0x0000611c    /* Start of free RAM */
-	.long boot          /* Default shell (reset) */
-addr_14:    
-os_magic:
-	.long gem_magic     /* Address for GEM magic */
-addr_18:    
-os_date:
-	.long 0x04061989    /* TOS date 04/06/1989 */
-addr_1c:    
-os_conf:
-	.short 0x0007       /* PAL version */
-addr_1e:    
-os_dosdate:
-	.short 0x1286       /* Date in DOS format */
-addr_20:
-pp_root:
-	.long 0x0000378c    /*  */
-addr_24:
-ppbkshift:
-	.long 0x00000e7d    /*  */
-addr_28:    
-pp_run:
-	.long 0x00005622    /*  */
-	.long 0x00000000    /*  */
-
-.global os_entry
-.global os_magic
-
-boot:
-.global boot
+_main:
+.global _main
 	movew #0x2700,%sr
 	reset
 	subal %a5,%a5
@@ -358,7 +316,7 @@ addr_3f6:
     bnes addr_414                               /* Not medium res? */
     movew %a5@(palette + 30),%a5@(palette + 6)  /* Copy colour 15 (black) to colour 3 */
 addr_414:
-    movel #boot,%a5@(swv_vec)                   /* Reboot on resolution-change vector */
+    movel #_main,%a5@(swv_vec)                  /* Reboot on resolution-change vector */
     movew #1,%a5@(vblsem)
     clrw %d0
     bsrw cartscan
@@ -448,7 +406,7 @@ addr_4fc:
     trap #1                                     /* GEMDOS */
     addaw #14,%sp                               /* Correct stack pointer */
     .short 0x4ef9                               /* jmp boot - Reboot the machine */
-    .long boot
+    .long _main
 
 addr_50c:
 default_env:
@@ -1071,7 +1029,7 @@ puntaes:
   cmpal %a5@(phystop),%a0
   bges addr_b08
   clrl %a0@
-  braw boot
+  braw _main
 addr_b08:
 	rts
 /* Default exception handler - saves everything in the Processor Save State Area */
@@ -1100,7 +1058,7 @@ addr_b28:
   movew #-1,%sp@-
   movew #76,%sp@-                         /* Call Pterm */
   trap #1
-  braw boot                               /* Reboot */
+  braw _main                              /* Reboot */
 addr_b56:
 drawbombs:
   moveb %a5@(video_res),%d7

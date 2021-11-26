@@ -6,7 +6,8 @@ OBJDUMP=m68k-elf-objdump
 ASFLAGS=-m68000 --no-pad-sections --traditional-format
 LDFLAGS=-m68000 -nostdlib
 
-OBJECTS=extern.o boot.o tos.o
+OBJECTS=extern.o \
+	boot/start1x.o boot.o tos.o
 
 tos.bin: $(OBJECTS)
 	m68k-elf-ld \
@@ -25,7 +26,7 @@ tos.bin: $(OBJECTS)
 	./preprocess.py $^ >$@
 
 clean:
-	$(RM) *.o *.pp tos.elf tos.bin 
+	$(RM) *.o *.pp tos.elf tos.bin boot/*.o
 
 view:
 	$(OBJDUMP) -b binary -m 68000 --adjust-vma=0xfc0000 -D tos.bin | less
@@ -37,7 +38,7 @@ desk.rsc: tos104uk.img
 # dd if=tos104uk.img of=linef.bin bs=1 skip=161872 count=5000
 # m68k-elf-objdump -b binary -m 68000 --adjust-vma=0xfe877a -D 2877a.bin | less
 
-stats: tos.s
+stats: tos-source.s
 	@printf "%.2f%% disassembled\n" \
 	$$(echo "scale=4; (1-((" $$(cat tos.s boot.s | grep -c \.short) "* 2) / 195542))*100" | bc)
 
