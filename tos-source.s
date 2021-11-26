@@ -2340,70 +2340,60 @@ isetdt:
 	rts
 
 addr_3240:
-	.short 0x7200
-	.short 0x1200
-	.short 0x83fc
-	.short 0x000a
-	.short 0xe941
-	.short 0x3001
-	.short 0x4841
-	.short 0xd041
-	.short 0x1100
-	rts
+  moveq #0,%d1
+  moveb %d0,%d1
+  divsw #0xa,%d1
+  aslw #4,%d1
+  movew %d1,%d0
+  swap %d1
+  addw %d1,%d0
+  moveb %d0,%a0@-
+  rts
 
 addr_3254:
-	.short 0x1018
-	.short 0x1200
-	.short 0xc07c
-	.short 0x000f
-	.short 0xc27c
-	.short 0x00f0
-	.short 0xe841
-	.short 0xc2fc
-	.short 0x000a
-	.short 0xd041
-	rts
+	moveb %a0@+,%d0
+  moveb %d0,%d1
+  andw #0xf,%d0
+  andw #0xf0,%d1
+  asrw #4,%d1
+  muluw #0xa,%d1
+  addw %d1,%d0
+  rts
 
 addr_326a:
 .global addr_326a
-	.short 0x70ff
-	.short 0x142d
-	.short 0xfc04
-	.short 0x0802
-	.short 0x0001
-	.short 0x6602
-	.short 0x7000
-	rts
+  moveq #-1,%d0
+  moveb %a5@(midi_acia_control),%d2
+  btst #1,%d2
+  bnes addr_3278
+  moveq #0,%d0
+addr_3278:
+  rts
 
 addr_327a:
 .global addr_327a
-	.short 0x322f
-	.short 0x0006
-	.short 0x43ed
-/* 0x003280: */
-	.short 0xfc04
-	.short 0x1429
-	.short 0x0000
-	.short 0x0802
-	.short 0x0001
-	.short 0x67f6
-	.short 0x1341
-	.short 0x0002
-	rts
+  movew %sp@(6),%d1
+addr_327e:	
+  lea %a5@(midi_acia_control),%a1
+addr_3282:
+  .short 0x1429,0x0000											/* moveb %a1@(0),%d2 */
+  btst #1,%d2
+  beqs addr_3282
+  moveb %d1,%a1@(2)
+  rts
+
 /* Midi - write string */
 addr_3292:
 midiws:
 .global midiws
-	.short 0x7600
-	.short 0x362f
-	.short 0x0004
-	.short 0x246f
-	.short 0x0006
-	.short 0x121a
-	.short 0x61de
-	.short 0x51cb
-	.short 0xfffa
-	rts
+  moveq #0,%d3
+  movew %sp@(4),%d3
+  moveal %sp@(6),%a2
+addr_329c:
+  moveb %a2@+,%d1
+  bsrb addr_327e
+  dbf %d3,addr_329c
+  rts
 
 addr_32a6:
 .global addr_32a6
@@ -2666,6 +2656,7 @@ addr_34e4:
   moveb #0,%a5@(ram_unknown22)
 addr_34fa:
   rts
+
 addr_34fc:
 .global addr_34fc
 	.short 0x41f9
@@ -2847,6 +2838,7 @@ addr_34fc:
 	.short 0x6100
 	.short 0x0110
 	rts
+	
 	.short 0x10d9
 	.short 0x51c8
 	.short 0xfffc
