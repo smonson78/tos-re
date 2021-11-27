@@ -287,11 +287,11 @@ addr_226:
 addr_242:    
     movel %a0@(4),%a5@(end_os)
     movel %a0@(8),%a5@(exec_os)
-    movel #addr_16ba,%a5@(hdv_init)
-    movel #addr_1a24,%a5@(hdv_rw)
-    movel #addr_173c,%a5@(hdv_bpb)
-    movel #addr_18ec,%a5@(hdv_mediach)
-    movel #addr_1cc6,%a5@(hdv_boot)
+    movel #_bhdv_init,%a5@(hdv_init)
+    movel #_bhdv_rwabs,%a5@(hdv_rw)
+    movel #_bhdv_getbpb,%a5@(hdv_bpb)
+    movel #_bhdv_mediach,%a5@(hdv_mediach)
+    movel #_bhdv_boot,%a5@(hdv_boot)
     movel #addr_3392,%a5@(prt_stat)
     movel #addr_32f6,%a5@(prt_vec)
     movel #addr_3408,%a5@(aux_stat)
@@ -864,7 +864,7 @@ trap14_vectors:
   /* 10 - int16_t Flopfmt(void *buf, int32_t filler, int16_t devno, int16_t spt, int16_t trackno, int16_t sideno, int16_t interlv, int32_t magic, int16_t virgin); */
 	.long flopfmt
   /* 11 - uint32_t Dbmsg(int16_t rsrvd, int16_t msg_num, int32_t msg_arg) */
-	.long dbmsg
+	.long _dbmsg
 	.long midiws                            /* 12 - void Midiws(int16_t cnt, void *ptr); */
 	.long mfpint                            /* 13 - void Mfpint(int16_t number, int16_t (*vector)()); */
 	.long iorec                             /* 14 - IOREC *Iorec(int16_t dev); */
@@ -872,9 +872,9 @@ trap14_vectors:
   .long rsconf
   /* 16 - KEYTAB *Keytbl(void *unshift, void *shift, void *capslock); */
 	.long keytbl
-	.long random                            /* 17 - int32_t Random(); */
+	.long _random                           /* 17 - int32_t Random(); */
   /* 18 - void Protobt(void *buf, int32_t serialno, int16_t disktype, int16_t execflag); */
-	.long protobt
+	.long _protobt
   /* 19 - int16_t Flopver(void *buf, int32_t filler, int16_t devno, int16_ sectno, int16_t trackno, int16_t sideno, int16_t count); */
 	.long flopver
 	.long scrdmp                            /* 20 - void Scrdmp(); */

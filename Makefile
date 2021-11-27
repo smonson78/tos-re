@@ -9,6 +9,7 @@ LDFLAGS=-m68000 -nostdlib
 OBJECTS=extern.o \
 	boot/start1x.o \
 	bios/floppy.o \
+	bios/blkdev.o \
 	tos.o
 
 tos.bin: $(OBJECTS)
@@ -29,7 +30,7 @@ tos.bin: $(OBJECTS)
 
 clean:
 	$(RM) *.o *.pp tos.elf tos.bin boot/*.o bios/*.o
-	$(RM) boot/start1x.s bios/floppy.s tos.s 
+	$(RM) boot/start1x.s bios/floppy.s bios/blkdev.s tos.s 
 
 view:
 	$(OBJDUMP) -b binary -m 68000 --adjust-vma=0xfc0000 -D tos.bin | less
