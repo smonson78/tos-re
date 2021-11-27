@@ -2255,8 +2255,7 @@ addr_315a:
 
 addr_315e:
 clockvec:
-  .short 0x4bf9															/* lea 0x0,%a5 */
-	.long 0
+  lea 0x0,%a5
   lea %a5@(clockbuf),%a0
   bsrw addr_3254
   subib #80,%d0
@@ -2657,192 +2656,96 @@ addr_34e4:
 addr_34fa:
   rts
 
+/* TODO: variables */
 addr_34fc:
 .global addr_34fc
-	.short 0x41f9
-	.short 0xffff
-/* 0x003500: */
-	.short 0xfa01
-	.short 0x7000
-	.short 0x01c8
-	.short 0x0000
-	.short 0x01c8
-	.short 0x0008
-	.short 0x01c8
-	.short 0x0010
-	.short 0x117c
-	.short 0x0048
-	.short 0x0016
-	.short 0x08e8
-	.short 0x0002
-	.short 0x0002
-	.short 0x3b7c
-	.short 0x1111
-	.short 0x0ea4
-	.short 0x3b7c
-	.short 0x0014
-	.short 0x0442
-	.short 0x7002
-	.short 0x7250
-	.short 0x343c
-	.short 0x00c0
-	.short 0x6100
-	.short 0x017a
-	.short 0x45f9
-	.short 0x00fc
-	.short 0x4242
-	.short 0x7005
-	.short 0x6100
-	.short 0x0224
-/* 0x003540: */
-	.short 0x7003
-	.short 0x7201
-	.short 0x7402
-	.short 0x6100
-	.short 0x0164
-	.short 0x33fc
-	.short 0x0001
-	.short 0x0000
-	.short 0x0a6e
-	.short 0x203c
-	.short 0x0088
-	.short 0x0101
-	.short 0x01c8
-	.short 0x0026
-	.short 0x6100
-	.short 0x0afa
-	.short 0x6100
-	.short 0x0454
-	.short 0x41ed
-	.short 0x0c70
-	.short 0x43f9
-	.short 0x00fc
-	.short 0x367a
-	.short 0x7021
-	.short 0x6100
-	.short 0x00e4
-	.short 0x41ed
-	.short 0x0da0
-	.short 0x43f9
-	.short 0x00fc
-	.short 0x366c
-	.short 0x700d
-/* 0x003580: */
-	.short 0x6100
-	.short 0x00d4
-	.short 0x203c
-	.short 0x00fc
-	.short 0x3b54
-	.short 0x2b40
-	.short 0x0e32
-	.short 0x2b40
-	.short 0x0e36
-	.short 0x2b7c
-	.short 0x00fc
-	.short 0x3f6a
-	.short 0x0e2e
-	.short 0x2b7c
-	.short 0x00fc
-	.short 0x3b12
-	.short 0x0e4a
-	.short 0x2b7c
-	.short 0x00fc
-	.short 0x3b20
-	.short 0x0e4e
-	.short 0x13fc
-	.short 0x0003
-	.short 0xffff
-	.short 0xfc04
-	.short 0x13fc
-	.short 0x0095
-	.short 0xffff
-	.short 0xfc04
-	.short 0x1b7c
-	.short 0x0007
-	.short 0x0484
-/* 0x0035c0: */
-	.short 0x2b7c
-	.short 0x00fc
-	.short 0x315e
-	.short 0x0e42
-	.short 0x203c
-	.short 0x00fc
-	.short 0x3654
-	.short 0x2b40
-	.short 0x0e3a
-	.short 0x2b40
-	.short 0x0e3e
-	.short 0x2b40
-	.short 0x0e46
-	.short 0x7000
-	.short 0x2b40
-	.short 0x0ea6
-	.short 0x1b40
-	.short 0x0eaa
-	.short 0x1b40
-	.short 0x0eab
-	.short 0x2b40
-	.short 0x0ea0
-	.short 0x6100
-	.short 0xfd78
-	.short 0x1b7c
-	.short 0x000f
-	.short 0x0e9e
-	.short 0x1b7c
-	.short 0x0002
-	.short 0x0e9f
-	.short 0x41ed
-	.short 0x0c92
-/* 0x003600: */
-	.short 0x43f9
-	.short 0x00fc
-	.short 0x365e
-	.short 0x700d
-	.short 0x614c
-	.short 0x6100
-	.short 0x0bcc
-	.short 0x13fc
-	.short 0x0003
-	.short 0xffff
-	.short 0xfc00
-	.short 0x13fc
-	.short 0x0096
-	.short 0xffff
-	.short 0xfc00
-	.short 0x267c
-	.short 0x00fc
-	.short 0x369c
-	.short 0x7203
-	.short 0x2401
-	.short 0x2001
-	.short 0x0600
-	.short 0x0009
-	.short 0xe582
-	.short 0x2473
-	.short 0x2000
-	.short 0x6100
-	.short 0x012c
-	.short 0x51c9
-	.short 0xffec
-	.short 0x45f9
-	.short 0x00fc
-/* 0x003640: */
-	.short 0x3aec
-	.short 0x7006
-	.short 0x6100
-	.short 0x011c
-	.short 0x45f9
-	.short 0x00fc
-	.short 0x38aa
-	.short 0x7002
-	.short 0x6100
-	.short 0x0110
-	rts
-	
+  lea mfp_pp,%a0
+  moveq #0,%d0
+  .short 0x01c8,0x0000											/* movepl %d0,%a0@(0) */
+  movepl %d0,%a0@(8)
+  movepl %d0,%a0@(16)
+  moveb #0x48,%a0@(22)
+  bset #2,%a0@(2)
+  movew #0x1111,%a5@(3748)
+  movew #0x14,%a5@(1090)
+  moveq #2,%d0
+  moveq #80,%d1
+  movew #0xc0,%d2
+  bsrw addr_36ac
+  lea addr_4242,%a2
+  moveq #5,%d0
+  bsrw addr_3762
+  moveq #3,%d0
+  moveq #1,%d1
+  moveq #2,%d2
+  bsrw addr_36ac
+  movew #0x1,baudrate
+  movel #0x880101,%d0
+  movepl %d0,%a0@(38)
+  bsrw addr_4058
+  bsrw addr_39b6
+  lea %a5@(3184),%a0
+  lea addr_367a,%a1
+  moveq #33,%d0
+  bsrw addr_3656
+  lea %a5@(3488),%a0
+  lea addr_366c,%a1
+  moveq #13,%d0
+  bsrw addr_3656
+  movel #addr_3b54,%d0
+  movel %d0,%a5@(3634)
+  movel %d0,%a5@(3638)
+  movel #addr_3f6a,%a5@(3630)
+  movel #addr_3b12,%a5@(3658)
+  movel #addr_3b20,%a5@(3662)
+  moveb #0x3,midi_acia_control
+  moveb #0x95,midi_acia_control
+  moveb #0x7,%a5@(1156)
+  movel #addr_315e,%a5@(3650)
+  movel #addr_3654,%d0
+  movel %d0,%a5@(3642)
+  movel %d0,%a5@(3646)
+  movel %d0,%a5@(3654)
+  moveq #0,%d0
+  movel %d0,%a5@(3750)
+  moveb %d0,%a5@(3754)
+  moveb %d0,%a5@(3755)
+  movel %d0,%a5@(3744)
+  bsrw addr_3366
+  moveb #0xf,%a5@(3742)
+  moveb #0x2,%a5@(3743)
+  lea %a5@(3218),%a0
+  lea addr_365e,%a1
+  moveq #13,%d0
+  bsrb addr_3656
+  bsrw addr_41d8
+  moveb #0x3,kbd_acia_control
+  moveb #0x96,kbd_acia_control
+  moveal #addr_369c,%a3
+  moveq #3,%d1
+addr_3626:
+  movel %d1,%d2
+  movel %d1,%d0
+  addib #9,%d0
+  asll #2,%d2
+  moveal %a3@(0x0,%d2:w),%a2
+  bsrw addr_3762
+  dbf %d1,addr_3626
+  lea addr_3aec,%a2
+  moveq #6,%d0
+  bsrw addr_3762
+  lea addr_38aa,%a2
+  moveq #2,%d0
+  bsrw addr_3762
+addr_3654:	
+  rts
+addr_3656:
 	.short 0x10d9
 	.short 0x51c8
 	.short 0xfffc
 	rts
+
+addr_365e:
 	.short 0x0000
 	.short 0x0ca0
 	.short 0x0100
@@ -2850,6 +2753,7 @@ addr_34fc:
 	.short 0x0000
 	.short 0x0040
 	.short 0x00c0
+addr_366c:
 	.short 0x0000
 	.short 0x0dae
 	.short 0x0080
@@ -2857,6 +2761,8 @@ addr_34fc:
 	.short 0x0000
 	.short 0x0020
 	.short 0x0060
+
+addr_367a:	
 	.short 0x0000
 	.short 0x0a70
 	.short 0x0100
@@ -2875,6 +2781,7 @@ addr_34fc:
 	.short 0x0000
 	.short 0x0000
 	.short 0x0100
+addr_369c:
 	.short 0x00fc
 	.short 0x3918
 	.short 0x00fc
@@ -3127,6 +3034,7 @@ addr_37e2:
 	.short 0x4cdf
 	.short 0x0703
 	.short 0x4e73
+
 	.short 0x48e7
 	.short 0xc0e0
 	.short 0x45f9
@@ -3140,6 +3048,7 @@ addr_37e2:
 	.short 0x4cdf
 	.short 0x0703
 	.short 0x4e73
+addr_38aa:
 	.short 0x48e7
 	.short 0xc0e0
 	.short 0x41f9
@@ -3347,11 +3256,9 @@ addr_3a58:
   moveb %d0,%a1@(44)
   movew %sp@(4),%d1
   movew %d1,baudrate
-  .short 0x45f9                           /* lea addr_3acc,%a2 */
-  .long baudctrl
+  lea addr_3acc,%a2
   moveb %a2@(0,%d1:w),%d0
-  .short 0x45f9                           /* lea addr_3adc,%a2 */
-  .long bauddata
+  lea addr_3adc,%a2
   moveb %a2@(0,%d1:w),%d2
   movel %d0,%d1
   moveq #3,%d0
@@ -3384,6 +3291,8 @@ baudctrl:
 addr_3adc:
 bauddata:
   .byte 1,2,4,5,8,10,11,16,32,64,96,128,143,175,64,96
+
+addr_3aec:
 	.short 0x48e7
 	.short 0xf0f4
 	.short 0x9bcd
@@ -3404,6 +3313,7 @@ bauddata:
 	.short 0x4cdf
 	.short 0x2f0f
 	.short 0x4e73
+addr_3b12:	
 	.short 0x41ed
 	.short 0x0da0
 	.short 0x43ed
@@ -3411,6 +3321,7 @@ bauddata:
 	.short 0x246d
 	.short 0x0e36
 	.short 0x600e
+addr_3b20:	
 	.short 0x41ed
 	.short 0x0c92
 	.short 0x43f9
@@ -3438,7 +3349,9 @@ bauddata:
 	.short 0x1029
 	.short 0x0002
 	.short 0x4ed2
+addr_3b54:	
 	rts
+
 	.short 0x1029
 	.short 0x0002
 	.short 0xb1fc
@@ -3977,6 +3890,7 @@ bauddata:
 	.short 0x246d
 	.short 0x0e2e
 	.short 0x4ed2
+addr_3f6a:
 	.short 0x3228
 	.short 0x0008
 	.short 0x5241
@@ -4311,6 +4225,8 @@ kbdvbase:
 .global kbdvbase
   movel #ram_unknown30,%d0
 	rts
+
+addr_4242:	
 	.short 0x52b9
 	.short 0x0000
 	.short 0x04ba

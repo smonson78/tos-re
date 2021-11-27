@@ -349,10 +349,7 @@ addr_332:
 addr_384:
     clrl %a0@+                                  /* Clear entry in VBL list */
     dbf %d0,addr_384                            /* Next entry */
-    
-    .short 0x41f9                               /* lea bios_vectors,%a0 - ROM copy of BIOS routine vectors */
-    .long bios_vectors
-
+    lea bios_vectors,%a0                        /* - ROM copy of BIOS routine vectors */
     moveaw #xconstat_vec,%a1                    /* 4 tables of 8 vectors each: xconstat, xconin, xcostat, xconout */
     moveq #31,%d0                               /* Copy 32 longwords */
 addr_396:    
@@ -1187,8 +1184,7 @@ drawbombs:
   lsll #8,%d0
   moveal %d0,%a0
   addaw %pc@(addr_b9e,%d7:w),%a0
-  .short 0x43f9                           /* lea bomb_image,%a1 */
-  .long bomb_image
+  lea bomb_image,%a1
   movew #15,%d6
 addr_b7e:
   movew %d1,%d2
@@ -1484,18 +1480,14 @@ addr_e3c:
 
 addr_e3e:
 gettime:
-	.short 0x47f9															/* lea addr_1fc2,%a3 */
-	.long addr_1fc2
-	.short 0x49f9															/* lea igetdt,%a4 */
-	.long igetdt
+	lea addr_1fc2,%a3
+	lea igetdt,%a4
 	bras addr_e58
 
 addr_e4c:
 settime:
-  .short 0x47f9                           	/* lea addr_2080,%a3 */
-  .long addr_2080
-  .short 0x49f9                           	/* lea isetdt,%a4 */
-  .long isetdt
+  lea addr_2080,%a3
+  lea isetdt,%a4
 addr_e58:
   bsrw addr_1f70
   bccs addr_e60

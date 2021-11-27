@@ -42,6 +42,10 @@ def generate_text():
 
 
 def getreg(name):
+    if name == "%fp":
+        return 6
+    if name == "%sp":
+        return 7
     return int(name[2:])
 
 def get_multibase(text):
@@ -210,6 +214,29 @@ for text in generate_text():
             #print(imm, reg)
             #print(text)
             #print()
+
+        # lea <addr>, reg
+        # GNU as turns this into a 16-bit PC-relative address if the address is close enough
+        if len(stripped) > 5 and stripped[0:4] == "lea " and stripped[4] != "%" and stripped[4] != "#":
+
+            addr, reg = stripped[4:].split(",", 1)
+
+            # Build operand
+            opcode = 0x41c0
+            
+            # Other operand - Other/Absolute Long
+            opcode |= 0x0039
+
+            # Add other operand register number
+            opcode |= getreg(reg) << 9
+
+            text = ".short 0x{:04x}\n.long {} /* {} */".format(opcode, addr, stripped)
+
+            #print(stripped)
+            #print(addr, reg)
+            #print(text)
+            #print()
+
 
         # GNU as assembles 8-bit negative signed numbers as 0xffxx while Pure C assembles them as 0x00xx.
         # This is a bit of a pain in the ass. Maybe I should write my own assembler.
