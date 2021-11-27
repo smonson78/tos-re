@@ -319,6 +319,12 @@ etv_term:
 .set baudrate,0xa6e
 .global baudrate
 
+.set rs232ibuf,0xa70
+.global rs232ibuf
+
+.set rs232obuf,0xb70
+.global rs232obuf
+
 .set rs232iorec,0xc70
 .global rs232iorec
 

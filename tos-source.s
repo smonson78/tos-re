@@ -2686,7 +2686,7 @@ initmfp:
   bsrw addr_4058
   bsrw addr_39b6
   lea %a5@(rs232iorec),%a0
-  lea addr_367a,%a1
+  lea rs232table,%a1
   moveq #33,%d0
   bsrw addr_3656
   lea %a5@(mdm3iorec),%a0
@@ -2761,35 +2761,31 @@ miditable:
 	.short 0x0020
 	.short 0x0060
 
-addr_367a:	
-	.short 0x0000
-	.short 0x0a70
-	.short 0x0100
-/* 0x003680: */
-	.short 0x0000
-	.short 0x0000
-	.short 0x0080
-	.short 0x00c0
-	.short 0x0000
-	.short 0x0b70
-	.short 0x0100
+addr_367a:
+rs232table:
+	.long rs232ibuf
+	.short 0x0100 /* Serial buffer size */
 	.short 0x0000
 	.short 0x0000
 	.short 0x0080
 	.short 0x00c0
+	.long rs232obuf
+	.short 0x0100 /* Serial buffer size */
 	.short 0x0000
 	.short 0x0000
-	.short 0x0100
+	.short 0x0080
+	.short 0x00c0
+	.byte 0,0,0,0,1,0
+	
 addr_369c:
-	.short 0x00fc
-	.short 0x3918
-	.short 0x00fc
-	.short 0x3890
-	.short 0x00fc
-	.short 0x38f6
-	.short 0x00fc
-	.short 0x37f2
+mpfvectr:
+	.long txerror
+	.long txrint
+	.long rxerror
+	.long rcvrint
+
 addr_36ac:
+settimer:
 	.short 0x48e7
 	.short 0xf8f0
 	.short 0x207c
@@ -2951,6 +2947,9 @@ addr_37e2:
 	rts
 	.short 0x5489
 	rts
+
+addr_37f2:
+rcvrint:
 	.short 0x48e7
 	.short 0xc0e0
 	.short 0x41f9
@@ -3034,6 +3033,8 @@ addr_37e2:
 	.short 0x0703
 	.short 0x4e73
 
+addr_3890:
+txrint:
 	.short 0x48e7
 	.short 0xc0e0
 	.short 0x45f9
@@ -3087,6 +3088,9 @@ addr_38aa:
 	.short 0x4cdf
 	.short 0x0703
 	.short 0x4e73
+
+addr_38f6:
+rxerror:
 	.short 0x48e7
 	.short 0x8080
 	.short 0x41f9
@@ -3105,6 +3109,9 @@ addr_38aa:
 	.short 0x4cdf
 	.short 0x0101
 	.short 0x4e73
+
+addr_3918:
+txerror:
 	.short 0x2f08
 	.short 0x41f9
 	.short 0xffff
@@ -3118,6 +3125,7 @@ addr_38aa:
 	.short 0x000e
 	.short 0x205f
 	rte
+
 addr_3932:
   lea rs232iorec,%a0
   moveb %a0@(32),%d0
