@@ -355,7 +355,7 @@ addr_384:
 addr_396:    
     movel %a0@+,%a1@+                           /* Copy */
     dbf %d0,addr_396                            /* Next vector */
-    bsrw addr_34fc
+    bsrw initmfp
     movel #ikbdres,%sp@-                        /* Push 2 params */
     movew #1,%sp@-                              
     jsr ikbdws

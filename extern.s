@@ -328,18 +328,45 @@ etv_term:
 .set ram_unknown135,0xc8d
 .global ram_unknown135
 
-.set ram_unknown132,0xc92
-.global ram_unknown132
+.set ikbdbuf,0xca0
+.global ikbdbuf
 
-.set ram_unknown133,0xda0
-.global ram_unknown133
+.set ikbdiorec,0xc92
+.global ikbdiorec
 
-.set ram_unknown30,0xe2e
-.global ram_unknown30
+.set mdm3iorec,0xda0
+.global mdm3iorec
+
+.set midibuf,0xdae
+.global midibuf
+
+.set midivec,0xe2e
+.global midivec
+
+.set vkbderr,0xe32
+.global vkbderr
+
+.set vmiderr,0xe36
+.global vmiderr
+
+.set statvec,0xe3a
+.global statvec
 
 /* A mouse vector */
 .set mouseint,0xe3e
 .global mouseint
+
+.set clockvec,0xe42
+.global clockvec
+
+.set joyvec,0xe46
+.global joyvec
+
+.set midisys,0xe4a
+.global midisys
+
+.set ikbdsys,0xe4e
+.global ikbdsys
 
 .set clockbuf,0xe63
 .global clockbuf
@@ -365,17 +392,27 @@ etv_term:
 .set keytab,0xe7e
 .global keytab
 
-.set ram_unknown31,0xe9e
-.global ram_unknown31
+.set kb_initial,0xe9e
+.global kb_initial
 
-.set ram_unknown136,0xea0
-.global ram_unknown136
+.set kb_repeat,0xe9f
+.global kb_repeat
 
-.set ram_unknown19,0xea6
-.global ram_unknown19
+.set lst_timeout,0xea0
+.global lst_timeout
 
-.set ram_unknown22,0xeaa
-.global ram_unknown22
+/* Timer C related */
+.set _tim_c_sieve,0xea4
+.global _tim_c_sieve
+
+.set _sndtable,0xea6
+.global _sndtable
+
+.set _snddelay,0xeaa
+.global _snddelay
+
+.set _sndtmp,0xeab
+.global _sndtmp
 
 .set ram_unknown24,0xeac
 .global ram_unknown24

@@ -2254,7 +2254,7 @@ addr_315a:
   rts
 
 addr_315e:
-clockvec:
+_clockvec:
   lea 0x0,%a5
   lea %a5@(clockbuf),%a0
   bsrw addr_3254
@@ -2396,7 +2396,7 @@ addr_329c:
 
 addr_32a6:
 .global addr_32a6
-  lea %a5@(ram_unknown133),%a0
+  lea %a5@(mdm3iorec),%a0
   lea %a5@(midi_acia_control),%a1
   moveq #-1,%d0
   lea %a0@(6),%a2
@@ -2434,7 +2434,7 @@ addr_32f6:
   btst #4,%a5@(ram_unknown24)
   bnew addr_3422
   movel %a5@(_hz_200),%d2
-  subl %a5@(ram_unknown136),%d2
+  subl %a5@(lst_timeout),%d2
   cmpil #1000,%d2
   bcss addr_3328
   movel %a5@(_hz_200),%d2
@@ -2448,7 +2448,7 @@ addr_3314:
   blts addr_3314
 addr_3328:
   moveq #0,%d0
-  movel %a5@(_hz_200),%a5@(ram_unknown136)
+  movel %a5@(_hz_200),%a5@(lst_timeout)
   rts
 addr_3332:
   movew %sr,%d3
@@ -2610,7 +2610,7 @@ addr_348a:
 
 addr_3494:
 .global addr_3494
-  lea %a5@(ram_unknown132),%a0
+  lea %a5@(ikbdiorec),%a0
   moveq #-1,%d0
   lea %a0@(6),%a2
   lea %a0@(8),%a3
@@ -2651,14 +2651,15 @@ addr_34e0:
 addr_34e4:
   btst #2,%a5@(conterm)
   beqs addr_34fa
-  movel #addr_2841c,%a5@(ram_unknown19)
-  moveb #0,%a5@(ram_unknown22)
+  movel #addr_2841c,%a5@(_sndtable)
+  moveb #0,%a5@(_snddelay)
 addr_34fa:
   rts
 
 /* TODO: variables */
 addr_34fc:
-.global addr_34fc
+initmfp:
+.global initmfp
   lea mfp_pp,%a0
   moveq #0,%d0
   .short 0x01c8,0x0000											/* movepl %d0,%a0@(0) */
@@ -2666,8 +2667,8 @@ addr_34fc:
   movepl %d0,%a0@(16)
   moveb #0x48,%a0@(22)
   bset #2,%a0@(2)
-  movew #0x1111,%a5@(3748)
-  movew #0x14,%a5@(1090)
+  movew #0x1111,%a5@(_tim_c_sieve)
+  movew #0x14,%a5@(_timr_ms)
   moveq #2,%d0
   moveq #80,%d1
   movew #0xc0,%d2
@@ -2684,38 +2685,38 @@ addr_34fc:
   movepl %d0,%a0@(38)
   bsrw addr_4058
   bsrw addr_39b6
-  lea %a5@(3184),%a0
+  lea %a5@(rs232iorec),%a0
   lea addr_367a,%a1
   moveq #33,%d0
   bsrw addr_3656
-  lea %a5@(3488),%a0
-  lea addr_366c,%a1
+  lea %a5@(mdm3iorec),%a0
+  lea miditable,%a1
   moveq #13,%d0
   bsrw addr_3656
   movel #addr_3b54,%d0
-  movel %d0,%a5@(3634)
-  movel %d0,%a5@(3638)
-  movel #addr_3f6a,%a5@(3630)
-  movel #addr_3b12,%a5@(3658)
-  movel #addr_3b20,%a5@(3662)
+  movel %d0,%a5@(vkbderr)
+  movel %d0,%a5@(vmiderr)
+  movel #addr_3f6a,%a5@(midivec)
+  movel #addr_3b12,%a5@(midisys)
+  movel #addr_3b20,%a5@(ikbdsys)
   moveb #0x3,midi_acia_control
   moveb #0x95,midi_acia_control
-  moveb #0x7,%a5@(1156)
-  movel #addr_315e,%a5@(3650)
+  moveb #0x7,%a5@(conterm)
+  movel #addr_315e,%a5@(clockvec)
   movel #addr_3654,%d0
-  movel %d0,%a5@(3642)
-  movel %d0,%a5@(3646)
-  movel %d0,%a5@(3654)
+  movel %d0,%a5@(statvec)
+  movel %d0,%a5@(mouseint)
+  movel %d0,%a5@(joyvec)
   moveq #0,%d0
-  movel %d0,%a5@(3750)
-  moveb %d0,%a5@(3754)
-  moveb %d0,%a5@(3755)
-  movel %d0,%a5@(3744)
+  movel %d0,%a5@(_sndtable)
+  moveb %d0,%a5@(_snddelay)
+  moveb %d0,%a5@(_sndtmp)
+  movel %d0,%a5@(lst_timeout)
   bsrw addr_3366
-  moveb #0xf,%a5@(3742)
-  moveb #0x2,%a5@(3743)
-  lea %a5@(3218),%a0
-  lea addr_365e,%a1
+  moveb #0xf,%a5@(kb_initial)
+  moveb #0x2,%a5@(kb_repeat)
+  lea %a5@(ikbdiorec),%a0
+  lea ikbdtable,%a1
   moveq #13,%d0
   bsrb addr_3656
   bsrw addr_41d8
@@ -2740,22 +2741,20 @@ addr_3626:
 addr_3654:	
   rts
 addr_3656:
-	.short 0x10d9
-	.short 0x51c8
-	.short 0xfffc
-	rts
+	moveb %a1@+,%a0@+
+  dbf %d0,addr_3656
+  rts
 
-addr_365e:
-	.short 0x0000
-	.short 0x0ca0
-	.short 0x0100
+ikbdtable:
+	.long ikbdbuf
+	.short 0x0100 /* Serial buffer size */
 	.short 0x0000
 	.short 0x0000
 	.short 0x0040
 	.short 0x00c0
-addr_366c:
-	.short 0x0000
-	.short 0x0dae
+
+miditable:
+	.long midibuf
 	.short 0x0080
 	.short 0x0000
 	.short 0x0000
@@ -4187,11 +4186,11 @@ bioskeys:
 addr_41f2:
 dosound:
 .global dosound
-  movel %a5@(ram_unknown19),%d0
+  movel %a5@(_sndtable),%d0
   movel %sp@(4),%d1
   bmis addr_4204
-  movel %d1,%a5@(ram_unknown19)
-  clrb %a5@(ram_unknown22)
+  movel %d1,%a5@(_sndtable)
+  clrb %a5@(_snddelay)
 addr_4204:
 	rts
 
@@ -4208,22 +4207,22 @@ addr_4216:
 addr_4218:
 kbrate:
 .global kbrate
-  movew %a5@(ram_unknown31),%d0
+  movew %a5@(kb_initial),%d0
   tstw %sp@(4)
   bmis addr_4238
   movew %sp@(4),%d1
-  moveb %d1,%a5@(ram_unknown31)
+  moveb %d1,%a5@(kb_initial)
   tstw %sp@(6)
   bmis addr_4238
   movew %sp@(6),%d1
-  moveb %d1,%a5@(ram_unknown31 + 1)
+  moveb %d1,%a5@(kb_initial + 1)
 addr_4238:
 	rts
 
 addr_423a:
 kbdvbase:
 .global kbdvbase
-  movel #ram_unknown30,%d0
+  movel #midivec,%d0
 	rts
 
 addr_4242:	
